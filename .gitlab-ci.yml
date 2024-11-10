@@ -1,11 +1,17 @@
-image: node:latest
+# image: node:latest
 
-stages:
-  - lint
-  - test
+# stages:
+#   - lint
+#   - test
 
-eslint:
-  stage: lint
+# eslint:
+#   stage: lint
+#   script:
+#     - npm install
+#     - npx eslint --fix .
+create_file:
+  image: alpine
   script:
-    - npm install
-    - npx eslint --fix .
+   - echo "Building ..."
+   - mkdir build
+   - touch build/somefile.txt
