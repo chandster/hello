@@ -187,26 +187,38 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           $('#indexing-indicator').addClass('enabled');
         }
       });
+
+
+    function loadContent(page) {
+      fetch(page)
+        .then(response => response.text())
+        .then(html => {
+          $('#content').html(html);
+        })
+        .catch(error => console.error('Error loading content:', error));
+    }
+
     $('#todo-list-button').on('click', () => {
-      chrome.tabs.create({ url: 'todo_list.html' });
+      loadContent('todo_list.html');
     });
 
     $('#manage-settings').on('click', () => {
-      chrome.tabs.create({ url: 'settings.html' });
+      loadContent('settings.html');
     });
 
     $('#notebook').on('click', () => {
-      chrome.tabs.create({ url: 'add_note.html' });
+      loadContent('add_note.html');
     });
 
     $('#indexing').on('click', () => {
-      chrome.tabs.create({ url: 'settings.html#indexing_' });
+      loadContent('settings.html#indexing_');
     });
 
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
     });
+    
     chrome.alarms.onAlarm.addListener((alarm) => {
       chrome.storage.local.get('tasks').then((result) => {
         const existingTasks = result || {};

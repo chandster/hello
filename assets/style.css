@@ -70,6 +70,7 @@ body, html {
 	background-color: white;
 	margin: 0;
 	max-width: 100%;
+	height: 100%;
 	padding: 0!important;
 	overflow-x: hidden;
   background-color: #dddddda3;
@@ -86,7 +87,9 @@ body::-webkit-scrollbar {
 }
 
 .popup {
-	width: 400px;
+	width: 100%;
+	min-height: 599px;
+	height: 100%;
   background-image: var(--comic-bg);
 }
 
@@ -168,6 +171,7 @@ ul {
 	background: none;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 	user-select: none;
 }
 .popup-control-group , .card-title-lg , .card-title-md , .search-bar , .search-bar-sm, .list-group-item {
@@ -180,8 +184,9 @@ ul {
 	padding-top: 0.4em
 }
 .popup-control {
-  width: 176px;
+width: 45%;
   align-items: center;
+  display: flex;
   justify-content: center;
 }
 .popup-control-group, .card-title-lg, .card-title-md, .panel-lg, .search-bar , .search-bar-sm , .list-group-item {
@@ -301,6 +306,11 @@ input::placeholder {
 .src-col {
 	padding-left: 0;
 }
+
+.col-auto {
+	display: flex; /* Ensure the child columns align correctly */
+	align-items: center; /* Vertical alignment */
+  }
 
 .search-bar-lg:focus {
 	outline: none;
