@@ -1,26 +1,26 @@
-import { BM25F } from './assets/wink-bm25-text-search.js';
-import MiniSearch from './assets/minisearch.min.js';
+import { BM25F } from "../assets/js/wink-bm25-text-search.js";
+import MiniSearch from "../assets/js/minisearch.min.js";
 
-const xmlEscape = require('xml-escape');
-const { Mutex } = require('async-mutex');
+const xmlEscape = require("xml-escape");
+const { Mutex } = require("async-mutex");
 
 const indexMutex = new Mutex();
 
 let engine;
-const winkNLP = require('wink-nlp');
-const model = require('wink-eng-lite-web-model');
+const winkNLP = require("wink-nlp");
+const model = require("wink-eng-lite-web-model");
 
 const nlp = winkNLP(model);
 const { its } = nlp;
-const _ = require('lodash');
+const _ = require("lodash");
 
-const { removeStopwords } = require('stopword');
+const { removeStopwords } = require("stopword");
 
 const defaultRegexList = [
-  '^https://[^/]+\.amazon\.com/.*$',
-  '^https://atoz\.amazon\.work/.*$',
-  '^https://quip-amazon\.com/.*$',
-  '^https://quip\.com/.*$',
+  "^https://[^/]+.amazon.com/.*$",
+  "^https://atoz.amazon.work/.*$",
+  "^https://quip-amazon.com/.*$",
+  "^https://quip.com/.*$",
 ];
 
 const TITLE_BOOST = 3;
@@ -30,10 +30,15 @@ const BM25F_MIN_DOCS = 3;
 
 const prepTask = function prepTask(text) {
   const tokens = [];
-  nlp.readDoc(text)
+  nlp
+    .readDoc(text)
     .tokens()
-    .filter((t) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
-    .each((t) => tokens.push((t.out(its.negationFlag)) ? `!${t.out(its.stem)}` : t.out(its.stem)));
+    .filter((t) => t.out(its.type) === "word" && !t.out(its.stopWordFlag))
+    .each((t) =>
+      tokens.push(
+        t.out(its.negationFlag) ? `!${t.out(its.stem)}` : t.out(its.stem)
+      )
+    );
   return tokens;
 };
 
@@ -43,7 +48,7 @@ let runningEngine;
 async function setupBM25F() {
   engine = new BM25F();
 
-  await chrome.storage.local.get(['indexed']).then((result) => {
+  await chrome.storage.local.get(["indexed"]).then((result) => {
     if (result && result.indexed) {
       docs = result.indexed.corpus;
     }
@@ -65,19 +70,21 @@ async function setupBM25F() {
 setupBM25F();
 
 const miniSearch = new MiniSearch({
-  fields: ['title', 'body'],
-  storeFields: ['url'],
+  fields: ["title", "body"],
+  storeFields: ["url"],
 });
 
-chrome.storage.local.get(['indexed']).then((result) => {
-  miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
+chrome.storage.local.get(["indexed"]).then((result) => {
+  miniSearch.addAll(
+    result.indexed && result.indexed.corpus ? result.indexed.corpus : []
+  );
 });
 
 const MAX_TAB_REFRESH_ATTEMPTS = 20;
 const TAB_REFRESH_DELAY_MS = 50;
 
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-  chrome.storage.local.get(['indexed']).then((result) => {
+  chrome.storage.local.get(["indexed"]).then((result) => {
     if (Object.keys(result).length > 0) {
       const { corpus } = result.indexed;
       if (corpus.length) {
@@ -85,14 +92,14 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         let searchResults = [];
 
         let combinator;
-        let searchTerms = text.split(' ');
+        let searchTerms = text.split(" ");
         const lastTerm = searchTerms[searchTerms.length - 1];
         switch (lastTerm) {
-          case '&':
-            combinator = 'AND';
+          case "&":
+            combinator = "AND";
             break;
-          case '~':
-            combinator = 'AND_NOT';
+          case "~":
+            combinator = "AND_NOT";
             break;
           default:
             combinator = null;
@@ -101,7 +108,7 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
 
         if (combinator && searchTerms.length) {
           searchTerms = searchTerms.slice(0, searchTerms.length - 1);
-          text = searchTerms.join(' ');
+          text = searchTerms.join(" ");
         }
 
         if (corpus.length >= MIN_SEARCH_TERM_LENGTH && !combinator) {
@@ -122,14 +129,16 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
             searchResults = miniSearch.search(text, {
               boost: { title: TITLE_BOOST },
               prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
+              fuzzy: (term) =>
+                term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null,
               combineWith: combinator,
             });
           } else {
             searchResults = miniSearch.search(text, {
               boost: { title: TITLE_BOOST },
               prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-              fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
+              fuzzy: (term) =>
+                term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null,
             });
           }
           for (let docID = 0; docID < 10; docID += 1) {
@@ -162,13 +171,17 @@ chrome.omnibox.onInputEntered.addListener((text) => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  chrome.storage.local.get('tasks').then((result) => {
+  chrome.storage.local.get("tasks").then((result) => {
     const existingTasks = result || {};
     const foundTask = existingTasks.tasks[alarm.name];
-    if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
+    if (
+      Object.keys(existingTasks).length !== 0 &&
+      foundTask &&
+      !foundTask.recentlyDeleted
+    ) {
       const notification = {
-        type: 'basic',
-        iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
+        type: "basic",
+        iconUrl: chrome.runtime.getURL("../images/logo128x128.png"),
         title: `Your task ${foundTask.title} is due`,
         message: foundTask.description,
       };
@@ -179,21 +192,20 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
-    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
+    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove)
   );
   if (Object.keys(updatedTasks).length === 0) {
     allTasks = {};
   } else {
     allTasks = updatedTasks;
   }
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-  });
+  chrome.storage.local.set({ tasks: allTasks }, () => {});
 }
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   const alarmName = alarm.name;
-  if (alarmName.endsWith('_deletion_alarm')) {
-    const taskId = alarmName.split('_')[0];
+  if (alarmName.endsWith("_deletion_alarm")) {
+    const taskId = alarmName.split("_")[0];
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = result.tasks || {};
       deleteTask(existingTasks, taskId);
@@ -202,7 +214,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 function removeAnchorLink(url) {
-  return url.split('#')[0];
+  return url.split("#")[0];
 }
 
 async function getLocalStorage(key) {
@@ -228,19 +240,22 @@ async function waitForTitleUpdate(title, lastTitles) {
         resolve(allTabs);
       });
     });
-    if (!(tabs && tabs.length)) return '';
+    if (!(tabs && tabs.length)) return "";
 
     title = tabs[0].title;
     if (!lastTitles.has(title)) break;
 
-    if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return '';
+    if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return "";
   }
 
   return title;
 }
 
 chrome.runtime.onMessage.addListener(async (request) => {
-  if (request.action === 'sendVisibleTextContent' || request.action === 'pageNavigated') {
+  if (
+    request.action === "sendVisibleTextContent" ||
+    request.action === "pageNavigated"
+  ) {
     const releaseIndexing = await indexMutex.acquire();
     try {
       const url = removeAnchorLink(request.url);
@@ -263,14 +278,14 @@ chrome.runtime.onMessage.addListener(async (request) => {
       if (!title) return;
 
       const allLastTitles = await new Promise((resolve) => {
-        chrome.storage.local.get(['allLastTitles'], (result) => {
+        chrome.storage.local.get(["allLastTitles"], (result) => {
           resolve(result.allLastTitles);
         });
       });
       let lastTitles = allLastTitles[tabId];
       lastTitles = new Set(lastTitles);
 
-      const indexedResult = await getLocalStorage('indexed');
+      const indexedResult = await getLocalStorage("indexed");
       const indexed = indexedResult.indexed || {};
       if (Object.keys(indexed).length === 0) {
         indexed.corpus = [];
@@ -284,7 +299,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
       if (lastTitles.has(title) || request.clicked) {
         lastTitles.add(title);
         title = await waitForTitleUpdate(title, lastTitles);
-        if (title === '') return;
+        if (title === "") return;
       }
       lastTitles.add(title);
       lastTitles = Array.from(lastTitles);
@@ -301,12 +316,13 @@ chrome.runtime.onMessage.addListener(async (request) => {
       const decodedURL = decodeURIComponent(page.url);
       if (`https://www.${page.title}` === decodedURL) {
         return;
-      } if (`https://${page.title}` === decodedURL) {
+      }
+      if (`https://${page.title}` === decodedURL) {
         return;
       }
 
       const oldBody = page.body.split(/\n|\s/);
-      const newBody = removeStopwords(oldBody).join(' ');
+      const newBody = removeStopwords(oldBody).join(" ");
       page.body = newBody;
       indexed.corpus.push(page);
       indexed.links.add(url);
@@ -326,30 +342,27 @@ chrome.runtime.onMessage.addListener(async (request) => {
     } finally {
       releaseIndexing();
     }
-  } else if (request.action === 'updateIndexing') {
+  } else if (request.action === "updateIndexing") {
     miniSearch.removeAll();
-    chrome.storage.local.get(['indexed']).then((result) => {
-      miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
+    chrome.storage.local.get(["indexed"]).then((result) => {
+      miniSearch.addAll(
+        result.indexed && result.indexed.corpus ? result.indexed.corpus : []
+      );
     });
     setupBM25F();
   }
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    chrome.storage.local.set({ allowedSites: [] }, () => {
-    });
+  if (details.reason === "install") {
+    chrome.storage.local.set({ allowedSites: [] }, () => {});
 
-    chrome.storage.local.set({ allowedURLs: [] }, () => {
-    });
+    chrome.storage.local.set({ allowedURLs: [] }, () => {});
 
-    chrome.storage.local.set({ allowedStringMatches: [] }, () => {
-    });
+    chrome.storage.local.set({ allowedStringMatches: [] }, () => {});
 
-    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {
-    });
+    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {});
 
-    chrome.storage.local.set({ allLastTitles: {} }, () => {
-    });
+    chrome.storage.local.set({ allLastTitles: {} }, () => {});
   }
 });

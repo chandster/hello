@@ -1,64 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <script src="assets/jquery-3.7.1.min.js"></script>
-      <meta charset="UTF-8">
-      <meta http-equiv="X-UA-Compatible" content="IE=edge">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>My To-Do List</title>
-      <link rel="stylesheet" href="assets/bootstrap.min.css">
-      <link rel="stylesheet" href="assets/style.css">
+    <script src="../../assets/js/jquery-3.7.1.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My To-Do List</title>
+    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
   </head>
 
   <body class="popup hidden">
-      <script src="appearance.js"></script>
-      <div class="container mt-3">
-          <div class="col card-title-md d-flex align-items-center" id="todo-list-button">
-              <div class="card-title-clear text-nowrap"><strong>To-Do List</strong></div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C45500" class="bi bi-chevron-right popup-chevron" viewBox="0 0 16 16">
-                  <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"></path>
-              </svg>
-          </div>
-          <ul class="list-group d-flex w-100 zero-margin round-override list-group-flush" id="checklist">
-          </ul>
-          <div class="row popup-control-group">
-            <div class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control" id="notebook">
-                <div class="col-auto zero-margin">
-                    <div class="card-title-clear text-nowrap">Notebook</div>
-                </div>
-                <div class="col-auto zero-margin fixed-h-34">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500" class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"></path>
-                    </svg>
-                </div>
-            </div>
-            <div class="col-auto"></div>
-            <div class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control" id="indexing">
-                <div class="col-auto px-1">
-                    <div class="circle-ind" id="indexing-indicator"></div>
-                </div>
-                <div class="col-auto zero-margin">
-                    <div class="card-title-clear text-nowrap">Indexing</div>
-                </div>
-                <div class="col-auto zero-margin fixed-h-34">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500" class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"></path>
-                  </svg>
-                </div>
-            </div>
-          </div>
-          <div class="col card-title-md d-flex align-items-center justify-content-center mt-2 mb-3" id="manage-settings">
-              <div class="col-auto cosmetic-offset-1">
-                  <div class="card-title-clear text-nowrap">Manage Settings</div>
-              </div>
-              <div class="col-auto zero-margin fixed-h-32">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500" class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                      <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"></path>
-                  </svg>
-              </div>
-          </div>
+    <script src="appearance.js"></script>
+    <div class="container mt-3">
+      <div
+        class="col card-title-md d-flex align-items-center"
+        id="todo-list-button"
+      >
+        <div class="card-title-clear text-nowrap">
+          <strong>To-Do List</strong>
+        </div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="#C45500"
+          class="bi bi-chevron-right popup-chevron"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
+          ></path>
+        </svg>
       </div>
-      <script src="popup.js"></script>
-      <script src="assets/bootstrap.min.js"></script>
+      <ul
+        class="list-group d-flex w-100 zero-margin round-override list-group-flush"
+        id="checklist"
+      ></ul>
+      <div class="row popup-control-group">
+        <div
+          class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control"
+          id="notebook"
+        >
+          <div class="col-auto zero-margin">
+            <div class="card-title-clear text-nowrap">Notebook</div>
+          </div>
+          <div class="col-auto zero-margin fixed-h-34">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="#C45500"
+              class="bi bi-chevron-right popup-chevron-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
+              ></path>
+            </svg>
+          </div>
+        </div>
+        <div class="col-auto"></div>
+        <div
+          class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control"
+          id="indexing"
+        >
+          <div class="col-auto px-1">
+            <div class="circle-ind" id="indexing-indicator"></div>
+          </div>
+          <div class="col-auto zero-margin">
+            <div class="card-title-clear text-nowrap">Indexing</div>
+          </div>
+          <div class="col-auto zero-margin fixed-h-34">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              fill="#C45500"
+              class="bi bi-chevron-right popup-chevron-2"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
+              ></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div
+        class="col card-title-md d-flex align-items-center justify-content-center mt-2 mb-3"
+        id="manage-settings"
+      >
+        <div class="col-auto cosmetic-offset-1">
+          <div class="card-title-clear text-nowrap">Manage Settings</div>
+        </div>
+        <div class="col-auto zero-margin fixed-h-32">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            fill="#C45500"
+            class="bi bi-chevron-right popup-chevron-2"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <script src="../popup/popup.js"></script>
+    <script src="../../assets/js/bootstrap.min.js"></script>
   </body>
 </html>
