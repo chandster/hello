@@ -12,6 +12,10 @@ let curIndexEntries = null;
 const maxStringLength = 64;
 const taskList = $('#selective-task-list');
 
+function normalizeURL(url) {
+  return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
 function loadCustomBackground() {
   chrome.storage.local.get('bg', (result) => {
     if (!$('body').hasClass('popup') && !$('body').hasClass('settings-body')) {
@@ -481,33 +485,38 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       event.preventDefault();
       const ruleLoc = $('#addRuleModal').attr('rule-loc');
       const rule = $('#addRuleInput').val();
+      const normalizedRule = normalizeURL(rule);
 
       chrome.storage.local.get({ [ruleLoc]: [] }, (result) => {
         const existingRules = result[ruleLoc] || [];
 
-        if (existingRules.includes(rule)) {
-          $('#ruleErrorModal').modal('show');
-        } else {
-          existingRules.push(rule);
-          chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
-            switch (ruleLoc) {
-              case 'allowedSites':
-                retrieveSitesList();
-                break;
-              case 'allowedURLs':
-                retrieveUrlsList();
-                break;
-              case 'allowedRegex':
-                retrieveRegexList();
-                break;
-              case 'allowedStringMatches':
-                retrieveStringMatchesList();
-                break;
-              default:
-                break;
-            }
-          });
+        for (const existingRule of existingRules) {
+          const normalizedExistingRule = normalizeURL(existingRule);
+          if (normalizedRule === normalizedExistingRule || normalizedExistingRule.startsWith(normalizedRule) || normalizedRule.startsWith(normalizedExistingRule)) {
+            $('#ruleErrorModal').modal('show');
+            return;
+          }
         }
+
+        existingRules.push(rule);
+        chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+          switch (ruleLoc) {
+            case 'allowedSites':
+              retrieveSitesList();
+              break;
+            case 'allowedURLs':
+              retrieveUrlsList();
+              break;
+            case 'allowedRegex':
+              retrieveRegexList();
+              break;
+            case 'allowedStringMatches':
+              retrieveStringMatchesList();
+              break;
+            default:
+              break;
+          }
+        });
       });
     });
 
@@ -569,7 +578,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         updateWallpaperPreview();
       });
     });
-
     $('.sys-dark-toggle').on('click', () => {
       chrome.storage.local.get('useprefer', (result) => {
         if (result.useprefer === true) {
