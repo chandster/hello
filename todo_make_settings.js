@@ -507,31 +507,27 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           ) {
             $('#ruleErrorModal').modal('show');
             return;
-          }/* eslint-disable no-restricted-syntax */
+          }
         }
-    
-        // If no conflict, add the rule to the respective section
-        chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
-          const existingRules = res[ruleLoc] || [];
-          existingRules.push(rule);
-          chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
-            switch (ruleLoc) {
-              case 'allowedSites':
-                retrieveSitesList();
-                break;
-              case 'allowedURLs':
-                retrieveUrlsList();
-                break;
-              case 'allowedRegex':
-                retrieveRegexList();
-                break;
-              case 'allowedStringMatches':
-                retrieveStringMatchesList();
-                break;
-              default:
-                break;
-            }
-          });
+
+        existingRules.push(rule);
+        chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+          switch (ruleLoc) {
+            case 'allowedSites':
+              retrieveSitesList();
+              break;
+            case 'allowedURLs':
+              retrieveUrlsList();
+              break;
+            case 'allowedRegex':
+              retrieveRegexList();
+              break;
+            case 'allowedStringMatches':
+              retrieveStringMatchesList();
+              break;
+            default:
+              break;
+          }
         });
       });
     });
