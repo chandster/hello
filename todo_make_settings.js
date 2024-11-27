@@ -497,7 +497,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         ];
     
         // Check if the rule already exists in any of the sections
-        /* eslint-disable no-restricted-syntax */
         for (const existingRule of allRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
           if (
@@ -509,28 +508,34 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             return;
           }
         }
-
-        allRules.push(rule);
-        chrome.storage.local.set({ [ruleLoc]: allRules }, () => {
-          switch (ruleLoc) {
-            case 'allowedSites':
-              retrieveSitesList();
-              break;
-            case 'allowedURLs':
-              retrieveUrlsList();
-              break;
-            case 'allowedRegex':
-              retrieveRegexList();
-              break;
-            case 'allowedStringMatches':
-              retrieveStringMatchesList();
-              break;
-            default:
-              break;
-          }
+    
+        // If no conflict, add the rule only to the specific section
+        chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
+          const existingRules = res[ruleLoc] || [];
+          existingRules.push(rule);
+          chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+            // Update the UI accordingly for the specific section
+            switch (ruleLoc) {
+              case 'allowedSites':
+                retrieveSitesList();
+                break;
+              case 'allowedURLs':
+                retrieveUrlsList();
+                break;
+              case 'allowedRegex':
+                retrieveRegexList();
+                break;
+              case 'allowedStringMatches':
+                retrieveStringMatchesList();
+                break;
+              default:
+                break;
+            }
+          });
         });
       });
     });
+    
     
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
