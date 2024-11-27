@@ -486,39 +486,56 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const ruleLoc = $('#addRuleModal').attr('rule-loc');
       const rule = $('#addRuleInput').val();
       const normalizedRule = normalizeURL(rule);
-
-      chrome.storage.local.get({ [ruleLoc]: [] }, (result) => {
-        const existingRules = result[ruleLoc] || [];
-
-        for (const existingRule of existingRules) {
+    
+      // Retrieve all rules across different sections
+      chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedRegex', 'allowedStringMatches'], (result) => {
+        const allRules = [
+          ...result.allowedSites || [],
+          ...result.allowedURLs || [],
+          ...result.allowedRegex || [],
+          ...result.allowedStringMatches || [],
+        ];
+    
+        // Check if the rule already exists in any of the sections
+        /* eslint-disable no-restricted-syntax */
+        for (const existingRule of allRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
-          if (normalizedRule === normalizedExistingRule || normalizedExistingRule.startsWith(normalizedRule) || normalizedRule.startsWith(normalizedExistingRule)) {
+          if (
+            normalizedRule === normalizedExistingRule ||
+            normalizedExistingRule.startsWith(normalizedRule) ||
+            normalizedRule.startsWith(normalizedExistingRule)
+          ) {
             $('#ruleErrorModal').modal('show');
             return;
-          }
+          }/* eslint-disable no-restricted-syntax */
         }
-
-        existingRules.push(rule);
-        chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
-          switch (ruleLoc) {
-            case 'allowedSites':
-              retrieveSitesList();
-              break;
-            case 'allowedURLs':
-              retrieveUrlsList();
-              break;
-            case 'allowedRegex':
-              retrieveRegexList();
-              break;
-            case 'allowedStringMatches':
-              retrieveStringMatchesList();
-              break;
-            default:
-              break;
-          }
+    
+        // If no conflict, add the rule to the respective section
+        chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
+          const existingRules = res[ruleLoc] || [];
+          existingRules.push(rule);
+          chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+            switch (ruleLoc) {
+              case 'allowedSites':
+                retrieveSitesList();
+                break;
+              case 'allowedURLs':
+                retrieveUrlsList();
+                break;
+              case 'allowedRegex':
+                retrieveRegexList();
+                break;
+              case 'allowedStringMatches':
+                retrieveStringMatchesList();
+                break;
+              default:
+                break;
+            }
+          });
         });
       });
     });
+    
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
