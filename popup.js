@@ -230,3 +230,25 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     });
   });
 }
+
+$(document).ready(function () {
+  $('#show-date-picker').on('click', function (e) {
+      e.preventDefault(); // Prevent default link behavior
+      // Hide dropdown menu
+      $('#due-dropdown-menu').hide();
+
+      // Show the date picker
+      $('#date-picker-wrapper').show();
+  });
+
+  $('#date-picker').on('change', function () {
+      // Get selected date value
+      const selectedDate = $(this).val();
+
+      // Replace dropdown button text with the selected date
+      $('#due-dropdown-button').text(selectedDate);
+
+      // Hide date picker after selection
+      $('#date-picker-wrapper').hide();
+  });
+});

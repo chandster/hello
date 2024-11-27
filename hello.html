@@ -3,6 +3,8 @@
 
 <head>
     <script src="assets/jquery-3.7.1.min.js"></script>
+    <script src="popup.js"></script>
+    <script src="assets/bootstrap.bundle.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,70 +18,122 @@
         <div id="content">
             <!-- Content will be loaded here -->
             <script src="appearance.js"></script>
-            <div class="container mt-3">
-                <div class="col card-title-md d-flex align-items-center" id="todo-list-button">
-                    <div class="card-title-clear text-nowrap"><strong>To-Do List</strong></div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#C45500"
-                        class="bi bi-chevron-right popup-chevron" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708">
-                        </path>
-                    </svg>
-                </div>
-                <ul class="list-group d-flex w-100 zero-margin round-override list-group-flush" id="checklist">
-                </ul>
-                <div class="row popup-control-group">
-                    <div class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control"
-                        id="notebook">
-                        <div class="col-auto zero-margin">
-                            <div class="card-title-clear text-nowrap">Notebook</div>
-                        </div>
-                        <div class="col-auto zero-margin fixed-h-34">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500"
-                                class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708">
-                                </path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="col-auto card-title-md d-flex align-items-center justify-content-center mt-3 popup-control"
-                        id="indexing">
-                        <div class="col-auto px-1">
-                            <div class="circle-ind" id="indexing-indicator"></div>
-                        </div>
-                        <div class="col-auto zero-margin">
-                            <div class="card-title-clear text-nowrap">Indexing</div>
-                        </div>
-                        <div class="col-auto zero-margin fixed-h-34">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500"
-                                class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708">
-                                </path>
-                            </svg>
-                        </div>
+            <div id="sort-filter-cont" class="d-flex justify-content-center align-items-center"
+                style="padding-bottom: 20px;">
+                <div class="dropdown" style="padding-right: 10px;">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-by-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="images/arrow-down-up.svg" alt="Icon" style="height: 20px;">
+                        Sort by
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="sort-by-dropdown">
+                        <a class="dropdown-item" href="#">Due date</a>
+                        <a class="dropdown-item" href="#">Creation date</a>
+                        <a class="dropdown-item" href="#">Importances</a>
                     </div>
                 </div>
-                <div class="col card-title-md d-flex align-items-center justify-content-center mt-2 mb-3"
-                    id="manage-settings">
-                    <div class="col-auto cosmetic-offset-1">
-                        <div class="card-title-clear text-nowrap">Manage Settings</div>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="group-by-dropdown"
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img src="images/collection.svg" alt="Icon" style="height: 20px;">
+                        Group by
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="group-by-dropdown">
+                        <a class="dropdown-item" href="#"><img src="images/tag.svg" alt="Icon"
+                                style="height: 20px;">Categories</a>
                     </div>
-                    <div class="col-auto zero-margin fixed-h-32">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#C45500"
-                            class="bi bi-chevron-right popup-chevron-2" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708">
-                            </path>
-                        </svg>
-                    </div>
+                </div>
+                <img src="images/gear.svg"
+                    alt="Icon" style="height: 20px; float: right;">
+            </div>
+            <div id="add-new-note" style="padding-bottom: 10px;">
+                <input class="form-control" type="text" placeholder="Add a note/task"
+                    style="outline: none !important; border-radius: 10px 10px 0px 0px;">
+                <div class="btn-group" role="group" aria-label="Basic example" style="width: 100%;">
+                    <div id="dropdown-container" style="width: 25%;">
+                    <div class="dropdown" style="display: inline-block; width: 100%;">
+                        <!-- Dropdown button -->
+                        <button type="button" 
+                                class="btn btn-secondary" 
+                                id="sort-by-dropdown" 
+                                data-bs-toggle="dropdown" 
+                                aria-expanded="false" 
+                                style="border-radius: 0px 0px 0px 10px; width: 100%;">
+                          <img src="images/calendar-day.svg" alt="Icon" style="height: 20px;">
+                        </button>
+                      
+                        <!-- Dropdown menu -->
+                        <div class="dropdown-menu" aria-labelledby="sort-by-dropdown" id="due-dropdown-menu">
+                          <h6 class="dropdown-header">Due</h6>
+                          <a class="dropdown-item" href="#">Today</a>
+                          <a class="dropdown-item" href="#">Tomorrow</a>
+                          <a class="dropdown-item" href="#">Next week</a>
+                          <div class="dropdown-divider"></div>
+                          <a class="dropdown-item" href="#" id="pick-date-link">Pick a date</a>
+  </div>
+                        </div>
+                      </div>
+                    <button type="button" class="btn btn-secondary" style="width: 25%;"><img src="images/tag.svg"
+                            alt="Icon" style="height: 20px;"></button>
+                    <button type="button" class="btn btn-secondary" style=" width: 25%;"><img src="images/repeat.svg"
+                            alt="Icon" style="height: 20px;"></button>
+                    <button type="button" class="btn btn-secondary"
+                        style="border-radius: 0px 0px 10px 0px; width: 25%;">Add</button>
+                </div>
+
+            </div>
+            <div class="container">
+                <div id="display-notes" style="width: 100%; padding-bottom: 10px;" class="justify-content-center">
+                    <p class="h2" style="width: 100%; text-align: center;">Notes</p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 5%;"></th>
+                                <th scope="col" style="width: 75%;">Title</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="justify-content: center; align-items: center;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                            id="flexRadioDefault1" style="border-color: blue;">
+                                        <label class="form-check-label" for="flexRadioDefault1"></label>
+                                    </div>
+                                </td>
+                                <td>Office opens at 12-4, this means</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="display-tasks" style="width: 100%;  height: 200px;" class="justify-content-center">
+                    <p class="h2" style="width: 100%; text-align: center;">Tasks</p>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width: 5%;"></th>
+                                <th scope="col" style="width: 75%;">Title</th>
+                                <th scope="col" style="width: 20%;">Due date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="justify-content: center; align-items: center;">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
+                                            id="flexRadioDefault1" style="border-color: blue;">
+                                        <label class="form-check-label" for="flexRadioDefault1"></label>
+                                    </div>
+                                </td>
+                                <td>Submit code for review</td>
+                                <td>22/04/03</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <script src="popup.js"></script>
-    <script src="assets/bootstrap.min.js"></script>
 
 </body>
 
