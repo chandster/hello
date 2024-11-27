@@ -497,6 +497,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         ];
     
         // Check if the rule already exists in any of the sections
+        /* eslint-disable no-restricted-syntax */
         for (const existingRule of allRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
           if (
@@ -507,7 +508,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             $('#ruleErrorModal').modal('show');
             return;
           }
-        }
+        }/* eslint-disable no-restricted-syntax */
     
         // If no conflict, add the rule only to the specific section
         chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
