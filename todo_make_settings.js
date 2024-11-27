@@ -489,14 +489,14 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
       chrome.storage.local.get({ [ruleLoc]: [] }, (result) => {
         const existingRules = result[ruleLoc] || [];
-
+        /* eslint-disable no-restricted-syntax */
         for (const existingRule of existingRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
           if (normalizedRule === normalizedExistingRule || normalizedExistingRule.startsWith(normalizedRule) || normalizedRule.startsWith(normalizedExistingRule)) {
             $('#ruleErrorModal').modal('show');
             return;
           }
-        }
+        }/* eslint-disable no-restricted-syntax */
 
         existingRules.push(rule);
         chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
