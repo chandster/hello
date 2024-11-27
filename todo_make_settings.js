@@ -510,7 +510,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           }
         }
 
-        existingRules.push(rule);
+        allRules.push(rule);
         chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
           switch (ruleLoc) {
             case 'allowedSites':
