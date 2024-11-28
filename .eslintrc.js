@@ -30,5 +30,6 @@ module.exports = {
     'no-useless-escape': 'off', // regex escape sequences were flagged
     'no-param-reassign': 'off', // ok for params to be modified
     'no-await-in-loop': 'off', // required for critical sections
+    'max-len': ['warn', { 'code': 200 }],
   },
 };
