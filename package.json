@@ -6,7 +6,9 @@
   "scripts": {
     "test": "jest --config jest.config.js",
     "lint": "eslint . --fix",
-    "precommit": "npx eslint --fix"
+    "precommit": "npx eslint --fix",
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "keywords": [],
   "author": "",
