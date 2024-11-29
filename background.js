@@ -24,6 +24,7 @@ const defaultRegexList = [
 ];
 
 const TITLE_BOOST = 3;
+const FREQUENT_WORD_BOOST = 2;
 const MIN_SEARCH_TERM_LENGTH = 3;
 const DEFAULT_WEIGHT = 0.2;
 const BM25F_MIN_DOCS = 3;
@@ -64,8 +65,69 @@ async function setupBM25F() {
 
 setupBM25F();
 
+// currently used to check suitability of a word to be stored in frequentWords
+// potential to be used elsewhere
+function wordIsAcceptable(word) {
+  // can add and remove stopwords here as necessary
+  const stopWords = ['myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
+    'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+    'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'been', 'being',
+    'have', 'has', 'had', 'having', 'does', 'did', 'doing', 'the', 'and', 'but', 'because', 'until',
+    'while', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+    'from', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there',
+    'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'nor', 'not', 'only',
+    'own', 'same', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now', 'dont', 'says'];
+  const acceptableWordLength = 2;
+
+  // reject if in stopWords
+  // reject if less than the acceptable length
+  if (stopWords.includes(word) || word < acceptableWordLength) {
+    return false;
+  }
+  // reject if it is a number
+  // unless the number looks like it *might* be a year
+  // since user might want to search for a document from a particular year
+  // we need to consider other numbers that may be useful search terms
+  const isNumeric = (string) => Number.isFinite(+string);
+  if (isNumeric(word)) {
+    if (word.length === 4 && (word[0] === '1' || word[0] === '2')) {
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
+
+// function to return an array of the most frequently occurring words in a given string
+function getMostFrequentWords(pageBody) {
+  const numWords = 50; // array returned will contain AT MOST this many words
+  pageBody = pageBody.toLowerCase(); // convert the body into lower case
+
+  // ignore all punctuation in the page body before splitting into an array of words
+  const punctuationPattern = /[^\w\s]|_/g;
+  pageBody = pageBody.replace(punctuationPattern, '');
+  const bodyArr = pageBody.split(' ');
+
+  // define a map to store words and their frequencies in bodyArr
+  let wordCountMap = new Map();
+
+  // update occurrences of every word in the page body, except stopwords
+  bodyArr.forEach((word) => {
+    if (wordIsAcceptable(word)) {
+      wordCountMap.set(word, (wordCountMap.get(word) || 0) + 1);
+    }
+  });
+
+  // map entries are sorted in order of most frequently occurring words
+  wordCountMap = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]);
+
+  // get the top ten words with highest counts as an array of strings
+  const topWords = wordCountMap.slice(0, numWords).map(([word]) => word);
+  return topWords;
+}
+
 const miniSearch = new MiniSearch({
-  fields: ['title', 'body'],
+  fields: ['title', 'body', 'frequentWords'],
   storeFields: ['url'],
 });
 
@@ -120,14 +182,14 @@ chrome.omnibox.onInputChanged.addListener((text, suggest) => {
         if (!suggestions.length) {
           if (combinator) {
             searchResults = miniSearch.search(text, {
-              boost: { title: TITLE_BOOST },
+              boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
               prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
               fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
               combineWith: combinator,
             });
           } else {
             searchResults = miniSearch.search(text, {
-              boost: { title: TITLE_BOOST },
+              boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
               prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
               fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
             });
@@ -296,6 +358,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
         url,
         title: xmlEscape(title),
         body: request.visibleTextContent,
+        frequentWords: [],
       };
 
       const decodedURL = decodeURIComponent(page.url);
@@ -307,7 +370,11 @@ chrome.runtime.onMessage.addListener(async (request) => {
 
       const oldBody = page.body.split(/\n|\s/);
       const newBody = removeStopwords(oldBody).join(' ');
+
+      const mostFrequentWords = getMostFrequentWords(newBody);
+
       page.body = newBody;
+      page.frequentWords = mostFrequentWords; // use mostFrequentWords array in miniSearch
       indexed.corpus.push(page);
       indexed.links.add(url);
 
