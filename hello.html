@@ -18,6 +18,7 @@
         <div id="content">
             <!-- Content will be loaded here -->
             <script src="appearance.js"></script>
+            <script src="hellonotes.js"></script>
             <div id="sort-filter-cont" class="d-flex justify-content-center align-items-center"
                 style="padding-bottom: 20px;">
                 <div class="dropdown" style="padding-right: 10px;">
@@ -43,8 +44,7 @@
                                 style="height: 20px;">Categories</a>
                     </div>
                 </div>
-                <img src="images/gear.svg"
-                    alt="Icon" style="height: 20px; float: right;">
+                <img src="images/gear.svg" id ="manage-settings" alt="Icon" style="height: 20px;">
             </div>
             <div id="add-new-note" style="padding-bottom: 10px;">
                 <input class="form-control" type="text" placeholder="Add a note/task"
@@ -84,7 +84,7 @@
             </div>
             <div class="container">
                 <div id="display-notes" style="width: 100%; padding-bottom: 10px;" class="justify-content-center">
-                    <p class="h2" style="width: 100%; text-align: center;">Notes</p>
+                    <p class="h5" style="width: 100%; text-align: center;" id="notebook">Notes</p>
                     <table class="table">
                         <thead>
                             <tr>
@@ -92,22 +92,12 @@
                                 <th scope="col" style="width: 75%;">Title</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td style="justify-content: center; align-items: center;">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                            id="flexRadioDefault1" style="border-color: blue;">
-                                        <label class="form-check-label" for="flexRadioDefault1"></label>
-                                    </div>
-                                </td>
-                                <td>Office opens at 12-4, this means</td>
-                            </tr>
+                        <tbody id="notes-display">
                         </tbody>
                     </table>
                 </div>
                 <div id="display-tasks" style="width: 100%;  height: 200px;" class="justify-content-center">
-                    <p class="h2" style="width: 100%; text-align: center;">Tasks</p>
+                    <p class="h5" style="width: 100%; text-align: center;" id="todo-list-button">Tasks</p>
                     <table class="table">
                         <thead>
                             <tr>
