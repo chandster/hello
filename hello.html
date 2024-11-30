@@ -19,31 +19,7 @@
             <!-- Content will be loaded here -->
             <script src="appearance.js"></script>
             <script src="hellonotes.js"></script>
-            <div id="sort-filter-cont" class="d-flex justify-content-center align-items-center"
-                style="padding-bottom: 20px;">
-                <div class="dropdown" style="padding-right: 10px;">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-by-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="images/arrow-down-up.svg" alt="Icon" style="height: 20px;">
-                        Sort by
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                        <a class="dropdown-item" href="#">Due date</a>
-                        <a class="dropdown-item" href="#">Creation date</a>
-                        <a class="dropdown-item" href="#">Importances</a>
-                    </div>
-                </div>
-                <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="group-by-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="images/collection.svg" alt="Icon" style="height: 20px;">
-                        Group by
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="group-by-dropdown">
-                        <a class="dropdown-item" href="#"><img src="images/tag.svg" alt="Icon"
-                                style="height: 20px;">Categories</a>
-                    </div>
-                </div>
+            <div>
                 <img src="images/gear.svg" id ="manage-settings" alt="Icon" style="height: 20px;">
             </div>
             <div id="add-new-note" style="padding-bottom: 10px;">
@@ -83,22 +59,9 @@
 
             </div>
             <div class="container">
-                <div id="display-notes" style="width: 100%; padding-bottom: 10px;" class="justify-content-center">
-                    <p class="h5" style="width: 100%; text-align: center;" id="notebook">Notes</p>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 5%;"></th>
-                                <th scope="col" style="width: 75%;">Title</th>
-                            </tr>
-                        </thead>
-                        <tbody id="notes-display">
-                        </tbody>
-                    </table>
-                </div>
                 <div id="display-tasks" style="width: 100%;  height: 200px;" class="justify-content-center">
-                    <p class="h5" style="width: 100%; text-align: center;" id="todo-list-button">Tasks</p>
-                    <table class="table">
+                    <p class="h5" style="width: 100%; text-align: center; background-color: #6c757d; margin-bottom: 0px; color: white; padding: 5px; border-radius: 10px 10px 0px 0px;" id="todo-list-button">Tasks</p>
+                    <table class="table" style="margin-bottom: 0px;">
                         <thead>
                             <tr>
                                 <th scope="col" style="width: 5%;"></th>
@@ -106,20 +69,10 @@
                                 <th scope="col" style="width: 20%;">Due date</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td style="justify-content: center; align-items: center;">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                            id="flexRadioDefault1" style="border-color: blue;">
-                                        <label class="form-check-label" for="flexRadioDefault1"></label>
-                                    </div>
-                                </td>
-                                <td>Submit code for review</td>
-                                <td>22/04/03</td>
-                            </tr>
+                        <tbody id="tasks-display">
                         </tbody>
                     </table>
+                    <div style="width: 100%; text-align: center; background-color: #6c757d; margin-bottom: 0px; color: white; padding: 5px; border-radius: 0px 0px 10px 10px; height: 17px;"></div>
                 </div>
             </div>
         </div>
