@@ -978,9 +978,6 @@ svg {
 	width: 10rem;
 	height: 10rem;
 	opacity: 0.75;
-	position: absolute;
-	padding-bottom: 1.5rem;
-  
 }
 .warn-text, .warn-text-2, .warn-text-3, .warn-text-4 {
 	font-weight: bold;
@@ -999,7 +996,6 @@ svg {
 }
 
 .warn-text-4 {
-	margin-top: 9rem;
 }
 
 .zero-margin {
