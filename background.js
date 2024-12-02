@@ -69,7 +69,7 @@ setupBM25F();
 // potential to be used elsewhere
 function wordIsAcceptable(word) {
   // can add and remove stopwords here as necessary
-  const stopWords = ['myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
+  const stopWords = ['to', 'of', 'we', 'in','it', 'if', 'be', 'myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
     'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
     'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'been', 'being',
     'have', 'has', 'had', 'having', 'does', 'did', 'doing', 'the', 'and', 'but', 'because', 'until',
@@ -81,7 +81,7 @@ function wordIsAcceptable(word) {
 
   // reject if in stopWords
   // reject if less than the acceptable length
-  if (stopWords.includes(word) || word < acceptableWordLength) {
+  if (stopWords.includes(word) || word.length < acceptableWordLength) {
     return false;
   }
   // reject if it is a number
@@ -98,32 +98,35 @@ function wordIsAcceptable(word) {
   return true;
 }
 
-// function to return an array of the most frequently occurring words in a given string
-function getMostFrequentWords(pageBody) {
-  const numWords = 50; // array returned will contain AT MOST this many words
-  pageBody = pageBody.toLowerCase(); // convert the body into lower case
+function getPageBody(body) { 
+  let pageBody = body.toLowerCase(); // convert the body into lower case
 
   // ignore all punctuation in the page body before splitting into an array of words
   const punctuationPattern = /[^\w\s]|_/g;
   pageBody = pageBody.replace(punctuationPattern, '');
   const bodyArr = pageBody.split(' ');
-
   // define a map to store words and their frequencies in bodyArr
   let wordCountMap = new Map();
 
-  // update occurrences of every word in the page body, except stopwords
-  bodyArr.forEach((word) => {
+  // update occurrences of every word in the page body, except unacceptable words
+  bodyArr.forEach((wordInBody) => {
+    let word = wordInBody.trim();
     if (wordIsAcceptable(word)) {
       wordCountMap.set(word, (wordCountMap.get(word) || 0) + 1);
     }
   });
 
   // map entries are sorted in order of most frequently occurring words
-  wordCountMap = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]);
+  let bodyWordsArray = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]).map(([word]) => word);
+  return bodyWordsArray.join(' ');
+}
 
-  // get the top ten words with highest counts as an array of strings
-  const topWords = wordCountMap.slice(0, numWords).map(([word]) => word);
-  return topWords;
+// function to return a top slice of words from a string of words
+// array returned will contain AT MOST numStrings many words
+function getWordSlice(text, numStrings) {
+  const wordArray = text.split(' ');
+  const topSlice = wordArray.slice(0, numStrings);
+  return topSlice;
 }
 
 const miniSearch = new MiniSearch({
@@ -368,10 +371,13 @@ chrome.runtime.onMessage.addListener(async (request) => {
         return;
       }
 
-      const oldBody = page.body.split(/\n|\s/);
-      const newBody = removeStopwords(oldBody).join(' ');
+      let oldBody = page.body.split(/\n|\s/);
+      oldBody = removeStopwords(oldBody).join(' ');
 
-      const mostFrequentWords = getMostFrequentWords(newBody);
+      const newBody = getPageBody(oldBody);
+
+      const numTopWords = 10 // define the length of mostFrequentWords
+      const mostFrequentWords = getWordSlice(newBody, numTopWords);
 
       page.body = newBody;
       page.frequentWords = mostFrequentWords; // use mostFrequentWords array in miniSearch
