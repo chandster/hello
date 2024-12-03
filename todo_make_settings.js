@@ -486,7 +486,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const ruleLoc = $('#addRuleModal').attr('rule-loc');
       const rule = $('#addRuleInput').val();
       const normalizedRule = normalizeURL(rule);
-    
+
       // Retrieve all rules across different sections
       chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedRegex', 'allowedStringMatches'], (result) => {
         const allRules = [
@@ -495,21 +495,21 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           ...result.allowedRegex || [],
           ...result.allowedStringMatches || [],
         ];
-    
+
         // Check if the rule already exists in any of the sections
         /* eslint-disable no-restricted-syntax */
         for (const existingRule of allRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
           if (
-            normalizedRule === normalizedExistingRule ||
-            normalizedExistingRule.startsWith(normalizedRule) ||
-            normalizedRule.startsWith(normalizedExistingRule)
+            normalizedRule === normalizedExistingRule
+            || normalizedExistingRule.startsWith(normalizedRule)
+            || normalizedRule.startsWith(normalizedExistingRule)
           ) {
             $('#ruleErrorModal').modal('show');
             return;
           }
         }/* eslint-disable no-restricted-syntax */
-    
+
         // If no conflict, add the rule only to the specific section
         chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
           const existingRules = res[ruleLoc] || [];
@@ -536,8 +536,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       });
     });
-    
-    
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);

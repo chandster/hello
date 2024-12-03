@@ -69,7 +69,7 @@ setupBM25F();
 // potential to be used elsewhere
 function wordIsAcceptable(word) {
   // can add and remove stopwords here as necessary
-  const stopWords = ['to', 'of', 'we', 'in','it', 'if', 'be', 'myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
+  const stopWords = ['to', 'of', 'we', 'in', 'it', 'if', 'be', 'myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
     'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
     'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'been', 'being',
     'have', 'has', 'had', 'having', 'does', 'did', 'doing', 'the', 'and', 'but', 'because', 'until',
@@ -98,7 +98,7 @@ function wordIsAcceptable(word) {
   return true;
 }
 
-function getPageBody(body) { 
+function getPageBody(body) {
   let pageBody = body.toLowerCase(); // convert the body into lower case
 
   // ignore all punctuation in the page body before splitting into an array of words
@@ -106,18 +106,18 @@ function getPageBody(body) {
   pageBody = pageBody.replace(punctuationPattern, '');
   const bodyArr = pageBody.split(' ');
   // define a map to store words and their frequencies in bodyArr
-  let wordCountMap = new Map();
+  const wordCountMap = new Map();
 
   // update occurrences of every word in the page body, except unacceptable words
   bodyArr.forEach((wordInBody) => {
-    let word = wordInBody.trim();
+    const word = wordInBody.trim();
     if (wordIsAcceptable(word)) {
       wordCountMap.set(word, (wordCountMap.get(word) || 0) + 1);
     }
   });
 
   // map entries are sorted in order of most frequently occurring words
-  let bodyWordsArray = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]).map(([word]) => word);
+  const bodyWordsArray = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]).map(([word]) => word);
   return bodyWordsArray.join(' ');
 }
 
@@ -365,10 +365,9 @@ chrome.runtime.onMessage.addListener(async (request) => {
       };
 
       let decodedURL = decodeURIComponent(page.url);
-      if (decodedURL.includes("?")) {
-        decodedURL = decodedURL.split("?")[0]
+      if (decodedURL.includes('?')) {
+        [decodedURL, queryString] = decodedURL.split('?');
       }
-      console.log(decodedURL);
       if (`https://www.${page.title}` === decodedURL) {
         return;
       } if (`https://${page.title}` === decodedURL) {
@@ -380,7 +379,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
 
       const newBody = getPageBody(oldBody);
 
-      const numTopWords = 10 // define the length of mostFrequentWords
+      const numTopWords = 10; // define the length of mostFrequentWords
       const mostFrequentWords = getWordSlice(newBody, numTopWords);
 
       page.body = newBody;
