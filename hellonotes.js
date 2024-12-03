@@ -3,7 +3,7 @@ $(document).ready(() => {
     function populateStorage() {
         const testNotes = [
             { id: "1", title: "First Note", content: "This is the first note.", date: "22/04/2003" },
-            { id: "2", title: "Second Note", content: "This is the second note.", date: "17/09/2003" },
+            { id: "2", title: "Second Note", content: "This is the second note.", date: "18/10/2024" },
             { id: "3", title: "Third Note", content: "This is the third note.", date: "08/12/2003" }
         ];
     
