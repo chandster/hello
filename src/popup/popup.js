@@ -1,8 +1,8 @@
-let currentURL = '';
+let currentURL = "";
 
 function checkSitesList() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedSites'], (result) => {
+    chrome.storage.local.get(["allowedSites"], (result) => {
       const storedSiteList = result.allowedSites;
       const sitesList = storedSiteList || [];
       const currentHostname = new URL(currentURL).hostname;
@@ -13,7 +13,7 @@ function checkSitesList() {
 
 function checkUrlsList() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedURLs'], (result) => {
+    chrome.storage.local.get(["allowedURLs"], (result) => {
       const storedUrlsList = result.allowedURLs;
       const urlsList = storedUrlsList || [];
       resolve(urlsList.includes(currentURL));
@@ -23,7 +23,7 @@ function checkUrlsList() {
 
 function checkStringMatchesList() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedStringMatches'], (result) => {
+    chrome.storage.local.get(["allowedStringMatches"], (result) => {
       const storedMatchesList = result.allowedStringMatches;
       const matchesList = storedMatchesList || [];
       resolve(matchesList.some((match) => currentURL.indexOf(match) > -1));
@@ -33,11 +33,13 @@ function checkStringMatchesList() {
 
 function checkRegexList() {
   return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedRegex'], (result) => {
+    chrome.storage.local.get(["allowedRegex"], (result) => {
       const storedRegexList = result.allowedRegex;
       const regexList = storedRegexList || [];
 
-      const isMatch = regexList.some((regex) => new RegExp(regex).test(currentURL));
+      const isMatch = regexList.some((regex) =>
+        new RegExp(regex).test(currentURL)
+      );
       resolve(isMatch);
     });
   });
@@ -66,7 +68,10 @@ function setTaskDeleted(allTasks, taskId) {
 }
 
 function sortTasks(tasks) {
-  const tasksArray = Object.entries(tasks).map(([id, task]) => ({ id, ...task }));
+  const tasksArray = Object.entries(tasks).map(([id, task]) => ({
+    id,
+    ...task,
+  }));
   tasksArray.sort((taskA, taskB) => new Date(taskA.due) - new Date(taskB.due));
   const sortedIds = tasksArray.map((task) => task.id);
   const sortedTasks = [];
@@ -90,11 +95,12 @@ const emptyTemplate = `
 `;
 
 function updateChecklist(existingTasks) {
-  $('#checklist').empty();
+  $("#checklist").empty();
   if (Object.keys(existingTasks).length === 0 || allDeleted(existingTasks)) {
-    $('#checklist').append(emptyTemplate);
+    $("#checklist").append(emptyTemplate);
   } else {
-    Object.keys(existingTasks).filter((taskId) => !existingTasks[taskId].recentlyDeleted)
+    Object.keys(existingTasks)
+      .filter((taskId) => !existingTasks[taskId].recentlyDeleted)
       .slice(0, 3)
       .forEach((taskId) => {
         const task = existingTasks[taskId];
@@ -102,10 +108,10 @@ function updateChecklist(existingTasks) {
           const dueDate = new Date(task.due);
           const now = new Date();
           const passed = dueDate < now;
-          const parts = dueDate.toLocaleString().split(',');
+          const parts = dueDate.toLocaleString().split(",");
           const formattedDueDate = `Due ${parts[0]}, at${parts[1]}`;
-          const label = `form-check-label${passed ? ' text-danger' : ''}`;
-          $('#checklist').append(`
+          const label = `form-check-label${passed ? " text-danger" : ""}`;
+          $("#checklist").append(`
             <li class="list-group-item mt-3 justify-content-between align-items-center">
               <div class="form-check d-flex popup-form-check align-items-center pb-1">
                 <input type="checkbox" class="form-check-input" id="item${task.id}">
@@ -120,53 +126,58 @@ function updateChecklist(existingTasks) {
           `);
         }
         setTimeout(() => {
-          $('.list-group-item').addClass('appear');
+          $(".list-group-item").addClass("appear");
         }, 200);
       });
-    $('.form-check-input').on('click', function _() {
-      const taskId = $(this).attr('id').slice(4);
-      const item = $(this).closest('.list-group-item');
-      let step = item.data('step') || 0;
-      clearInterval(item.data('interval'));
-      if ($(this).is(':checked')) {
+    $(".form-check-input").on("click", function _() {
+      const taskId = $(this).attr("id").slice(4);
+      const item = $(this).closest(".list-group-item");
+      let step = item.data("step") || 0;
+      clearInterval(item.data("interval"));
+      if ($(this).is(":checked")) {
         const interval = setInterval(() => {
           if (step <= 1000) {
             item.css({
-              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${
+                (step / 1000) * 100
+              }%, var(--ui-pane-color) 0%)`,
             });
             step += 1;
-            item.data('step', step);
+            item.data("step", step);
           } else {
             clearInterval(interval);
             chrome.storage.local.get({ tasks: {} }, (result) => {
               setTaskDeleted(result.tasks, taskId);
               item.remove();
-              if ($('#checklist').children().length === 0) {
-                $('#checklist').append(emptyTemplate);
+              if ($("#checklist").children().length === 0) {
+                $("#checklist").append(emptyTemplate);
               }
             });
           }
         }, 5);
-        item.data('interval', interval);
+        item.data("interval", interval);
       } else {
         const interval = setInterval(() => {
           if (step > 0) {
             item.css({
-              background: `linear-gradient(to right, var(--del-progress-color) ${(step / 1000) * 100}%, var(--ui-pane-color) 0%)`,
+              background: `linear-gradient(to right, var(--del-progress-color) ${
+                (step / 1000) * 100
+              }%, var(--ui-pane-color) 0%)`,
             });
             step -= 20;
             if (step < 0) {
               step = 0;
             }
-            item.data('step', step);
+            item.data("step", step);
           } else {
             item.css({
-              background: 'linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)',
+              background:
+                "linear-gradient(to right, var(--del-progress-color) 0%, var(--ui-pane-color) 0%)",
             });
             clearInterval(interval);
           }
         }, 5);
-        item.data('interval', interval);
+        item.data("interval", interval);
       }
     });
   }
@@ -178,29 +189,33 @@ async function getCurrentTab() {
   currentURL = tab.url;
 }
 
-if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
+if (window.location.href.startsWith(chrome.runtime.getURL(""))) {
   $(() => {
     getCurrentTab();
-    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
-      .then((results) => {
-        if (results.some((result) => result)) {
-          $('#indexing-indicator').addClass('enabled');
-        }
-      });
-    $('#todo-list-button').on('click', () => {
-      chrome.tabs.create({ url: 'todo_list.html' });
+    Promise.all([
+      checkSitesList(),
+      checkUrlsList(),
+      checkStringMatchesList(),
+      checkRegexList(),
+    ]).then((results) => {
+      if (results.some((result) => result)) {
+        $("#indexing-indicator").addClass("enabled");
+      }
+    });
+    $("#todo-list-button").on("click", () => {
+      chrome.tabs.create({ url: "src/components/todo_list.html" });
     });
 
-    $('#manage-settings').on('click', () => {
-      chrome.tabs.create({ url: 'settings.html' });
+    $("#manage-settings").on("click", () => {
+      chrome.tabs.create({ url: "src/components/settings.html" });
     });
 
-    $('#notebook').on('click', () => {
-      chrome.tabs.create({ url: 'add_note.html' });
+    $("#notebook").on("click", () => {
+      chrome.tabs.create({ url: "src/components/add_note.html" });
     });
 
-    $('#indexing').on('click', () => {
-      chrome.tabs.create({ url: 'settings.html#indexing_' });
+    $("#indexing").on("click", () => {
+      chrome.tabs.create({ url: "src/components/settings.html#indexing_" });
     });
 
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -208,11 +223,15 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       updateChecklist(existingTasks);
     });
     chrome.alarms.onAlarm.addListener((alarm) => {
-      chrome.storage.local.get('tasks').then((result) => {
+      chrome.storage.local.get("tasks").then((result) => {
         const existingTasks = result || {};
         const foundTask = existingTasks.tasks[alarm.name];
-        if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
-          $(`label[associatedTask=${foundTask.id}]`).addClass('text-danger');
+        if (
+          Object.keys(existingTasks).length !== 0 &&
+          foundTask &&
+          !foundTask.recentlyDeleted
+        ) {
+          $(`label[associatedTask=${foundTask.id}]`).addClass("text-danger");
         }
       });
     });

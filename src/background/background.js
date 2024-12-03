@@ -1,5 +1,5 @@
-import { BM25F } from "../assets/js/wink-bm25-text-search.js";
-import MiniSearch from "../assets/js/minisearch.min.js";
+import { BM25F } from "../../assets/js/wink-bm25-text-search.js";
+import MiniSearch from "../../assets/js/minisearch.min.js";
 
 const xmlEscape = require("xml-escape");
 const { Mutex } = require("async-mutex");
