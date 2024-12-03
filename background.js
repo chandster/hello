@@ -107,6 +107,7 @@ function getPageBody(body) {
   const bodyArr = pageBody.split(' ');
   // define a map to store words and their frequencies in bodyArr
   const wordCountMap = new Map();
+  const wordCountMap = new Map();
 
   // update occurrences of every word in the page body, except unacceptable words
   bodyArr.forEach((wordInBody) => {
