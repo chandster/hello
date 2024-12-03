@@ -56,7 +56,8 @@ function loadAppearance(usepreference) {
 const noneMsg = `
   <div class="row justify-content-center">
       <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="warn-2 mt-0 bi bi-exclamation-triangle-fill" viewBox="0 0 16 16">
-          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+          <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767zM8 5c.535 
+          0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5m.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
       </svg>
   </div>
   <div class="row justify-contents-center text-center">
@@ -486,7 +487,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const ruleLoc = $('#addRuleModal').attr('rule-loc');
       const rule = $('#addRuleInput').val();
       const normalizedRule = normalizeURL(rule);
-    
+
       // Retrieve all rules across different sections
       chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedRegex', 'allowedStringMatches'], (result) => {
         const allRules = [
@@ -495,21 +496,21 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
           ...result.allowedRegex || [],
           ...result.allowedStringMatches || [],
         ];
-    
+
         // Check if the rule already exists in any of the sections
         /* eslint-disable no-restricted-syntax */
         for (const existingRule of allRules) {
           const normalizedExistingRule = normalizeURL(existingRule);
           if (
-            normalizedRule === normalizedExistingRule ||
-            normalizedExistingRule.startsWith(normalizedRule) ||
-            normalizedRule.startsWith(normalizedExistingRule)
+            normalizedRule === normalizedExistingRule
+            || normalizedExistingRule.startsWith(normalizedRule)
+            || normalizedRule.startsWith(normalizedExistingRule)
           ) {
             $('#ruleErrorModal').modal('show');
             return;
           }
         }/* eslint-disable no-restricted-syntax */
-    
+
         // If no conflict, add the rule only to the specific section
         chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
           const existingRules = res[ruleLoc] || [];
@@ -536,8 +537,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       });
     });
-    
-    
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
