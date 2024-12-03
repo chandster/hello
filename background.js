@@ -364,7 +364,11 @@ chrome.runtime.onMessage.addListener(async (request) => {
         frequentWords: [],
       };
 
-      const decodedURL = decodeURIComponent(page.url);
+      let decodedURL = decodeURIComponent(page.url);
+      if (decodedURL.includes("?")) {
+        decodedURL = decodedURL.split("?")[0]
+      }
+      console.log(decodedURL);
       if (`https://www.${page.title}` === decodedURL) {
         return;
       } if (`https://${page.title}` === decodedURL) {
