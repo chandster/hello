@@ -12,6 +12,10 @@ let curIndexEntries = null;
 const maxStringLength = 64;
 const taskList = $('#selective-task-list');
 
+function normalizeURL(url) {
+  return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+
 function loadCustomBackground() {
   chrome.storage.local.get('bg', (result) => {
     if (!$('body').hasClass('popup') && !$('body').hasClass('settings-body')) {
@@ -481,15 +485,37 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       event.preventDefault();
       const ruleLoc = $('#addRuleModal').attr('rule-loc');
       const rule = $('#addRuleInput').val();
+      const normalizedRule = normalizeURL(rule);
 
-      chrome.storage.local.get({ [ruleLoc]: [] }, (result) => {
-        const existingRules = result[ruleLoc] || [];
+      // Retrieve all rules across different sections
+      chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedRegex', 'allowedStringMatches'], (result) => {
+        const allRules = [
+          ...result.allowedSites || [],
+          ...result.allowedURLs || [],
+          ...result.allowedRegex || [],
+          ...result.allowedStringMatches || [],
+        ];
 
-        if (existingRules.includes(rule)) {
-          $('#ruleErrorModal').modal('show');
-        } else {
+        // Check if the rule already exists in any of the sections
+        /* eslint-disable no-restricted-syntax */
+        for (const existingRule of allRules) {
+          const normalizedExistingRule = normalizeURL(existingRule);
+          if (
+            normalizedRule === normalizedExistingRule
+            || normalizedExistingRule.startsWith(normalizedRule)
+            || normalizedRule.startsWith(normalizedExistingRule)
+          ) {
+            $('#ruleErrorModal').modal('show');
+            return;
+          }
+        }/* eslint-disable no-restricted-syntax */
+
+        // If no conflict, add the rule only to the specific section
+        chrome.storage.local.get({ [ruleLoc]: [] }, (res) => {
+          const existingRules = res[ruleLoc] || [];
           existingRules.push(rule);
           chrome.storage.local.set({ [ruleLoc]: existingRules }, () => {
+            // Update the UI accordingly for the specific section
             switch (ruleLoc) {
               case 'allowedSites':
                 retrieveSitesList();
@@ -507,7 +533,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
                 break;
             }
           });
-        }
+        });
       });
     });
 
@@ -569,7 +595,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         updateWallpaperPreview();
       });
     });
-
     $('.sys-dark-toggle').on('click', () => {
       chrome.storage.local.get('useprefer', (result) => {
         if (result.useprefer === true) {
