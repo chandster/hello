@@ -191,11 +191,34 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     function loadContent(page) {
       fetch(page)
-        .then(response => response.text())
-        .then(html => {
-          $('#content').html(html);
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          return response.text();
         })
-        .catch(error => console.error('Error loading content:', error));
+        .then(html => {
+          // Load the HTML content
+          const $content = $('#content');
+          $content.html(html);
+    
+          // Find and execute all <script> tags in the loaded content
+          $content.find('script').each(function () {
+            const scriptElement = $(this);
+            const scriptSrc = scriptElement.attr('src');
+    
+            if (scriptSrc) {
+              // If the script has a src attribute, load and execute it
+              const script = document.createElement('script');
+              script.src = scriptSrc;
+              script.async = false; // Ensure scripts are executed in order
+              document.head.appendChild(script);
+            } else {
+              // If the script is inline, execute its content
+              const inlineCode = scriptElement.html();
+              eval(inlineCode);
+            }
+          });
+        })
+        .catch(error => console.error('Error loading content:', error.message, error.stack));
     }
 
     $('#todo-list-button').on('click', () => {
