@@ -214,7 +214,11 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
             } else {
               // If the script is inline, execute its content
               const inlineCode = scriptElement.html();
-              eval(inlineCode);
+              try {
+                new Function(inlineCode)();
+              } catch (error) {
+                console.error('Error executing inline script while loading content: ', error);
+              }
             }
           });
         })
