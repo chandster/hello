@@ -188,41 +188,36 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         }
       });
 
-
     function loadContent(page) {
       fetch(page)
-        .then(response => {
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
           return response.text();
         })
-        .then(html => {
-          // Load the HTML content
+        .then((html) => {
           const $content = $('#content');
           $content.html(html);
-    
-          // Find and execute all <script> tags in the loaded content
+
           $content.find('script').each(function () {
             const scriptElement = $(this);
             const scriptSrc = scriptElement.attr('src');
-    
+
             if (scriptSrc) {
-              // If the script has a src attribute, load and execute it
               const script = document.createElement('script');
               script.src = scriptSrc;
               script.async = false; // Ensure scripts are executed in order
               document.head.appendChild(script);
             } else {
-              // If the script is inline, execute its content
               const inlineCode = scriptElement.html();
-              try {
-                new Function(inlineCode)();
-              } catch (error) {
-                console.error('Error executing inline script while loading content: ', error);
-              }
+              const script = document.createElement('script');
+              script.textContent = inlineCode;
+              document.head.appendChild(script);
             }
           });
         })
-        .catch(error => console.error('Error loading content:', error.message, error.stack));
+        .catch((error) => {
+          console.error('Error loading content:', error.message, error.stack);
+        });
     }
 
     $('#todo-list-button').on('click', () => {
@@ -245,7 +240,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
     });
-    
+
     chrome.alarms.onAlarm.addListener((alarm) => {
       chrome.storage.local.get('tasks').then((result) => {
         const existingTasks = result || {};
@@ -258,24 +253,24 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   });
 }
 
-$(document).ready(function () {
-  $('#show-date-picker').on('click', function (e) {
-      e.preventDefault(); // Prevent default link behavior
-      // Hide dropdown menu
-      $('#due-dropdown-menu').hide();
+$(document).ready(() => {
+  $('#show-date-picker').on('click', (e) => {
+    e.preventDefault(); // Prevent default link behavior
+    // Hide dropdown menu
+    $('#due-dropdown-menu').hide();
 
-      // Show the date picker
-      $('#date-picker-wrapper').show();
+    // Show the date picker
+    $('#date-picker-wrapper').show();
   });
 
   $('#date-picker').on('change', function () {
-      // Get selected date value
-      const selectedDate = $(this).val();
+    // Get selected date value
+    const selectedDate = $(this).val();
 
-      // Replace dropdown button text with the selected date
-      $('#due-dropdown-button').text(selectedDate);
+    // Replace dropdown button text with the selected date
+    $('#due-dropdown-button').text(selectedDate);
 
-      // Hide date picker after selection
-      $('#date-picker-wrapper').hide();
+    // Hide date picker after selection
+    $('#date-picker-wrapper').hide();
   });
 });
