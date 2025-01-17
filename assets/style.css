@@ -1101,6 +1101,8 @@ svg {
 
 .settings-wallpaper-preview-img {
   border-radius: 12px;
+  width: 100%;
+  height: 100%;
 }
 
 @keyframes due-shake {
