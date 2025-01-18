@@ -21,35 +21,27 @@
             <script src="hellonotes.js"></script>
             <div id="sort-filter-cont" class="d-flex justify-content-center align-items-center"
                 style="padding-bottom: 20px;">
-                <!-- <div class="dropdown" style="padding-right: 10px;">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="sort-by-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="images/arrow-down-up.svg" alt="Icon" style="height: 20px;">
-                        Sort by
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                        <a class="dropdown-item" href="#">Due date</a>
-                        <a class="dropdown-item" href="#">Creation date</a>
-                        <a class="dropdown-item" href="#">Importances</a>
-                    </div>
-                </div> -->
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="group-by-dropdown"
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img src="images/collection.svg" alt="Icon" style="height: 20px;">
-                        Group by
+                      data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <img src="images/collection.svg" alt="Icon" style="height: 20px;">
+                      Group by
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="group-by-dropdown">
-                        <a class="dropdown-item" href="#"><img src="images/tag.svg" alt="Icon"
-                                style="height: 20px;">Categories</a>
+                    <div class="dropdown-menu p-3" aria-labelledby="group-by-dropdown" id="tagsDropdownMenu">
+                      <h6 class="dropdown-header">Select Tags</h6>
+                      <!-- Dynamically populated checkboxes will go here -->
                     </div>
-                </div>
+                  </div>
             </div>
             <div id="add-new-note" style="padding-bottom: 10px;">
-                <input class="form-control" type="text" placeholder="Add a note/task"
-                    style="outline: none !important; border-radius: 10px 10px 0px 0px;">
+                <textarea class="form-control" id="noteinput" type="text" placeholder="Add a note/task"
+                    style="outline: none !important; border-radius: 10px 10px 0px 0px;"></textarea>
+                    <div id="noteDetails" style="width: 100%; display: inline-block; background-color: white; padding: 10px; font-size: x-small; color: #6c757d;">
+                        <div id="noteDate" style="display: inline-block;">Due Date: </div>
+                        <div id="noteTags" style="display: inline-block;">Tags: </div>
+                      </div>
                 <div class="btn-group" role="group" aria-label="Basic example" style="width: 100%;">
-                    <div id="dropdown-container" style="width: 25%;">
+                    <div id="dropdown-container" style="width: 20%;">
                     <div class="dropdown" style="display: inline-block; width: 100%;">
                         <!-- Dropdown button -->
                         <button type="button" 
@@ -63,27 +55,60 @@
                       
                         <!-- Dropdown menu -->
                         <div class="dropdown-menu" aria-labelledby="sort-by-dropdown" id="due-dropdown-menu">
-                          <h6 class="dropdown-header">Due</h6>
-                          <a class="dropdown-item" href="#">Today</a>
-                          <a class="dropdown-item" href="#">Tomorrow</a>
-                          <a class="dropdown-item" href="#">Next week</a>
-                          <div class="dropdown-divider"></div>
-                          <a class="dropdown-item" href="#" id="pick-date-link">Pick a date</a>
-  </div>
+                            <h6 class="dropdown-header">Due</h6>
+                            <a class="dropdown-item" id="due-today">Today</a>
+                            <a class="dropdown-item" id="due-tomorrow">Tomorrow</a>
+                            <a class="dropdown-item" id="due-next-week">Next week</a>
+                            <div class="dropdown-divider"></div>
+                            <label class="form-label">Pick a date</label>
+                            <input type="date" id="custom-date" name="due-date"/>
+                          </div>
                         </div>
                       </div>
-                    <button type="button" class="btn btn-secondary" style="width: 25%;"><img src="images/tag.svg"
-                            alt="Icon" style="height: 20px;"></button>
-                    <button type="button" class="btn btn-secondary" style=" width: 25%;"><img src="images/repeat.svg"
-                            alt="Icon" style="height: 20px;"></button>
-                    <button type="button" class="btn btn-secondary"
-                        style="border-radius: 0px 0px 10px 0px; width: 25%;">Add</button>
-                </div>
+                      <div class="dropdown">
+                        <button
+                          type="button"
+                          class="btn btn-secondary dropdown-toggle"
+                          style="border-radius: 0px 0px 0px 0px;"
+                          id="categoryDropdownButton"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false">
+                          <img src="images/tag.svg" alt="Icon" style="height: 20px;">
+                        </button>
+                      
+                        <ul class="dropdown-menu p-3" aria-labelledby="categoryDropdownButton">
+                            <li><h6 class="dropdown-header">Select Categories</h6></li>
+                            <li id="categoryDropdownMenu">
+                            </li>
+                            <li><div class="dropdown-divider"></div></li>
+                            <li>
+                              <div class="form-group">
+                                <label for="newCategoryInput" class="form-label">Add New Category</label>
+                                <input type="text" id="newCategoryInput" class="form-control" placeholder="Category name">
+                                <button class="btn btn-primary mt-2 w-100" id="saveCategoryButton">Add</button>
+                              </div>
+                            </li>
+                          </ul>
+                      </div>
+                    
+                    <!-- Input field for adding new categories -->
+                    <div id="newCategoryInputContainer" style="display: none; margin-top: 10px;">
+                        <input type="text" id="newCategoryInput" class="form-control" placeholder="Enter new category name">
+                        <button class="btn btn-primary mt-2" id="saveCategoryButton">Save</button>
+                    </div>
+                    <button type="button" id="deleteNote" class="btn btn-secondary" style="border-radius: 0px 0px 0px 0px; width: 5%; display: none;">
+                          <img src="images/trash.svg" alt="Icon" style="height: 20px;">
+                        </button>
+                    <button type="button" class="btn btn-secondary" id="canceledit"
+                        style="border-radius: 0px 0px 0px 0px; width: 30%; display: none;">Cancel Edit</button>
+                    <button type="button" class="btn btn-secondary" id="addnote"
+                        style="border-radius: 0px 0px 10px 0px; width: 15%;">Add</button>
+                    </div>
 
             </div>
             <div class="container" style="padding-bottom: 10px;">
                 <div id="display-tasks" class="justify-content-center">
-                    <p class="h5" style="width: 100%; text-align: center; background-color: #6c757d; margin-bottom: 0px; color: white; padding: 5px; border-radius: 10px 10px 0px 0px;" id="todo-list-button">Tasks</p>
+                    <p class="h5" style="width: 100%; text-align: center; background-color: #6c757d; margin-bottom: 0px; color: white; padding: 5px; border-radius: 10px 10px 0px 0px;">Tasks</p>
                     <table class="table" style="margin-bottom: 0px;">
                         <thead>
                             <tr>
