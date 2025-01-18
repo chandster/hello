@@ -188,14 +188,36 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         }
       });
 
-
     function loadContent(page) {
       fetch(page)
-        .then(response => response.text())
-        .then(html => {
-          $('#content').html(html);
+        .then((response) => {
+          if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+          return response.text();
         })
-        .catch(error => console.error('Error loading content:', error));
+        .then((html) => {
+          const $content = $('#content');
+          $content.html(html);
+
+          $content.find('script').each(function () {
+            const scriptElement = $(this);
+            const scriptSrc = scriptElement.attr('src');
+
+            if (scriptSrc) {
+              const script = document.createElement('script');
+              script.src = scriptSrc;
+              script.async = false; // Ensure scripts are executed in order
+              document.head.appendChild(script);
+            } else {
+              const inlineCode = scriptElement.html();
+              const script = document.createElement('script');
+              script.textContent = inlineCode;
+              document.head.appendChild(script);
+            }
+          });
+        })
+        .catch((error) => {
+          console.error('Error loading content:', error.message, error.stack);
+        });
     }
 
     $('#todo-list-button').on('click', () => {
@@ -218,7 +240,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
     });
-    
+
     chrome.alarms.onAlarm.addListener((alarm) => {
       chrome.storage.local.get('tasks').then((result) => {
         const existingTasks = result || {};
@@ -231,24 +253,24 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   });
 }
 
-$(document).ready(function () {
-  $('#show-date-picker').on('click', function (e) {
-      e.preventDefault(); // Prevent default link behavior
-      // Hide dropdown menu
-      $('#due-dropdown-menu').hide();
+$(document).ready(() => {
+  $('#show-date-picker').on('click', (e) => {
+    e.preventDefault(); // Prevent default link behavior
+    // Hide dropdown menu
+    $('#due-dropdown-menu').hide();
 
-      // Show the date picker
-      $('#date-picker-wrapper').show();
+    // Show the date picker
+    $('#date-picker-wrapper').show();
   });
 
   $('#date-picker').on('change', function () {
-      // Get selected date value
-      const selectedDate = $(this).val();
+    // Get selected date value
+    const selectedDate = $(this).val();
 
-      // Replace dropdown button text with the selected date
-      $('#due-dropdown-button').text(selectedDate);
+    // Replace dropdown button text with the selected date
+    $('#due-dropdown-button').text(selectedDate);
 
-      // Hide date picker after selection
-      $('#date-picker-wrapper').hide();
+    // Hide date picker after selection
+    $('#date-picker-wrapper').hide();
   });
 });
