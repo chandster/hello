@@ -219,7 +219,7 @@ $(document).ready(() => {
         // Update the existing note
         chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
-          const targetNote = existingNotes.find(n => n.id == currentNote);
+          const targetNote = existingNotes.find(n => Number(n.id) === currentNote);
           const title = content.length > 10 ? content.substring(0, 15) + "..." : content; //title is max first 15 chars of text
           targetNote.title = title;
           targetNote.tags = getSelectedCheckboxes();
@@ -245,7 +245,7 @@ $(document).ready(() => {
         resetAddNoteForm();
         chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
-          const index = existingNotes.findIndex((note) => note.id == currentNote.id);
+          const index = existingNotes.findIndex((note) => Number(note.id) === currentNote.id);
           loadNotes();
           if (index !== -1) {
             existingNotes[index] = currentNote;
@@ -378,7 +378,7 @@ $(document).ready(() => {
     currentNote = $(this).data('index');
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find(n => n.id == currentNote);
+      const note = existingNotes.find(n => Number(n.id) === currentNote);
       if (note) {
         viewNote(note);
         addNoteButton.text('Save');
@@ -396,7 +396,7 @@ $(document).ready(() => {
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find(n => n.id == currentNote);
+      const note = existingNotes.find(n => Number(n.id) === currentNote);
       const now = new Date();
       const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
       //const alarmName = `${note.id}_deletion_alarm`;
