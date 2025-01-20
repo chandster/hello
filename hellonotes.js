@@ -12,6 +12,31 @@ $(document).ready(() => {
   let isEditMode = false;
   let selectedDueDate = null;
 
+  function getSelectedTagsForFiltering() {
+    const selectedTags = [];
+    $('#tagsDropdownMenu .form-check-input:checked').each(function () {
+      const categoryId = $(this).data('category-id');
+      if (categoryId !== undefined) {
+        selectedTags.push(categoryId);
+      }
+    });
+    return selectedTags;
+  }
+
+  function getSelectedCheckboxes() {
+    const dropdownMenu = document.getElementById("categoryDropdownMenu");
+    const selectedCheckboxes = dropdownMenu.querySelectorAll(".form-check-input:checked");
+    const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
+      const tagId = checkbox.getAttribute("data-category-id"); 
+      const tagName = checkbox.value;
+      acc[tagId] = {
+        name: tagName,
+      };
+      return acc;
+    }, {});
+    return tags;
+  }
+
   function attachCheckboxListeners() {
     $('#categoryDropdownMenu').on('change', '.form-check-input', function () {
       ;
@@ -43,19 +68,6 @@ $(document).ready(() => {
     });
   }
 
-  function getSelectedCheckboxes() {
-    const dropdownMenu = document.getElementById("categoryDropdownMenu");
-    const selectedCheckboxes = dropdownMenu.querySelectorAll(".form-check-input:checked");
-    const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
-      const tagId = checkbox.getAttribute("data-category-id"); 
-      const tagName = checkbox.value;
-      acc[tagId] = {
-        name: tagName,
-      };
-      return acc;
-    }, {});
-    return tags;
-  }
 
   function setDueDate(daysToAdd) {
     const dueDate = new Date();
@@ -136,16 +148,6 @@ $(document).ready(() => {
     setDueDate(7);
   }
 
-  function getSelectedTagsForFiltering() {
-    const selectedTags = [];
-    $('#tagsDropdownMenu .form-check-input:checked').each(function () {
-      const categoryId = $(this).data('category-id');
-      if (categoryId !== undefined) {
-        selectedTags.push(categoryId);
-      }
-    });
-    return selectedTags;
-  }
 
   function markSelectedCheckboxes(tags) {
     const selectedTags = tags;
@@ -172,6 +174,29 @@ $(document).ready(() => {
     autoResizeTextareas();
     markSelectedCheckboxes(note.tags);
   };
+
+  function loadTagsToDropdown() {
+    chrome.storage.local.get({ tags: {} }, (data) => {
+      const tags = data.tags || {};
+      const tagsMenu = $('#tagsDropdownMenu');
+      tagsMenu.empty();
+      const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
+      tagsMenu.append(headerItem);
+      Object.entries(tags).forEach(([tagId, tagData]) => {
+        const { tagName, tagColour } = tagData;
+        const categoryItem = `
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+      <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+        ${tagName}
+      </label>
+    </div>`;
+
+        // Append the new category to the dropdown menu
+        tagsMenu.append(categoryItem);
+      });
+    });
+  }
 
   function formatTagsForDisplay(tags) {
     if (!tags) {
@@ -278,28 +303,7 @@ $(document).ready(() => {
     }
   });
 
-  function loadTagsToDropdown() {
-    chrome.storage.local.get({ tags: {} }, (data) => {
-      const tags = data.tags || {};
-      const tagsMenu = $('#tagsDropdownMenu');
-      tagsMenu.empty();
-      const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
-      tagsMenu.append(headerItem);
-      Object.entries(tags).forEach(([tagId, tagData]) => {
-        const { tagName, tagColour } = tagData;
-        const categoryItem = `
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
-      <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
-        ${tagName}
-      </label>
-    </div>`;
 
-        // Append the new category to the dropdown menu
-        tagsMenu.append(categoryItem);
-      });
-    });
-  }
 
 
   $(document).on('click', '#createTagBtn', () => {
