@@ -2,29 +2,29 @@
 <html lang="en">
 
 <head>
-    <script src="assets/jquery-3.7.1.min.js"></script>
-    <script src="popup.js"></script>
-    <script src="assets/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/jquery-3.7.1.min.js"></script>
+    <script src="../popup/popup.js"></script>
+    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My To-Do List</title>
-    <link rel="stylesheet" href="assets/bootstrap.min.css">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="../../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 
 <body class="popup hidden">
     <div class="container mt-3" style="height: 100%;">
         <div id="content">
             <!-- Content will be loaded here -->
-            <script src="appearance.js"></script>
-            <script src="hellonotes.js"></script>
+            <script src="../utils/appearance.js"></script>
+            <script src="../../hellonotes.js"></script>
             <div id="sort-filter-cont" class="d-flex justify-content-center align-items-center"
                 style="padding-bottom: 20px;">
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="group-by-dropdown"
                       data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <img src="images/collection.svg" alt="Icon" style="height: 20px;">
+                      <img src="../../assets/images/collection.svg" alt="Icon" style="height: 20px;">
                       Group by
                     </button>
                     <div class="dropdown-menu p-3" aria-labelledby="group-by-dropdown" id="tagsDropdownMenu">
@@ -50,7 +50,7 @@
                                 data-bs-toggle="dropdown" 
                                 aria-expanded="false" 
                                 style="border-radius: 0px 0px 0px 10px; width: 100%;">
-                          <img src="images/calendar-day.svg" alt="Icon" style="height: 20px;">
+                          <img src="../../assets/images/calendar-day.svg" alt="Icon" style="height: 20px;">
                         </button>
                       
                         <!-- Dropdown menu -->
@@ -73,7 +73,7 @@
                           id="categoryDropdownButton"
                           data-bs-toggle="dropdown"
                           aria-expanded="false">
-                          <img src="images/tag.svg" alt="Icon" style="height: 20px;">
+                          <img src="../../assets/images/tag.svg" alt="Icon" style="height: 20px;">
                         </button>
                       
                         <ul class="dropdown-menu p-3" aria-labelledby="categoryDropdownButton">
@@ -97,7 +97,7 @@
                         <button class="btn btn-primary mt-2" id="saveCategoryButton">Save</button>
                     </div>
                     <button type="button" id="deleteNote" class="btn btn-secondary" style="border-radius: 0px 0px 0px 0px; width: 5%; display: none;">
-                          <img src="images/trash.svg" alt="Icon" style="height: 20px;">
+                          <img src="../../assets/images/trash.svg" alt="Icon" style="height: 20px;">
                         </button>
                     <button type="button" class="btn btn-secondary" id="canceledit"
                         style="border-radius: 0px 0px 0px 0px; width: 30%; display: none;">Cancel Edit</button>
@@ -124,7 +124,7 @@
                 </div>
             </div>
         </div>
-        <button type="button" class="btn btn-secondary" style="width: 100%;" id ="manage-settings"><img src="images/gear.svg"
+        <button type="button" class="btn btn-secondary" style="width: 100%;" id ="manage-settings"><img src="../../assets/images/gear.svg"
             alt="Icon" style="height: 20px;">Settings</button>
     </div>
 
