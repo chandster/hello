@@ -24,10 +24,10 @@ $(document).ready(() => {
   }
 
   function getSelectedCheckboxes() {
-    const dropdownMenu = document.getElementById("categoryDropdownMenu");
-    const selectedCheckboxes = dropdownMenu.querySelectorAll(".form-check-input:checked");
+    const dropdownMenu = document.getElementById('categoryDropdownMenu');
+    const selectedCheckboxes = dropdownMenu.querySelectorAll('.form-check-input:checked');
     const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
-      const tagId = checkbox.getAttribute("data-category-id"); 
+      const tagId = checkbox.getAttribute('data-category-id');
       const tagName = checkbox.value;
       acc[tagId] = {
         name: tagName,
@@ -37,9 +37,20 @@ $(document).ready(() => {
     return tags;
   }
 
+  function formatTagsForDisplay(tags) {
+    if (!tags) {
+      return '';
+    }
+    const tagNames = [];
+    Object.keys(tags).forEach((categoryId) => {
+      const tag = tags[categoryId];
+      tagNames.push(tag.name);
+    });
+    return tagNames.join(', ');
+  }
+
   function attachCheckboxListeners() {
-    $('#categoryDropdownMenu').on('change', '.form-check-input', function () {
-      ;
+    $('#categoryDropdownMenu').on('change', '.form-check-input', () => {
       const selectedTags = getSelectedCheckboxes();
       const formattedTags = formatTagsForDisplay(selectedTags);
       $('#noteTags').text(`Tags: ${formattedTags}`);
@@ -53,9 +64,9 @@ $(document).ready(() => {
       title,
       content,
       due: selectedDueDate,
-      scheduledDeletion: "",
+      scheduledDeletion: '',
       recentlyDeleted: false,
-      tags
+      tags,
     };
     currentNote = note;
     chrome.storage.local.get({ notes: [] }, (data) => {
@@ -68,41 +79,6 @@ $(document).ready(() => {
     });
   }
 
-
-  function setDueDate(daysToAdd) {
-    const dueDate = new Date();
-    dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
-    selectedDueDate = dueDate.toISOString()
-    const formattedDate = formatDateForDisplay(dueDate);
-    $('#noteDate').text(`Due Date: ${formattedDate}`);;
-  }
-
-  function autoResizeTextareas() {
-    document.querySelectorAll("textarea").forEach(function (textarea) {
-      textarea.style.overflowY = "hidden";
-      textarea.addEventListener("input", function () {
-        this.style.height = "auto";
-        this.style.height = this.scrollHeight + "px";
-      });
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    });
-  }
-
-
-  function resetAddNoteForm() {
-    noteForm.val('');
-    isEditMode = false;
-    addNoteButton.text('Add');
-    $('#noteTags').text(`Tags: `);
-    setDueDate(7);
-    selectedDueDate = null;
-    cancelEditButton.hide();
-    deleteNoteButton.hide();
-    autoResizeTextareas();
-    clearAllCheckboxes();
-  }
-
   function formatDateForDisplay(date) {
     const d = new Date(date);
     const day = String(d.getDate()).padStart(2, '0');
@@ -111,9 +87,46 @@ $(document).ready(() => {
     return `${day}/${month}/${year}`;
   }
 
+  function setDueDate(daysToAdd) {
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+    selectedDueDate = dueDate.toISOString();
+    const formattedDate = formatDateForDisplay(dueDate);
+    $('#noteDate').text(`Due Date: ${formattedDate}`);
+  }
+
+  function autoResizeTextareas() {
+    document.querySelectorAll('textarea').forEach((textarea) => {
+      textarea.style.overflowY = 'hidden';
+      textarea.addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = `${this.scrollHeight}px`;
+      });
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    });
+  }
+
+  function clearAllCheckboxes() {
+    $('#categoryDropdownMenu .form-check-input').prop('checked', false);
+  }
+
+  function resetAddNoteForm() {
+    noteForm.val('');
+    isEditMode = false;
+    addNoteButton.text('Add');
+    $('#noteTags').text('Tags: ');
+    setDueDate(7);
+    selectedDueDate = null;
+    cancelEditButton.hide();
+    deleteNoteButton.hide();
+    autoResizeTextareas();
+    clearAllCheckboxes();
+  }
+
   function loadNotes() {
     chrome.storage.local.get({ notes: [] }, (data) => {
-      const notes = data.notes;
+      const { notes } = data;
       const tableBody = $('#tasks-display');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
@@ -121,9 +134,7 @@ $(document).ready(() => {
         if (note.recentlyDeleted) {
           return;
         }
-        const noteHasSelectedTags = selectedTags.every(tagId => {
-          return note.tags && note.tags[tagId];
-        });
+        const noteHasSelectedTags = selectedTags.every((tagId) => note.tags && note.tags[tagId]);
 
         if (!noteHasSelectedTags) {
           return;
@@ -147,7 +158,6 @@ $(document).ready(() => {
     });
     setDueDate(7);
   }
-
 
   function markSelectedCheckboxes(tags) {
     const selectedTags = tags;
@@ -173,7 +183,7 @@ $(document).ready(() => {
     $('#noteTags').text(`Tags: ${formattedTag}`);
     autoResizeTextareas();
     markSelectedCheckboxes(note.tags);
-  };
+  }
 
   function loadTagsToDropdown() {
     chrome.storage.local.get({ tags: {} }, (data) => {
@@ -198,19 +208,6 @@ $(document).ready(() => {
     });
   }
 
-  function formatTagsForDisplay(tags) {
-    if (!tags) {
-      return '';
-    }
-    let tagNames = [];
-    Object.keys(tags).forEach(categoryId => {
-      const tag = tags[categoryId];
-      tagNames.push(tag.name);
-    });
-    return tagNames.join(', ');
-  }
-
-
   $('#addnote').on('click', () => {
     const textarea = document.querySelector('#add-new-note textarea');
     const content = textarea.value.trim();
@@ -219,8 +216,8 @@ $(document).ready(() => {
         // Update the existing note
         chrome.storage.local.get({ notes: [] }, (data) => {
           const existingNotes = data.notes;
-          const targetNote = existingNotes.find(n => Number(n.id) === currentNote);
-          const title = content.length > 10 ? content.substring(0, 15) + "..." : content; //title is max first 15 chars of text
+          const targetNote = existingNotes.find((n) => Number(n.id) === currentNote);
+          const title = content.length > 10 ? `${content.substring(0, 15)}...` : content; // title is max first 15 chars of text
           targetNote.title = title;
           targetNote.tags = getSelectedCheckboxes();
           targetNote.content = content;
@@ -233,10 +230,9 @@ $(document).ready(() => {
           });
           loadNotes();
         });
-
       } else {
-        //make a new note
-        const title = content.length > 10 ? content.substring(0, 15) + "..." : content; //title is max first 15 chars of text
+        // make a new note
+        const title = content.length > 10 ? `${content.substring(0, 15)}...` : content; // title is max first 15 chars of text
         if (!selectedDueDate) {
           setDueDate(7);
         }
@@ -257,30 +253,29 @@ $(document).ready(() => {
     }
   });
 
-  cancelEditButton.on('click', function () {
+  cancelEditButton.on('click', () => {
     resetAddNoteForm();
   });
 
-
-  addCategoryLink.on('click', function (e) {
+  addCategoryLink.on('click', (e) => {
     e.preventDefault();
     dropdownMenu.hide();
     newCategoryInputContainer.show();
   });
 
-  saveCategoryButton.on('click', function () {
+  saveCategoryButton.on('click', () => {
     const newCategoryName = newCategoryInput.val().trim();
-    const newCategoryColour = "";
+    const newCategoryColour = '';
     const newCategoryId = Date.now();
 
     if (newCategoryName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
         const existingTags = data.tags;
 
-        if (!Object.values(existingTags).some(tag => tag.tagName === newCategoryName)) {
+        if (!Object.values(existingTags).some((tag) => tag.tagName === newCategoryName)) {
           existingTags[newCategoryId] = {
             tagName: newCategoryName,
-            tagColour: newCategoryColour
+            tagColour: newCategoryColour,
           };
 
           chrome.storage.local.set({ tags: existingTags }, () => {
@@ -302,9 +297,6 @@ $(document).ready(() => {
       alert('Please enter a category name.');
     }
   });
-
-
-
 
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
@@ -330,7 +322,7 @@ $(document).ready(() => {
 
   function loadCats() {
     chrome.storage.local.get({ tags: {} }, (data) => {
-      const tags = data.tags;
+      const { tags } = data;
 
       // Add each tag to the dropdown menu
       Object.entries(tags).forEach(([tagId, tagData]) => {
@@ -348,37 +340,34 @@ $(document).ready(() => {
     attachCheckboxListeners();
   }
 
-
-  $('#due-today').on('click', function () {
+  $('#due-today').on('click', () => {
     setDueDate(0);
   });
 
-
-  $('#tagsDropdownMenu').on('change', '.form-check-input', function () {
+  $('#tagsDropdownMenu').on('change', '.form-check-input', () => {
     loadNotes();
   });
 
-  $('#due-tomorrow').on('click', function () {
+  $('#due-tomorrow').on('click', () => {
     setDueDate(1);
   });
 
-  $('#due-next-week').on('click', function () {
+  $('#due-next-week').on('click', () => {
     setDueDate(7);
   });
 
   $('#custom-date').on('change', function () {
     selectedDueDate = this.value;
     const formattedDate = formatDateForDisplay(selectedDueDate);
-    $('#noteDate').text(`Due Date: ${formattedDate}`);;
+    $('#noteDate').text(`Due Date: ${formattedDate}`);
   });
-
 
   $(document).on('click', '.view-note', function () {
     isEditMode = true;
     currentNote = $(this).data('index');
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find(n => Number(n.id) === currentNote);
+      const note = existingNotes.find((n) => Number(n.id) === currentNote);
       if (note) {
         viewNote(note);
         addNoteButton.text('Save');
@@ -388,18 +377,13 @@ $(document).ready(() => {
     });
   });
 
-
-  function clearAllCheckboxes() {
-    $('#categoryDropdownMenu .form-check-input').prop('checked', false);
-  }
-
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find(n => Number(n.id) === currentNote);
+      const note = existingNotes.find((n) => Number(n.id) === currentNote);
       const now = new Date();
       const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-      //const alarmName = `${note.id}_deletion_alarm`;
+      // const alarmName = `${note.id}_deletion_alarm`;
       note.recentlyDeleted = true;
       note.scheduledDeletion = deletionDate.toISOString();
       chrome.storage.local.set({ notes: existingNotes }, () => {
@@ -408,7 +392,7 @@ $(document).ready(() => {
     });
   }
 
-  deleteNoteButton.on('click', function () {
+  deleteNoteButton.on('click', () => {
     setNoteDeleted();
     resetAddNoteForm();
   });
