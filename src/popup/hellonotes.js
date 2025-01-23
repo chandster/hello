@@ -1,6 +1,6 @@
 $(document).ready(() => {
   let currentNote = null;
-  const dropdownMenu = $('#categoryDropdownMenu');
+  const categoryDropdownMenu = $('#categoryDropdownMenu');
   const addCategoryLink = $('#addCategoryLink');
   const newCategoryInputContainer = $('#newCategoryInputContainer');
   const newCategoryInput = $('#newCategoryInput');
@@ -259,7 +259,7 @@ $(document).ready(() => {
 
   addCategoryLink.on('click', (e) => {
     e.preventDefault();
-    dropdownMenu.hide();
+    categoryDropdownMenu.hide();
     newCategoryInputContainer.show();
   });
 
@@ -288,7 +288,7 @@ $(document).ready(() => {
               ${newCategoryName}
             </label>
           </div>`;
-          dropdownMenu.prepend(newCategoryItem);
+          categoryDropdownMenu.prepend(newCategoryItem);
         }
         loadTagsToDropdown();
       });
@@ -334,7 +334,7 @@ $(document).ready(() => {
               ${tagName}
             </label>
           </div>`;
-        dropdownMenu.prepend(tagItem);
+        categoryDropdownMenu.prepend(tagItem);
       });
     });
     attachCheckboxListeners();
