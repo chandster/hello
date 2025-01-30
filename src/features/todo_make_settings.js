@@ -775,5 +775,54 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
-  });
+   // === New code starts here ===
+    
+    // Pane navigation setup for settings
+    const paneMap = {
+      'appearance': 'appearance-pane',
+      'indexing': 'indexing-pane',
+      'backup': 'backup-pane',
+      'about': 'about-pane'
+    };
+    
+    // Function to handle sidebar navigation
+    function handleSidebarNavigation() {
+      const sidebarButtons = document.querySelectorAll('.settings-entry');
+      sidebarButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove 'selected' class from all buttons
+          sidebarButtons.forEach(btn => btn.classList.remove('selected'));
+    
+          // Add 'selected' class to clicked button
+          button.classList.add('selected');
+    
+          // Hide all panes
+          Object.values(paneMap).forEach(paneId => {
+            const pane = document.getElementById(paneId);
+            if (pane) {
+              pane.classList.add('d-none');
+            }
+          });
+    
+          // Show the correct pane
+          const paneToShow = paneMap[button.id];
+          if (paneToShow) {
+            const pane = document.getElementById(paneToShow);
+            if (pane) {
+              pane.classList.remove('d-none');
+            }
+          }
+        });
+      });
+    
+      // Display the default pane (e.g., "Appearance") when the page loads
+      const defaultPane = document.getElementById('appearance-pane');
+      if (defaultPane) {
+        defaultPane.classList.remove('d-none');
+      }
+    }
+    
+    handleSidebarNavigation();
+    
+    });
 }
