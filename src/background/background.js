@@ -1,5 +1,6 @@
 import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
 import MiniSearch from '../../assets/js/minisearch.min.js';
+import * as PrepDocument from './prep-document.js';
 
 const xmlEscape = require('xml-escape');
 const { Mutex } = require('async-mutex');
@@ -13,8 +14,6 @@ const model = require('wink-eng-lite-web-model');
 const nlp = winkNLP(model);
 const { its } = nlp;
 const _ = require('lodash');
-
-const { removeStopwords } = require('stopword');
 
 const defaultRegexList = [
   '^https://[^/]+.amazon.com/.*$',
@@ -80,70 +79,6 @@ async function getLocalStorage(key) {
   });
 }
 
-// currently used to check suitability of a word to be stored in frequentWords
-// potential to be used elsewhere
-function wordIsAcceptable(word) {
-  // can add and remove stopwords here as necessary
-  const stopWords = ['to', 'of', 'we', 'in', 'it', 'if', 'be', 'myself', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves',
-    'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
-    'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'been', 'being',
-    'have', 'has', 'had', 'having', 'does', 'did', 'doing', 'the', 'and', 'but', 'because', 'until',
-    'while', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
-    'from', 'down', 'out', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there',
-    'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'nor', 'not', 'only',
-    'own', 'same', 'than', 'too', 'very', 'can', 'will', 'just', 'don', 'should', 'now', 'dont', 'says'];
-  const acceptableWordLength = 2;
-
-  // reject if in stopWords
-  // reject if less than the acceptable length
-  if (stopWords.includes(word) || word.length < acceptableWordLength) {
-    return false;
-  }
-  // reject if it is a number
-  // unless the number looks like it *might* be a year
-  // since user might want to search for a document from a particular year
-  // we need to consider other numbers that may be useful search terms
-  const isNumeric = (string) => Number.isFinite(+string);
-  if (isNumeric(word)) {
-    if (word.length === 4 && (word[0] === '1' || word[0] === '2')) {
-      return true;
-    }
-    return false;
-  }
-  return true;
-}
-
-function getPageBody(body) {
-  let pageBody = body.toLowerCase(); // convert the body into lower case
-
-  // ignore all punctuation in the page body before splitting into an array of words
-  const punctuationPattern = /[^\w\s]|_/g;
-  pageBody = pageBody.replace(punctuationPattern, '');
-  const bodyArr = pageBody.split(' ');
-  // define a map to store words and their frequencies in bodyArr
-  const wordCountMap = new Map();
-
-  // update occurrences of every word in the page body, except unacceptable words
-  bodyArr.forEach((wordInBody) => {
-    const word = wordInBody.trim();
-    if (wordIsAcceptable(word)) {
-      wordCountMap.set(word, (wordCountMap.get(word) || 0) + 1);
-    }
-  });
-
-  // map entries are sorted in order of most frequently occurring words
-  const bodyWordsArray = Array.from(wordCountMap).sort((word, nextWord) => nextWord[1] - word[1]).map(([word]) => word);
-  return bodyWordsArray.join(' ');
-}
-
-// function to return a top slice of words from a string of words
-// array returned will contain AT MOST numStrings many words
-function getWordSlice(text, numStrings) {
-  const wordArray = text.split(' ');
-  const topSlice = wordArray.slice(0, numStrings);
-  return topSlice;
-}
-
 // update the documents used by miniSearch
 function updateIndex(miniSearch, result) {
   miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
@@ -166,28 +101,6 @@ chrome.storage.local.get(['indexed']).then((result) => {
 const MAX_TAB_REFRESH_ATTEMPTS = 20;
 const TAB_REFRESH_DELAY_MS = 50;
 
-function addPageToIndex(page, indexed) {
-  let oldBody = page.body.split(/\n|\s/);
-  oldBody = removeStopwords(oldBody).join(' ');
-
-  const newBody = getPageBody(oldBody);
-
-  const numTopWords = 10; // define the length of mostFrequentWords
-  const mostFrequentWords = getWordSlice(newBody, numTopWords);
-
-  page.body = newBody;
-  page.frequentWords = mostFrequentWords; // use mostFrequentWords array in miniSearch
-  indexed.corpus.push(page);
-
-  miniSearch.add(page);
-  return indexed;
-}
-
-function addUrlToIndex(url, indexed) {
-  indexed.links.add(url);
-  return indexed;
-}
-
 async function getIndexed() {
   const indexedResult = await getLocalStorage('indexed');
   const indexed = indexedResult.indexed || {};
@@ -198,6 +111,24 @@ async function getIndexed() {
   // chrome storage serialising and deserialising loses set type
   indexed.links = new Set(indexed.links);
   return indexed;
+}
+
+// gets the logical combinator (if present) to be passed into the MiniSearch search
+function getLogicalCombinator(searchTerms) {
+  const lastTerm = searchTerms[searchTerms.length - 1];
+  let combinator;
+  switch (lastTerm) {
+    case '&':
+      combinator = 'AND';
+      break;
+    case '~':
+      combinator = 'AND_NOT';
+      break;
+    default:
+      combinator = null;
+      break;
+  }
+  return combinator;
 }
 
 // returns results from a MiniSearch search
@@ -217,24 +148,6 @@ function searchWithCombinator(miniSearchObj, text, combinator) {
     fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
     combineWith: combinator,
   });
-}
-
-// gets the logical combinator (if present) to be passed into the MiniSearch search
-function getLogicalCombinator(searchTerms) {
-  const lastTerm = searchTerms[searchTerms.length - 1];
-  let combinator;
-  switch (lastTerm) {
-    case '&':
-      combinator = 'AND';
-      break;
-    case '~':
-      combinator = 'AND_NOT';
-      break;
-    default:
-      combinator = null;
-      break;
-  }
-  return combinator;
 }
 
 // gets top search suggestions as an array of dictionaries
@@ -301,18 +214,6 @@ function deleteTask(allTasks, taskIdToRemove) {
     allTasks = updatedTasks;
   }
   chrome.storage.local.set({ tasks: allTasks }, () => {});
-}
-
-function removeAnchorLink(url) {
-  return url.split('#')[0];
-}
-
-function removeQuery(url) {
-  if (url.includes('?')) {
-    splitUrl = url.split('?');
-    [url, queryString] = splitUrl;
-  }
-  return url;
 }
 
 async function waitForTitleUpdate(title, lastTitles) {
@@ -406,8 +307,7 @@ chrome.runtime.onMessage.addListener(async (request) => {
   ) {
     const releaseIndexing = await indexMutex.acquire();
     try {
-      let url = removeAnchorLink(request.url);
-      url = removeQuery(url);
+      const url = PrepDocument.stripUrl(request.url);
 
       const tabs = await new Promise((resolve) => {
         chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
@@ -455,9 +355,8 @@ chrome.runtime.onMessage.addListener(async (request) => {
       if (`https://${page.title}` === decodedURL) {
         return;
       }
-
-      indexed = addPageToIndex(page, indexed);
-      indexed = addUrlToIndex(url, indexed);
+      indexed = PrepDocument.addPageToIndex(page, indexed, miniSearch);
+      indexed = PrepDocument.addUrlToIndex(url, indexed);
 
       engine.addDoc(page, String(page.id));
       runningEngine = _.cloneDeep(engine);

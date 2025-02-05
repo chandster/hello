@@ -4,7 +4,7 @@
   "description": "Hawk is an indexing and general convenience extension. Read the settings to learn more!",
   "main": "commitlint.config.js",
   "scripts": {
-    "test": "jest --config jest.config.js",
+    "test": "jest",
     "lint": "eslint . --fix",
     "precommit": "npx eslint --fix",
     "build": "node ./node_modules/webpack/bin/webpack.js --config config/webpack.config.js",
