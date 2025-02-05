@@ -115,7 +115,7 @@ ul {
 	position: relative;
 }
 .button-div, #add-todo-btn, .primary-outline-btn, #add-note-button, .add-task, .add-task-modal, .selective-checkbox, #appearance,
-#notebook, #indexing,#backup,#about, #manage-settings, #todo-list-button, .note-item {
+#notebook,#backup,#about, #manage-settings, #todo-list-button, .note-item {
 	cursor: pointer;
 }
 
@@ -368,6 +368,10 @@ input::placeholder {
   width: 1em;
 	box-shadow: var(--panel-box-shadow);
 }
+
+.circle-ind.disabled {
+	background-color: var(--circle-ind-color);
+  }
 
 .circle-ind.enabled {
   background-color: #34c744;

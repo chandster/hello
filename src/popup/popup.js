@@ -184,7 +184,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
       .then((results) => {
         if (results.some((result) => result)) {
+          console.log("Enable");
+          $('#indexing-indicator').removeClass('disabled');
           $('#indexing-indicator').addClass('enabled');
+        } else {
+          console.log("Disable");
+          $('#indexing-indicator').removeClass('enabled');
+          $('#indexing-indicator').addClass('disabled');
         }
       });
 
@@ -230,10 +236,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 
     $('#notebook').on('click', () => {
       loadContent('add_note.html');
-    });
-
-    $('#indexing').on('click', () => {
-      loadContent('settings.html#indexing_');
     });
 
     chrome.storage.local.get({ tasks: {} }, (result) => {
