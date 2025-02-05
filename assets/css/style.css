@@ -1375,16 +1375,15 @@ svg {
     height: 32px;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-    animation: float 3s ease-in-out infinite;
 }
 
-/* Floating Animation */
+/* Remove the keyframes for floating animation */
 @keyframes float {
     0% {
         transform: translateY(0px);
     }
     50% {
-        transform: translateY(-6px);
+        transform: translateY(0px);
     }
     100% {
         transform: translateY(0px);
@@ -1394,7 +1393,7 @@ svg {
 /* Icon Hover Effects */
 .settings-entry:hover .settings-icon {
     filter: drop-shadow(0 4px 8px rgba(var(--accent-color-rgb), 0.3));
-    transform: scale(1.15) translateY(-4px);
+    transform: scale(1.15);
 }
 
 /* Selected State Enhancement */
