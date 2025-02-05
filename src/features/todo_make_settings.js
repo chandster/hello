@@ -539,28 +539,29 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       });
     });
     $('#addCurrentSite').on('click', () => {
-      console.log("Add current site button clicked");
+      console.log('🔵 Add current site button clicked');
+  
       chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
           if (tabs.length === 0) {
-              console.log("⚠️ No active tab found.");
+              console.log('⚠️ No active tab found.');
               return;
           }
   
-          const currentSite = new URL(tabs[0].url).hostname; // Get active tab's domain
-          console.log("🌍 Adding current site:", currentSite);
+          const currentURL = tabs[0].url; // Get full URL of the active tab
+          console.log('🌍 Adding current URL:', currentURL);
   
-          // Check if the site is already in the allowed list
-          chrome.storage.local.get(['allowedSites'], (result) => {
-              let allowedSites = result.allowedSites || [];
+          // Check if the URL is already in the allowed list
+          chrome.storage.local.get(['allowedURLs'], (result) => {
+              const allowedURLs = result.allowedURLs || [];
   
-              if (!allowedSites.includes(currentSite)) {
-                  allowedSites.push(currentSite);
-                  chrome.storage.local.set({ allowedSites }, () => {
-                      console.log("✅ Current site added:", currentSite);
-                      retrieveSitesList(); // Refresh UI list
+              if (!allowedURLs.includes(currentURL)) {
+                  allowedURLs.push(currentURL);
+                  chrome.storage.local.set({ allowedURLs }, () => {
+                      console.log('✅ Current URL added:', currentURL);
+                      retrieveUrlsList(); // Refresh the URLs tab UI
                   });
               } else {
-                  console.log("⚠️ Site already in allow list:", currentSite);
+                  console.log('⚠️ URL already in allow list:', currentURL);
                   $('#ruleErrorModal').modal('show'); // Show error if already added
               }
           });
@@ -854,5 +855,3 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     handleSidebarNavigation();
   });
 }
-
-

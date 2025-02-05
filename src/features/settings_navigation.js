@@ -1,4 +1,3 @@
-
 function main() {
   console.log('Document is ready!');
 
@@ -60,5 +59,3 @@ if (document.readyState === 'loading') {
 } else {
   main();
 }
-
-
