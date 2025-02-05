@@ -538,6 +538,35 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       });
     });
+    $('#addCurrentSite').on('click', () => {
+      console.log("Add current site button clicked");
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+          if (tabs.length === 0) {
+              console.log("⚠️ No active tab found.");
+              return;
+          }
+  
+          const currentSite = new URL(tabs[0].url).hostname; // Get active tab's domain
+          console.log("🌍 Adding current site:", currentSite);
+  
+          // Check if the site is already in the allowed list
+          chrome.storage.local.get(['allowedSites'], (result) => {
+              let allowedSites = result.allowedSites || [];
+  
+              if (!allowedSites.includes(currentSite)) {
+                  allowedSites.push(currentSite);
+                  chrome.storage.local.set({ allowedSites }, () => {
+                      console.log("✅ Current site added:", currentSite);
+                      retrieveSitesList(); // Refresh UI list
+                  });
+              } else {
+                  console.log("⚠️ Site already in allow list:", currentSite);
+                  $('#ruleErrorModal').modal('show'); // Show error if already added
+              }
+          });
+      });
+  });
+  
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
@@ -775,5 +804,55 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
+    // === New code starts here ===
+
+    // Pane navigation setup for settings
+    const paneMap = {
+      appearance: 'appearance-pane',
+      indexing: 'indexing-pane',
+      backup: 'backup-pane',
+      about: 'about-pane',
+    };
+
+    // Function to handle sidebar navigation
+    function handleSidebarNavigation() {
+      const sidebarButtons = document.querySelectorAll('.settings-entry');
+      sidebarButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          // Remove 'selected' class from all buttons
+          sidebarButtons.forEach((btn) => btn.classList.remove('selected'));
+
+          // Add 'selected' class to clicked button
+          button.classList.add('selected');
+
+          // Hide all panes
+          Object.values(paneMap).forEach((paneId) => {
+            const pane = document.getElementById(paneId);
+            if (pane) {
+              pane.classList.add('d-none');
+            }
+          });
+
+          // Show the correct pane
+          const paneToShow = paneMap[button.id];
+          if (paneToShow) {
+            const pane = document.getElementById(paneToShow);
+            if (pane) {
+              pane.classList.remove('d-none');
+            }
+          }
+        });
+      });
+
+      // Display the default pane (e.g., "Appearance") when the page loads
+      const defaultPane = document.getElementById('appearance-pane');
+      if (defaultPane) {
+        defaultPane.classList.remove('d-none');
+      }
+    }
+
+    handleSidebarNavigation();
   });
 }
+
+
