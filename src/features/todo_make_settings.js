@@ -538,6 +538,36 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       });
     });
+    $('#addCurrentSite').on('click', () => {
+      console.log('🔵 Add current site button clicked');
+  
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+          if (tabs.length === 0) {
+              console.log('⚠️ No active tab found.');
+              return;
+          }
+  
+          const currentURL = tabs[0].url; // Get full URL of the active tab
+          console.log('🌍 Adding current URL:', currentURL);
+  
+          // Check if the URL is already in the allowed list
+          chrome.storage.local.get(['allowedURLs'], (result) => {
+              const allowedURLs = result.allowedURLs || [];
+  
+              if (!allowedURLs.includes(currentURL)) {
+                  allowedURLs.push(currentURL);
+                  chrome.storage.local.set({ allowedURLs }, () => {
+                      console.log('✅ Current URL added:', currentURL);
+                      retrieveUrlsList(); // Refresh the URLs tab UI
+                  });
+              } else {
+                  console.log('⚠️ URL already in allow list:', currentURL);
+                  $('#ruleErrorModal').modal('show'); // Show error if already added
+              }
+          });
+      });
+  });
+  
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
