@@ -172,6 +172,25 @@ function updateChecklist(existingTasks) {
   }
 }
 
+function updateIndicator() {
+    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
+      .then((results) => {
+        if (results.some((result) => result)) {
+          console.log("Enable");
+          $('#indexing-indicator').removeClass('disabled').addClass('enabled');
+        } else {
+          console.log("Disable");
+          $('#indexing-indicator').removeClass('enabled').addClass('disabled');
+        }
+      });
+}
+
+function getTabAndUpdateIndicator() {
+  getCurrentTab().then(() => {
+    updateIndicator();
+  });
+}
+
 async function getCurrentTab() {
   const queryOptions = { active: true, currentWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
@@ -180,19 +199,6 @@ async function getCurrentTab() {
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
-    getCurrentTab();
-    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
-      .then((results) => {
-        if (results.some((result) => result)) {
-          console.log("Enable");
-          $('#indexing-indicator').removeClass('disabled');
-          $('#indexing-indicator').addClass('enabled');
-        } else {
-          console.log("Disable");
-          $('#indexing-indicator').removeClass('enabled');
-          $('#indexing-indicator').addClass('disabled');
-        }
-      });
 
     function loadContent(page) {
       fetch(page)
@@ -238,6 +244,19 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       loadContent('add_note.html');
     });
 
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      if (message.type === "URL_UPDATED") {
+        console.log("URL WAS UPDATED");
+        currentURL = message.url;
+        updateIndicator();
+      }
+      if (message.type === "TAB_CHANGED") {
+        console.log("TAB WAS CHANGED");
+        currentURL = message.url;
+        updateIndicator();
+      }
+    });
+
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
@@ -256,6 +275,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 }
 
 $(document).ready(() => {
+  getTabAndUpdateIndicator();
   $('#show-date-picker').on('click', (e) => {
     e.preventDefault(); // Prevent default link behavior
     // Hide dropdown menu

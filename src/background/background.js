@@ -250,6 +250,22 @@ async function updateAllLastTitles(request, title, allLastTitles, tabId, lastTit
   await chrome.storage.local.set({ allLastTitles });
 }
 
+// Listen for when the tab's url changes and send a message to popup.js
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) {
+    chrome.runtime.sendMessage({ type: "URL_UPDATED", url: changeInfo.url });
+  }
+});
+
+// Listen for when the user changes tabs and send a message to popup.js
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab && tab.url) {
+      chrome.runtime.sendMessage({ type: "TAB_CHANGED", url: tab.url });
+    };
+  });
+});
+
 chrome.omnibox.onInputChanged.addListener((text, suggest) => {
   chrome.storage.local.get(['indexed']).then((result) => {
     if (Object.keys(result).length > 0) {
