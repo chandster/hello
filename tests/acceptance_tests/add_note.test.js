@@ -22,6 +22,7 @@ const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
     const page = await browser.newPage();
     await page.goto('about:blank');
 
+    
     console.log('🔄 Opening Extension Popup...');
     const popupUrl = `chrome-extension://${extensionId}/src/component/hello.html`;
     const popupPage = await browser.newPage();
