@@ -18,7 +18,7 @@
         <div id="content">
             <!-- Content will be loaded here -->
             <script src="../utils/appearance.js"></script>
-            <script src="../popup/hellonotes.js"></script>
+            <script type="module" src="../popup/hellonotes.js"></script>
             <div id="sort-filter-cont" class="d-flex justify-content-between align-items-center"
               style="padding-bottom: 20px; ">
               <div class="dropdown">
@@ -111,16 +111,27 @@
 
             </div>
             <div style="padding-bottom: 10px;" id="display-tasks">
-                    <div class="h5" style="width: 100%; text-align: center; background-color: #6c757d; margin: 0px; color: white; border-radius: 10px 10px 0px 0px;">Tasks</div>
-                    <table class="table" style="margin: 0px;">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width: 5%;"></th>
-                                <th scope="col" style="width: 75%;">Title</th>
-                                <th scope="col" style="width: 20%;">Due date</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tasks-display">
+              <div class="h5"
+                style="width: 100%; text-align: center; background-color: #6c757d; margin: 0px; color: white; border-radius: 10px 10px 0px 0px;">
+                Tasks</div>
+              <table class="table" style="margin: 0px;">
+                <thead id="tasks-display-noNotes">
+                  <tr id="tasks-display-default">
+                    <th scope="col" style="width: 100%; text-align: center;">
+                      <div style="display: flex; flex-direction: column; align-items: center;">
+                        <img src="../../assets/images/emoji-frown.svg" alt="Icon" style="height: 50px;">
+                        <span>No notes to display</span>
+                      </div>
+                    </th>
+                  </tr>
+            
+                  <tr id="tasks-display-notes" style="display: none;">
+                    <th scope="col" style="width: 5%;"></th>
+                    <th scope="col" style="width: 75%;">Title</th>
+                    <th scope="col" style="width: 20%;">Due date</th>
+                  </tr>
+                </thead>  
+                <tbody id="tasks-display">
                         </tbody>
                     </table>
                     <div style="width: 100%; text-align: center; background-color: #6c757d; margin-bottom: 0px; color: white; padding: 5px; border-radius: 0px 0px 10px 10px; height: 17px;"></div>
