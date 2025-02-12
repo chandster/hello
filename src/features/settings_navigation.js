@@ -1,13 +1,6 @@
-console.log('Settings js file is running');
-
 function main() {
-  console.log('Document is ready!');
-
   const settingsEntries = document.querySelectorAll('.settings-entry');
   const panes = document.querySelectorAll('.settings-pane');
-
-  console.log('Found settings entries:', settingsEntries.length);
-  console.log('Found panes:', panes.length);
 
   function showPane(targetId) {
     // Hide all panes
@@ -32,7 +25,6 @@ function main() {
   // Attach click event listeners
   settingsEntries.forEach((entry) => {
     entry.addEventListener('click', () => {
-      console.log('Clicked on:', entry);
       const targetId = entry.getAttribute('data-target');
       showPane(targetId);
     });
@@ -43,16 +35,12 @@ function main() {
 
   if (goBackBtn) {
     goBackBtn.addEventListener('click', () => {
-      console.log('Go back button clicked');
-
       if (window.history.length > 1) {
         window.history.back();
       } else {
         window.location.href = '../components/hello.html'; // Change to your desired fallback page
       }
     });
-  } else {
-    console.log('Go Back button not found in DOM');
   }
 
   // Show default pane on load

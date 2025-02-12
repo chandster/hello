@@ -98,7 +98,8 @@ function updateWallpaperPreview() {
     if (result.bg !== '' && result.bg !== undefined) {
       imgElement.attr('src', result.bg);
     } else {
-      imgElement.attr('src', getComputedStyle(document.documentElement).getPropertyValue('--wallpaper-preview'));
+      let imgSrc = '../../assets/images/comic_bg.png';
+      imgElement.attr('src', imgSrc);
     }
   });
 }
