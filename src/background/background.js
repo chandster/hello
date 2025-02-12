@@ -16,12 +16,6 @@ const _ = require('lodash');
 
 const { removeStopwords } = require('stopword');
 
-const defaultRegexList = [
-  '^https://[^/]+.amazon.com/.*$',
-  '^https://atoz.amazon.work/.*$',
-  '^https://quip-amazon.com/.*$',
-  '^https://quip.com/.*$',
-];
 
 const TITLE_BOOST = 3;
 const FREQUENT_WORD_BOOST = 2;
@@ -401,7 +395,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info) => {
   if (info.menuItemId === "add-note") {
     alert("You clicked the custom menu item!");
   }
