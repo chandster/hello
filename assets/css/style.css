@@ -956,8 +956,8 @@ svg {
 	font-size: 1.6vw;
 	color: var(--selected-color);
 	font-weight: bold;
-	padding-top: 1rem;
-	padding-bottom: 1rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
   background: var(--accent-color);
   color: white;
   border-radius: 4px;
@@ -1377,42 +1377,9 @@ svg {
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
 }
 
-/* Remove the keyframes for floating animation */
-@keyframes float {
-    0% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(0px);
-    }
-    100% {
-        transform: translateY(0px);
-    }
-}
-
 /* Icon Hover Effects */
 .settings-entry:hover .settings-icon {
     filter: drop-shadow(0 4px 8px rgba(var(--accent-color-rgb), 0.3));
-    transform: scale(1.15);
-}
-
-/* Selected State Enhancement */
-.settings-entry.selected .settings-icon {
-    animation: selected-pulse 2s infinite;
-    filter: drop-shadow(0 0 8px var(--accent-color));
-}
-
-/* Pulse Animation for Selected State */
-@keyframes selected-pulse {
-    0% {
-        filter: drop-shadow(0 0 8px var(--accent-color));
-    }
-    50% {
-        filter: drop-shadow(0 0 12px var(--accent-color));
-    }
-    100% {
-        filter: drop-shadow(0 0 8px var(--accent-color));
-    }
 }
 
 /* Entry Container Enhancement */
@@ -1424,7 +1391,6 @@ svg {
     align-items: center;
     justify-content: center;
     margin: 0.8rem 0;
-    transition: all 0.3s ease;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(8px);
@@ -1433,7 +1399,6 @@ svg {
 /* Selected Entry Style */
 .settings-entry.selected {
     background: var(--accent-color);
-    transform: translateX(5px);
     box-shadow: 0 4px 15px rgba(var(--accent-color-rgb), 0.3);
 }
 
@@ -1469,7 +1434,6 @@ svg {
 /* Selected State Styling */
 .settings-entry.selected {
     background: var(--accent-color);
-    transform: translateX(5px); /* Slight shift when selected */
 }
 
 /* Tooltip Enhancement */
@@ -1499,7 +1463,7 @@ svg {
     transition: all 0.4s ease;
     padding: 1.5rem;
     border-radius: 12px;
-    background: var(--panel-bg);
+    background: white;
     box-shadow: var(--panel-box-shadow);
 }
 
@@ -2154,7 +2118,6 @@ svg {
     position: absolute;
     top: 100%;
     left: 50%;
-    transform: translateX(-50%);
     padding: 8px 12px;
     background: rgba(0, 0, 0, 0.85);
     color: white;
