@@ -26,7 +26,6 @@ $(document).ready(() => {
   }
 
   function getSelectedCheckboxes() {
-    const dropdownMenu = document.getElementById('categoryDropdownMenu');
     const selectedCheckboxes = dropdownMenu.querySelectorAll('.form-check-input:checked');
     const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
       const tagId = checkbox.getAttribute('data-category-id');
@@ -130,7 +129,6 @@ $(document).ready(() => {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const { notes } = data;
       const tableBody = $('#tasks-display');
-      const tableHead = $('#tasks-display-head');
       const noTasks = $('#tasks-display-noNotes');
       const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
@@ -145,7 +143,7 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-        activeDisplayNote++;
+        activeDisplayNote + 1;
         const row = $(`
                     <tr>
                         <td style="justify-content: center; align-items: center;">
