@@ -173,22 +173,16 @@ function updateChecklist(existingTasks) {
 }
 
 function updateIndicator() {
-    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
-      .then((results) => {
-        if (results.some((result) => result)) {
-          console.log("Enable");
-          $('#indexing-indicator').removeClass('disabled').addClass('enabled');
-        } else {
-          console.log("Disable");
-          $('#indexing-indicator').removeClass('enabled').addClass('disabled');
-        }
-      });
-}
-
-function getTabAndUpdateIndicator() {
-  getCurrentTab().then(() => {
-    updateIndicator();
-  });
+  Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
+    .then((results) => {
+      if (results.some((result) => result)) {
+        console.log('Enable');
+        $('#indexing-indicator').removeClass('disabled').addClass('enabled');
+      } else {
+        console.log('Disable');
+        $('#indexing-indicator').removeClass('enabled').addClass('disabled');
+      }
+    });
 }
 
 async function getCurrentTab() {
@@ -197,9 +191,15 @@ async function getCurrentTab() {
   currentURL = tab.url;
 }
 
+
+function getTabAndUpdateIndicator() {
+  getCurrentTab().then(() => {
+    updateIndicator();
+  });
+}
+
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
-
     function loadContent(page) {
       fetch(page)
         .then((response) => {
@@ -244,14 +244,14 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       loadContent('add_note.html');
     });
 
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      if (message.type === "URL_UPDATED") {
-        console.log("URL WAS UPDATED");
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === 'URL_UPDATED') {
+        console.log('URL WAS UPDATED');
         currentURL = message.url;
         updateIndicator();
       }
-      if (message.type === "TAB_CHANGED") {
-        console.log("TAB WAS CHANGED");
+      if (message.type === 'TAB_CHANGED') {
+        console.log('TAB WAS CHANGED');
         currentURL = message.url;
         updateIndicator();
       }

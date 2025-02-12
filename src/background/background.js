@@ -251,9 +251,9 @@ async function updateAllLastTitles(request, title, allLastTitles, tabId, lastTit
 }
 
 // Listen for when the tab's url changes and send a message to popup.js
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
   if (changeInfo.url) {
-    chrome.runtime.sendMessage({ type: "URL_UPDATED", url: changeInfo.url });
+    chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
   }
 });
 
@@ -261,8 +261,8 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.tabs.onActivated.addListener((activeInfo) => {
   chrome.tabs.get(activeInfo.tabId, (tab) => {
     if (tab && tab.url) {
-      chrome.runtime.sendMessage({ type: "TAB_CHANGED", url: tab.url });
-    };
+      chrome.runtime.sendMessage({ type: 'TAB_CHANGED', url: tab.url });
+    }
   });
 });
 
