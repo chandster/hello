@@ -143,7 +143,7 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-        activeDisplayNote + 1;
+        activeDisplayNote = activeDisplayNote + 1;
         const row = $(`
                     <tr>
                         <td style="justify-content: center; align-items: center;">
@@ -159,7 +159,6 @@ $(document).ready(() => {
 
         tableBody.append(row);
       });
-      console.log(activeDisplayNote);
       if (activeDisplayNote > 0) {
         noTasks.hide();
         tasks.show();
