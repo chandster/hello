@@ -988,7 +988,7 @@ svg {
 
 .settings-icon {
 	margin-left: 0.75rem;
-	margin-right: 0.5rem;
+	margin-right: 0.75rem;
   width: 24px;
   height: 24px;
 }
@@ -1280,7 +1280,6 @@ svg {
 .settings-entry .settings-icon {
     width: 24px;
     height: 24px;
-    margin-right: 0;
 }
 
 /* Hide the text next to icons */
@@ -1972,7 +1971,7 @@ svg {
 #settings-sidebar {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-around;
     align-items: center;
     width: 100%;
     min-height: 70px;
@@ -2007,8 +2006,7 @@ svg {
 
 /* Settings Title */
 .settings-title {
-    margin-right: 2rem;
-    font-size: 1.2rem;
+    font-size: 22px;
 }
 
 /* Responsive Design */
@@ -2024,10 +2022,6 @@ svg {
         padding: 0.4rem;
     }
 
-    .settings-title {
-        margin-right: 1.5rem;
-        font-size: 1.1rem;
-    }
 
     .settings-entry[data-tooltip]:before {
         font-size: 0.75rem;
