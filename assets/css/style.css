@@ -1821,7 +1821,6 @@ svg {
 }
 
 .button-container:hover {
-    background-color: var(--accent-color-dark, #0056b3);
     transform: scale(1.02);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
