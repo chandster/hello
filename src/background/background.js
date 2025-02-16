@@ -98,92 +98,53 @@ function getLogicalCombinator(searchTerms) {
       combinator = null;
       break;
   }
-  return combinator;
+  return indexer;
 }
-
-// returns results from a MiniSearch search
-function search(miniSearchObj, text) {
-  return miniSearchObj.search(text, {
-    boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
-    prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-    fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
+const getStoredIndex = (cb)=>{
+  chrome.storage.local.get(LOCAL_INDEX_ID, (data)=>{cb(data[LOCAL_INDEX_ID])});
+}
+ 
+const storeIndex = (indexData) => {
+  const data = {
+    [LOCAL_INDEX_ID]: indexData
+  }
+  chrome.storage.local.set(data, function() {
+    console.log('Index data saved['+data.length+']');
   });
 }
-
-// returns results from a MiniSearch search with a provided logical combinator
-function searchWithCombinator(miniSearchObj, text, combinator) {
-  return miniSearchObj.search(text, {
-    boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
-    prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-    fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
-    combineWith: combinator,
-  });
-}
-
-// gets top search suggestions as an array of dictionaries
-function getSuggestions(searchResults, numSuggestions, corpus) {
-  const suggestions = [];
-  for (let docID = 0; docID < numSuggestions; docID += 1) {
-    if (docID === searchResults.length) break;
-    const searchResult = searchResults[docID];
-    const page = corpus[searchResult.id - 1];
-    suggestions.push({
-      content: page.url,
-      description: page.title,
-      deletable: true,
-    });
+ 
+const getIndex = ()=> {
+  if(!chrome.indexer){
+    initialiseIndexer();
   }
-  return suggestions;
+  return chrome.indexer;
 }
-
-// search indexed pages (corpus) for text with BM25 and MiniSearch
-// hoping to remove the dependency on BM25 and use MiniSearch only
-function suggestFromIndex(text, corpus) {
-  let suggestions = [];
-  let searchResults = [];
-
-  let searchTerms = text.split(' ');
-  const combinator = getLogicalCombinator(searchTerms);
-
-  if (combinator && searchTerms.length) {
-    searchTerms = searchTerms.slice(0, searchTerms.length - 1);
-    text = searchTerms.join(' ');
-  }
-
-  if (corpus.length >= MIN_SEARCH_TERM_LENGTH && !combinator) {
-    searchResults = runningEngine.search(text);
-    for (let docID = 0; docID < 10; docID += 1) {
-      if (docID === searchResults.length) break;
-      const page = corpus[searchResults[docID][0] - 1];
-      suggestions.push({
-        content: page.url,
-        description: page.title,
-        deletable: true,
-      });
+const replaceIndexerData = () => {
+ 
+ 
+}
+const addToIndex = (document)=> {
+  let idx = getIndex();
+  if(idx){
+    console.time("Indexing Doc:" + document.id);
+    if(idx.has(document.id)){
+      idx.replace(document);
+      console.log("Replacing doc in the index");
+    }else{
+      idx.add(document);
+      console.log("Adding new doc in the index");
     }
+    console.timeEnd("Indexing Doc:" + document.id);
+    console.time("Storing the whole Index");
+    let data = JSON.stringify(idx);
+    storeIndex(data);
+    console.timeEnd("Storing the whole Index");
   }
-  if (!suggestions.length) {
-    if (combinator) {
-      searchResults = searchWithCombinator(miniSearch, text, combinator);
-    } else {
-      searchResults = search(miniSearch, text);
-    }
-    const MAX_SUGGESTIONS = 10;
-    suggestions = getSuggestions(searchResults, MAX_SUGGESTIONS, corpus);
-  }
-  return suggestions;
 }
-
-function deleteTask(allTasks, taskIdToRemove) {
-  const updatedTasks = Object.fromEntries(
-    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
-  );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {});
+ 
+const search = (document, options) => {
+  let idx = getIndex();
+  return idx.search(document);
 }
 
 // Listen for when the tab's url changes and send a message to popup.js
