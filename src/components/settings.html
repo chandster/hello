@@ -6,9 +6,9 @@
     <title>Hawk - Settings</title>
 </head>
 <body class="settings-body hidden">
-    <button id="goBackBtn" class="btn btn-primary">Go Back</button>
+    <button id="goBackBtn" class="btn btn-secondary">Go Back</button>
     <div class="container d-flex settings-container flex-nowrap">
-        <div class="col-4 me-5 settings-sidebar" id="settings-sidebar">
+        <div class="col-4 me-5 settings-sidebar" style="background-color: white;" id="settings-sidebar">
             <div class="settings-title">Settings</div>
             <div class="settings-entry selected" id="appearance" data-tooltip="Appearance settings" data-target="appearance-pane">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-display-fill settings-icon" viewBox="0 0 16 16">
@@ -49,8 +49,8 @@
                         <img class="settings-wallpaper-preview-img">
                     </div>
                     <div class="col-auto zero-margin zero-padding w-100 mt-2">
-                        <button class="btn btn-primary background-reset-btn">Restore to default</button>
-                        <label for="backgroundInput" class="btn btn-primary browse-background-btn">Browse for background</label>
+                        <button class="btn btn-secondary background-reset-btn">Restore to default</button>
+                        <label for="backgroundInput" class="btn btn-secondary browse-background-btn">Browse for background</label>
                         <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
                     </div>
                 </div>
@@ -75,12 +75,12 @@
                 <div class="section-heading">Restore data</div>
                 <div class="row flex settings-section align-contents-center mb-4">
                     <div class="button-container" data-tooltip="Either restore all data from a JSON file, or import it and select elements for restore from below">
-                        <label for="jsonAllInput" class="btn btn-primary restore-all-btn">Restore all from JSON file</label>
+                        <label for="jsonAllInput" class="btn btn-secondary restore-all-btn">Restore all from JSON file</label>
                         <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
                     </div>
                     
                     <div class="button-container" data-tooltip="Upload a JSON file to import settings">
-                        <label for="jsonSelectiveInput" class="btn btn-primary import-selection-btn">Import data for selection</label>
+                        <label for="jsonSelectiveInput" class="btn btn-secondary import-selection-btn">Import data for selection</label>
                         <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
                     </div>
                 </div>
@@ -104,17 +104,17 @@
                         <div class="tab-pane fade" id="tasks-selection-list" role="tabpanel"></div>
                         <div class="tab-pane fade" id="index-selection-list" role="tabpanel"></div>
                     </div>
-                    <button class="btn btn-primary restore-selection-btn mt-4">Perform overwriting restore of selected data</button>
+                    <button class="btn btn-secondary restore-selection-btn mt-4">Perform overwriting restore of selected data</button>
                 </div>
                 <div class="section-heading mt-4">Restore all data by category</div>
                 <div class="row flex settings-section align-contents-center">
                     <div class="col-auto zero-margin zero-padding dynamic-title">Restore only the data from a given data category from the provided JSON backup</div>
                     <div class="col-auto zero-margin zero-padding mt-2 w-100">
-                        <label for="jsonIndexInput" class="btn btn-primary index-restore-btn">Upload data to restore search index</label>
+                        <label for="jsonIndexInput" class="btn btn-secondary index-restore-btn">Upload data to restore search index</label>
                         <input type="file" id="jsonIndexInput" name="jsonIndexInput" accept=".json" style="display: none;" />
-                        <label for="jsonInput" class="btn btn-primary tasks-restore-btn">Upload data to restore tasks</label>
+                        <label for="jsonInput" class="btn btn-secondary tasks-restore-btn">Upload data to restore tasks</label>
                         <input type="file" id="jsonInput" name="jsonInput" accept=".json" style="display: none;" />
-                        <label for="jsonNoteInput" class="btn btn-primary note-restore-btn">Upload data to restore notes</label>
+                        <label for="jsonNoteInput" class="btn btn-secondary note-restore-btn">Upload data to restore notes</label>
                         <input type="file" id="jsonNoteInput" name="jsonNoteInput" accept=".json" style="display: none;" />
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                 <div class="row flex settings-section align-contents-center">
                     <div class="col-auto zero-margin zero-padding dynamic-title">All data will be exported to a JSON file from which data can be restored in future</div>
                     <div class="col-auto zero-margin zero-padding mt-2 w-100">
-                        <button class="btn btn-primary backup-btn">Export extension data to JSON file</button>
+                        <button class="btn btn-secondary backup-btn">Export extension data to JSON file</button>
                     </div>
                 </div>
                 <div class="section-heading mt-4">Reset</div>
@@ -154,8 +154,10 @@
                             <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
                         </div>
                         <div class="col d-flex justify-content-xxl-end zero-margin">
-                            <button class="btn btn-primary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
+                            <button class="btn btn-secondary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
+                            
                         </div>
+                        <button type="button" id="addCurrentSite" class="btn btn-secondary add-rule-btn tab-section-btn">Add current URL</button>
                     </ul>
                     <div class="tab-content mt-2">
                         <div class="tab-pane fade show active" id="sites" role="tabpanel">
@@ -251,7 +253,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" form="addRuleForm" data-bs-dismiss="modal" id="addRule" class="btn btn-primary">Add Rule</button>
+                    <button type="submit" form="addRuleForm" data-bs-dismiss="modal" id="addRule" class="btn btn-secondary">Add Rule</button>
                 </div>
             </div>
         </div>
@@ -284,7 +286,7 @@
                     This allow rule already exists.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="dismissError">OK</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="dismissError">OK</button>
                 </div>
             </div>
         </div>
@@ -306,9 +308,9 @@
         </div>
       </div>
     </div>
-    <script src="../../assets/js/jquery-3.7.1.min.js"></script>
-    <script src="../../assets/js/bootstrap.bundle.min.js"></script>
-    <script src="../features/settings_navigation.js"></script>
+    <script type="module" src="../../assets/js/jquery-3.7.1.min.js"></script>
+    <script type="module" src="../../assets/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../features/settings_navigation.js"></script>
     <script type="module" src="../utils/appearance.js"></script>
     <script type="module" src="../features/todo_make_settings.js"></script>
 </body>

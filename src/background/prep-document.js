@@ -71,11 +71,7 @@ function removeAnchorLink(url) {
 }
 
 function removeQuery(url) {
-  if (url.includes('?')) {
-    const splitUrl = url.split('?');
-    [url, queryString] = splitUrl;
-  }
-  return url;
+  return url.split('?')[0];
 }
 
 function stripUrl(url) {
