@@ -2137,7 +2137,6 @@ svg {
     padding-top: 1rem;
     overflow-y: auto;
     max-height: calc(100vh - 70px);
-    min-height: 100px;
 }
 
 /* Responsive Adjustments */
