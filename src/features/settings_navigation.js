@@ -44,7 +44,7 @@ function main() {
   }
 
   // Show default pane on load
-  showPane('appearance-pane');
+  showPane('indexing-pane');
 }
 
 if (document.readyState === 'loading') {
