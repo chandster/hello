@@ -4,7 +4,7 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 
 // Dynamically get the extension path
-const extensionPath = path.resolve(__dirname, '../sh27-main'); // Adjust if needed
+const extensionPath = path.resolve(__dirname, '../../'); // Adjust if needed
 const extensionId = 'nfeeaifmnnlphlhlpifkfonoddpfegag'; // Use your static extension ID
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -24,7 +24,7 @@ const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await page.goto('about:blank');
 
     console.log('🔄 Opening Extension Popup...');
-    const popupUrl = `chrome-extension://${extensionId}/src/component/hello.html`;
+    const popupUrl = `chrome-extension://${extensionId}/src/components/hello.html`;
     const popupPage = await browser.newPage();
     await popupPage.goto(popupUrl, { waitUntil: 'load', timeout: 60000 });
 
