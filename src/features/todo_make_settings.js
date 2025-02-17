@@ -98,7 +98,8 @@ function updateWallpaperPreview() {
     if (result.bg !== '' && result.bg !== undefined) {
       imgElement.attr('src', result.bg);
     } else {
-      imgElement.attr('src', getComputedStyle(document.documentElement).getPropertyValue('--wallpaper-preview'));
+      const imgSrc = '../../assets/images/comic_bg.png';
+      imgElement.attr('src', imgSrc);
     }
   });
 }
@@ -538,6 +539,35 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         });
       });
     });
+    $('#addCurrentSite').on('click', () => {
+      console.log('🔵 Add current site button clicked');
+
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+        if (tabs.length === 0) {
+          console.log('⚠️ No active tab found.');
+          return;
+        }
+
+        const currentURL = tabs[0].url; // Get full URL of the active tab
+        console.log('🌍 Adding current URL:', currentURL);
+
+        // Check if the URL is already in the allowed list
+        chrome.storage.local.get(['allowedURLs'], (result) => {
+          const allowedURLs = result.allowedURLs || [];
+
+          if (!allowedURLs.includes(currentURL)) {
+            allowedURLs.push(currentURL);
+            chrome.storage.local.set({ allowedURLs }, () => {
+              console.log('✅ Current URL added:', currentURL);
+              retrieveUrlsList(); // Refresh the URLs tab UI
+            });
+          } else {
+            console.log('⚠️ URL already in allow list:', currentURL);
+            $('#ruleErrorModal').modal('show'); // Show error if already added
+          }
+        });
+      });
+    });
 
     $(document).on('click', '.btn.btn-primary.backup-btn', (event) => {
       const $backupBtn = $(event.currentTarget);
@@ -775,5 +805,53 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         reader.readAsText(selectedFile);
       }
     });
+    // === New code starts here ===
+
+    // Pane navigation setup for settings
+    const paneMap = {
+      appearance: 'appearance-pane',
+      indexing: 'indexing-pane',
+      backup: 'backup-pane',
+      about: 'about-pane',
+    };
+
+    // Function to handle sidebar navigation
+    function handleSidebarNavigation() {
+      const sidebarButtons = document.querySelectorAll('.settings-entry');
+      sidebarButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          // Remove 'selected' class from all buttons
+          sidebarButtons.forEach((btn) => btn.classList.remove('selected'));
+
+          // Add 'selected' class to clicked button
+          button.classList.add('selected');
+
+          // Hide all panes
+          Object.values(paneMap).forEach((paneId) => {
+            const pane = document.getElementById(paneId);
+            if (pane) {
+              pane.classList.add('d-none');
+            }
+          });
+
+          // Show the correct pane
+          const paneToShow = paneMap[button.id];
+          if (paneToShow) {
+            const pane = document.getElementById(paneToShow);
+            if (pane) {
+              pane.classList.remove('d-none');
+            }
+          }
+        });
+      });
+
+      // Display the default pane (e.g., "Appearance") when the page loads
+      const defaultPane = document.getElementById('appearance-pane');
+      if (defaultPane) {
+        defaultPane.classList.remove('d-none');
+      }
+    }
+
+    handleSidebarNavigation();
   });
 }
