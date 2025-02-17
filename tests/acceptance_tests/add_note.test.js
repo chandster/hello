@@ -7,7 +7,9 @@ const path = require('path');
 const extensionPath = path.resolve(__dirname, '../../'); // Adjust if needed
 const extensionId = 'nfeeaifmnnlphlhlpifkfonoddpfegag'; // Use your static extension ID
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
 (async function runTest() {
   try {
