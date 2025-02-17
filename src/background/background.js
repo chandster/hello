@@ -31,6 +31,7 @@ const BM25F_MIN_DOCS = 3;
 let docs;
 let runningEngine;
 
+
 const prepTask = function prepTask(text) {
   const tokens = [];
   nlp
@@ -314,6 +315,13 @@ chrome.alarms.onAlarm.addListener((alarm) => {
       chrome.notifications.create(alarm.name, notification);
     }
   });
+});
+
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  if (info.menuItemId === "add-note") {
+    alert("You clicked the custom menu item!");
+  }
 });
 
 chrome.runtime.onMessage.addListener(async (request) => {
