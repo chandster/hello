@@ -1119,7 +1119,6 @@ svg {
 
 #about-pane {
   height: 37rem;
-  width: 95%;
   padding-right: 2.5rem;
   overflow-y: scroll;
 }
