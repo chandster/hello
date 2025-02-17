@@ -26,7 +26,8 @@ $(document).ready(() => {
   }
 
   function getSelectedCheckboxes() {
-    const selectedCheckboxes = dropdownMenu.querySelectorAll('.form-check-input:checked');
+    const dropdownMenuNote = document.getElementById('categoryDropdownMenu');
+    const selectedCheckboxes = dropdownMenuNote.querySelectorAll('.form-check-input:checked');
     const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
       const tagId = checkbox.getAttribute('data-category-id');
       const tagName = checkbox.value;
