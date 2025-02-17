@@ -108,9 +108,20 @@
 
             </div>
             <div style="padding-bottom: 10px;" id="display-tasks">
-              <div class="h5"
-                style="width: 100%; text-align: center; background-color: #6c757d; margin: 0px; color: white; border-radius: 10px 10px 0px 0px;">
-                Tasks</div>
+              <div class="d-flex align-items-stretch" id="tasks-header">
+                <div class="h5 d-flex ps-1 justify-content-center" style="width: 100%; text-align: center; background-color: #6c757d; margin: 0px; padding: 10px 0px; color: white; border-radius: 10px 0px 0px 0px;">
+                  Tasks</div>
+                <div class="dropdown d-flex">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="group-by-dropdown" data-bs-toggle="dropdown"
+                    style="width: 100%;" aria-haspopup="true" aria-expanded="false">
+                    <img src="../../assets/images/collection.svg" alt="Icon" style="height: 20px;">
+                    Group by
+                  </button>
+                  <div class="dropdown-menu p-3" aria-labelledby="group-by-dropdown" id="tagsDropdownMenu">
+                    <h6 class="dropdown-header">Select Tags</h6>
+                  </div>
+                </div>
+          </div>
               <table class="table" style="margin: 0px;">
                 <thead id="tasks-display-noNotes">
                   <tr id="tasks-display-default">
