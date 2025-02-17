@@ -172,22 +172,34 @@ function updateChecklist(existingTasks) {
   }
 }
 
+function updateIndicator() {
+  Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
+    .then((results) => {
+      if (results.some((result) => result)) {
+        console.log('Enable');
+        $('#indexing-indicator').removeClass('disabled').addClass('enabled');
+      } else {
+        console.log('Disable');
+        $('#indexing-indicator').removeClass('enabled').addClass('disabled');
+      }
+    });
+}
+
 async function getCurrentTab() {
   const queryOptions = { active: true, currentWindow: true };
   const [tab] = await chrome.tabs.query(queryOptions);
   currentURL = tab.url;
 }
 
+
+function getTabAndUpdateIndicator() {
+  getCurrentTab().then(() => {
+    updateIndicator();
+  });
+}
+
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
   $(() => {
-    getCurrentTab();
-    Promise.all([checkSitesList(), checkUrlsList(), checkStringMatchesList(), checkRegexList()])
-      .then((results) => {
-        if (results.some((result) => result)) {
-          $('#indexing-indicator').addClass('enabled');
-        }
-      });
-
     function loadContent(page) {
       fetch(page)
         .then((response) => {
@@ -232,8 +244,17 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       loadContent('add_note.html');
     });
 
-    $('#indexing').on('click', () => {
-      loadContent('settings.html#indexing_');
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === 'URL_UPDATED') {
+        console.log('URL WAS UPDATED');
+        currentURL = message.url;
+        updateIndicator();
+      }
+      if (message.type === 'TAB_CHANGED') {
+        console.log('TAB WAS CHANGED');
+        currentURL = message.url;
+        updateIndicator();
+      }
     });
 
     chrome.storage.local.get({ tasks: {} }, (result) => {
@@ -254,6 +275,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
 }
 
 $(document).ready(() => {
+  getTabAndUpdateIndicator();
   $('#show-date-picker').on('click', (e) => {
     e.preventDefault(); // Prevent default link behavior
     // Hide dropdown menu
