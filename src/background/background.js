@@ -252,7 +252,7 @@ async function updateAllLastTitles(request, title, allLastTitles, tabId, lastTit
 }
 
 // Listen for when the tab's url changes and send a message to popup.js
-chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+chrome.tabs.onUpdated.addListener((changeInfo) => {
   if (changeInfo.url) {
     chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
   }
