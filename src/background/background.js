@@ -418,3 +418,54 @@ chrome.runtime.onInstalled.addListener((details) => {
     chrome.storage.local.set({ allLastTitles: {} }, () => {});
   }
 });
+
+chrome.runtime.onInstalled.addListener(() => {
+  createContextMenu();
+});
+
+function createContextMenu() {
+  chrome.contextMenus.create({
+    id: "addNote",
+    title: "Hawk - Add text to Notes",
+    contexts: ["selection"]
+  });
+};
+
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "addNote") {
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      const currentTitle = tabs[0].title;
+      const selectedText = currentTitle + " " + info.selectionText;
+      const title = selectedText.length > 10 ? `${selectedText.substring(0, 15)}...` : selectedText; 
+      addNewNote(title, selectedText, {});
+  });
+  }
+});
+
+function addNewNote(title, content, tags) {
+  const noteId = Date.now().toString();
+  const note = {
+    id: noteId,
+    title,
+    content,
+    due: setDueDate(7),
+    scheduledDeletion: '',
+    recentlyDeleted: false,
+    tags,
+  };
+  chrome.storage.local.get({ notes: [] }, (data) => {
+    const existingNotes = data.notes;
+
+    existingNotes.push(note);
+
+    chrome.storage.local.set({ notes: existingNotes }, () => {
+    });
+  });
+}
+
+function setDueDate(daysToAdd) {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+  return dueDate.toISOString();
+}
