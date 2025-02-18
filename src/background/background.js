@@ -31,7 +31,6 @@ const BM25F_MIN_DOCS = 3;
 let docs;
 let runningEngine;
 
-
 const prepTask = function prepTask(text) {
   const tokens = [];
   nlp
@@ -317,10 +316,9 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   });
 });
 
-
 chrome.contextMenus.onClicked.addListener((info) => {
-  if (info.menuItemId === "add-note") {
-    alert("You clicked the custom menu item!");
+  if (info.menuItemId === 'add-note') {
+    alert('You clicked the custom menu item!');
   }
 });
 
@@ -419,29 +417,19 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-chrome.runtime.onInstalled.addListener(() => {
-  createContextMenu();
-});
-
 function createContextMenu() {
   chrome.contextMenus.create({
-    id: "addNote",
-    title: "Hawk - Add text to Notes",
-    contexts: ["selection"]
+    id: 'addNote',
+    title: 'Hawk - Add text to Notes',
+    contexts: ['selection'],
   });
-};
+}
 
-
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "addNote") {
-    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-      const currentTitle = tabs[0].title;
-      const selectedText = currentTitle + " " + info.selectionText;
-      const title = selectedText.length > 10 ? `${selectedText.substring(0, 15)}...` : selectedText; 
-      addNewNote(title, selectedText, {});
-  });
-  }
-});
+function setDueDate(daysToAdd) {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+  return dueDate.toISOString();
+}
 
 function addNewNote(title, content, tags) {
   const noteId = Date.now().toString();
@@ -464,8 +452,17 @@ function addNewNote(title, content, tags) {
   });
 }
 
-function setDueDate(daysToAdd) {
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
-  return dueDate.toISOString();
-}
+chrome.contextMenus.onClicked.addListener((info) => {
+  if (info.menuItemId === 'addNote') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentTitle = tabs[0].title;
+      const selectedText = `${currentTitle} ${info.selectionText}`;
+      const title = selectedText.length > 10 ? `${selectedText.substring(0, 15)}...` : selectedText;
+      addNewNote(title, selectedText, {});
+    });
+  }
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  createContextMenu();
+});
