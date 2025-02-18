@@ -14,13 +14,13 @@
 
 /* Modern Color Scheme */
 :root {
-  --ui-pane-color: #dddddda3;
+  --ui-pane-color: rgba(230, 126, 34, 0.1);
   --pane-text-color: #212529;
   --primary-color: #e67e22;
   --primary-hover: #d35400;
   --accent-color: #e67e22;
   --panel-bg: rgba(255, 255, 255, 0.95);
-  --search-bar-color: #ffffff69;
+  --search-bar-color: rgba(230, 126, 34, 0.08);
   --settings-section-color: rgba(230, 126, 34, 0.1);
   --settings-section-outline: solid 1px rgba(230, 126, 34, 0.2);
   --panel-box-shadow: 0px 4px 15px rgba(230, 126, 34, 0.15);
@@ -30,11 +30,11 @@
   --filter-color: black;
   --dynamic-svg-color: black;
   --selected-color: white;
-  --modal-form-section-color: #DDDDDD;
+  --modal-form-section-color: rgba(230, 126, 34, 0.2);
   --warn-color: #2c2f32;
   --del-progress-color: #ff000036;
-  --cont-color: #dddddd;
-  --circle-ind-color: #6c757d;
+  --cont-color: rgba(230, 126, 34, 0.15);
+  --circle-ind-color: #e67e22;
   --settings-bg: url('../images/comic_cogs_bg.png');
   --wallpaper-preview: ../images/comic_bg.png;
   --comic-bg: url('../images/comic_bg.png');
@@ -47,14 +47,31 @@
   --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
   --border-radius: 12px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Darker greys to complement orange */
+  --background-dark: #1a1a1a;
+  --panel-bg: rgba(38, 38, 38, 0.95);
+  --ui-pane-color: rgba(45, 45, 45, 0.95);
+  --search-bar-color: rgba(50, 50, 50, 0.9);
+  --settings-section-color: rgba(40, 40, 40, 0.95);
+  --modal-form-section-color: rgba(35, 35, 35, 0.95);
+  --warn-color: #e6e6e6;
+  --text-dark: #d4d4d4;
+  --pane-text-color: #e6e6e6;
+  --placeholder-text-color: #999999;
+  
+  /* Keep orange accents */
+  --primary-color: #e67e22;
+  --primary-hover: #d35400;
+  --accent-color: #e67e22;
+  --panel-box-shadow: 0px 4px 15px rgba(230, 126, 34, 0.2);
 }
 
 /* Dark mode variables */
 html.dark {
-  --ui-pane-color: #2c2c2ca3;
+  --ui-pane-color: rgba(230, 126, 34, 0.2);
   --pane-text-color: white;
   --panel-bg: var(--panel-bg-dark);
-  --search-bar-color: #00000069;
+  --search-bar-color: rgba(230, 126, 34, 0.15);
   --settings-section-color: rgba(230, 126, 34, 0.15);
   --settings-section-outline: none;
   --placeholder-text-color: #c2c2c2;
@@ -63,34 +80,34 @@ html.dark {
   --filter-color: white;
   --dynamic-svg-color: white;
   --selected-color: white;
-  --modal-form-section-color: #4a4a4a;
+  --modal-form-section-color: rgba(230, 126, 34, 0.3);
   --warn-color: white;
   --del-progress-color: #321717c9;
-  --cont-color: #dddddd26;
+  --cont-color: rgba(230, 126, 34, 0.25);
   --circle-ind-color: #3d4144;
   --wallpaper-preview: ../images/comic_bg_dark.png;
   --settings-bg: url('../images/comic_cogs_bg_dark.png');
   --comic-bg: url('../images/comic_bg_dark.png');
-  --panel-box-shadow: 0px 0px 24px #0000008a;
+  --panel-box-shadow: 0px 4px 20px rgba(230, 126, 34, 0.2);
   --note-item-hover-color: #1e1e1f;
   --text-color: var(--text-light);
   background-color: var(--background-dark);
-}
-
-body.hidden {
-  display: none;
+  --panel-bg: rgba(28, 28, 30, 0.95);
+  --ui-pane-color: rgba(35, 35, 35, 0.95);
+  --search-bar-color: rgba(40, 40, 40, 0.95);
+  --settings-section-color: rgba(45, 45, 45, 0.95);
 }
 
 /* Base Styles */
 body, html {
 	font-family: 'Roboto', sans-serif !important;
-	background-color: var(--background-light);
+	background-color: rgba(230, 126, 34, 0.05);
 	margin: 0;
 	max-width: 100%;
 	height: 100%;
 	padding: 0!important;
 	overflow-x: hidden;
-  background-color: #dddddda3;
+  background-color: #262626;
   line-height: 1.6;
   color: var(--text-dark);
   transition: var(--transition);
@@ -142,7 +159,7 @@ ul {
 
 .button-div, #add-todo-btn, .primary-outline-btn {
 	margin-top: 0.8em !important;
-	background-color: #DDDDDD;
+	background-color: rgba(230, 126, 34, 0.1);
 	border: 2px solid #C45500;
 	position: absolute;
 	top: 50%; 
@@ -268,7 +285,7 @@ ul {
 }
 
 .filter-btn:hover {
-	background-color: #6c757d2e;
+	background-color: rgba(230, 126, 34, 0.2);
 }
 
 .filter-btn:active svg {
@@ -282,6 +299,8 @@ ul {
   transition: background 0.5s ease-out;
   font-size: 0.85rem;
   padding: 0.4rem 0.6rem;
+  background-color: var(--search-bar-color);
+  color: var(--text-dark);
 }
 
 .search-bar-sm:focus {
@@ -483,7 +502,7 @@ input::placeholder {
 .note-container, .form-check-2 {
 	background-color: var(--panel-bg);
 	backdrop-filter: blur(8px);
-	box-shadow: var(--panel-box-shadow);
+	box-shadow: 0 4px 15px rgba(230, 126, 34, 0.15);
 	padding: 1.5em;
 	border-radius: 12px;
   transition: var(--transition);
@@ -492,7 +511,7 @@ input::placeholder {
 .note-container:hover,
 .form-check-2:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(230, 126, 34, 0.25);
 }
 
 .changing {
@@ -533,10 +552,7 @@ input::placeholder {
 	display: block;
 	margin-top: 1.5em;
   transition: background 0.5s ease-out;
-}
-
-.form-check-2 .form-check-input {
-	float: left;
+  border: 1px solid rgba(230, 126, 34, 0.2);
 }
 
 .task-desc {
@@ -561,7 +577,7 @@ input::placeholder {
 }
 
 .todo-container {
-	background-color: #DDDDDD;
+	background-color: rgba(230, 126, 34, 0.08);
 	border: None;
 }
 
@@ -597,7 +613,7 @@ input::placeholder {
 }
 
 .task-form {
-	background-color: #DDDDDD;
+	background-color: rgba(230, 126, 34, 0.1);
 	border-radius: 5px;
 	padding: 15px;
 	margin-bottom: 20px;
@@ -633,7 +649,7 @@ input::placeholder {
 }
 
 .task-form-modal {
-	background-color: #DDDDDD;
+	background-color: rgba(230, 126, 34, 0.1);
 	border-radius: 5px;
 	padding: 15px;
 }
@@ -938,7 +954,7 @@ svg {
 }
 
 .settings-entry:hover {
-  background: var(--settings-section-color);
+  background-color: rgba(230, 126, 34, 0.15);
   /* Remove transform effect */
 }
 
@@ -1056,6 +1072,8 @@ svg {
 	background-color: var(--settings-section-color);
 	width: 96%;
   transition: var(--transition);
+  background: var(--settings-section-color);
+  border: 1px solid rgba(230, 126, 34, 0.15);
 }
 
 .settings-section:hover {
@@ -1752,6 +1770,9 @@ svg {
 .form-control {
     font-size: 0.85rem;
     padding: 0.4rem 0.6rem;
+    background-color: var(--search-bar-color);
+    color: var(--text-dark);
+    border: 1px solid rgba(230, 126, 34, 0.2);
 }
 
 /* Tooltip Enhancement */
@@ -2483,4 +2504,10 @@ svg {
 
 .settings-entry.selected .settings-icon-text {
     color: var(--primary-color);
+}
+
+/* Modal backgrounds */
+.modal-content {
+  background-color: var(--panel-bg);
+  border: 1px solid rgba(230, 126, 34, 0.2);
 }
