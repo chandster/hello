@@ -2416,3 +2416,71 @@ svg {
 .settings-entry.selected .settings-icon-text {
     color: white;
 }
+
+/* Sliding indicator for selected tab */
+.settings-sidebar {
+    position: relative;
+    padding-bottom: 3px; /* Space for the indicator */
+}
+
+.settings-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 60px; /* Width of each tab */
+    background-color: var(--primary-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px;
+}
+
+/* Update settings entry for horizontal layout */
+.settings-entry {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    cursor: pointer;
+    min-width: 60px; /* Match indicator width */
+}
+
+/* Sliding indicator for selected tab */
+.settings-sidebar {
+    position: relative;
+}
+
+.settings-indicator {
+    position: absolute;
+    bottom: -2px;
+    height: 3px;
+    background-color: var(--primary-color);
+    transition: transform 0.3s ease;
+    border-radius: 3px;
+    width: 60px; /* Match the width of your icons */
+}
+
+.settings-entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Remove existing selected state background */
+.settings-entry.selected {
+    background: transparent;
+    color: var(--primary-color);
+}
+
+.settings-entry.selected .settings-icon {
+    color: var(--primary-color);
+    fill: var(--primary-color);
+}
+
+.settings-entry.selected .settings-icon-text {
+    color: var(--primary-color);
+}
