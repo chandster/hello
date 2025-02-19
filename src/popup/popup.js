@@ -191,7 +191,6 @@ async function getCurrentTab() {
   currentURL = tab.url;
 }
 
-
 function getTabAndUpdateIndicator() {
   getCurrentTab().then(() => {
     updateIndicator();

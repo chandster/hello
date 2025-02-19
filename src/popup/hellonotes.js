@@ -1,5 +1,3 @@
-
-
 $(document).ready(() => {
   let currentNote = null;
   const categoryDropdownMenu = $('#categoryDropdownMenu');
@@ -134,7 +132,7 @@ $(document).ready(() => {
       const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
-      var activeDisplayNote = 0;
+      let activeDisplayNote = 0;
       notes.forEach((note, index) => {
         if (note.recentlyDeleted) {
           return;
@@ -144,7 +142,7 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-        activeDisplayNote = activeDisplayNote + 1;
+        activeDisplayNote += 1;
         const row = $(`
                     <tr>
                         <td style="justify-content: center; align-items: center;">
@@ -163,11 +161,10 @@ $(document).ready(() => {
       if (activeDisplayNote > 0) {
         noTasks.hide();
         tasks.show();
-        
-    } else {
-      tasks.hide();
-      noTasks.show();
-    }
+      } else {
+        tasks.hide();
+        noTasks.show();
+      }
     });
     setDueDate(7);
   }
@@ -411,11 +408,10 @@ $(document).ready(() => {
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === "local" && changes.notes) {
-        loadNotes();
+    if (areaName === 'local' && changes.notes) {
+      loadNotes();
     }
-});
-  
+  });
 
   // Load the notes when the document is ready
   loadNotes();
