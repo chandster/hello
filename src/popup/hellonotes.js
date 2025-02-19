@@ -66,10 +66,13 @@ $(document).ready(() => {
       title,
       content,
       due: selectedDueDate,
-      scheduledDeletion: '',
-      recentlyDeleted: false,
       tags,
+      overdue: false
     };
+    const alarmName = `${noteId}_task_due_alarm`;
+    chrome.alarms.create(alarmName, {
+      when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
+  });
     currentNote = note;
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
@@ -89,9 +92,15 @@ $(document).ready(() => {
     return `${day}/${month}/${year}`;
   }
 
-  function setDueDate(daysToAdd) {
+  function setDueDate(daysToAdd, today = false) {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+    if (today) {
+      dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      //dueDate.setHours(dueDate.getHours() + 3); 
+    } else {
+      dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
+    }
     selectedDueDate = dueDate.toISOString();
     const formattedDate = formatDateForDisplay(dueDate);
     $('#noteDate').text(`Due Date: ${formattedDate}`);
@@ -147,16 +156,14 @@ $(document).ready(() => {
         activeDisplayNote = activeDisplayNote + 1;
         const row = $(`
                     <tr>
-                        <td style="justify-content: center; align-items: center;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio-${index}" style="border-color: blue;">
-                                <label class="form-check-label" for="radio-${index}"></label>
-                            </div>
-                        </td>
                         <td class="view-note" data-index="${note.id}">${note.title}</td>
-                         <td>${formatDateForDisplay(note.due)}</td>
+                         <td class="note-date">${formatDateForDisplay(note.due)}</td>
                     </tr>
                 `);
+                if (note.overdue) {
+                  row.find('td').addClass('task-overdue');
+                  row.find('.note-date').text("OVERDUE");
+              }
 
         tableBody.append(row);
       });
@@ -354,7 +361,7 @@ $(document).ready(() => {
   }
 
   $('#due-today').on('click', () => {
-    setDueDate(0);
+    setDueDate(0, true);
   });
 
   $('#tagsDropdownMenu').on('change', '.form-check-input', () => {
@@ -390,16 +397,17 @@ $(document).ready(() => {
     });
   });
 
+  function deleteAlarm() {
+      const alarmName = currentNote + "_task_due_alarm";
+      chrome.alarms.clear(alarmName);
+  }
+
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find((n) => Number(n.id) === currentNote);
-      const now = new Date();
-      const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-      // const alarmName = `${note.id}_deletion_alarm`;
-      note.recentlyDeleted = true;
-      note.scheduledDeletion = deletionDate.toISOString();
-      chrome.storage.local.set({ notes: existingNotes }, () => {
+      const updatedNotes = existingNotes.filter((note) => Number(note.id) !== currentNote);
+      deleteAlarm(currentNote);
+      chrome.storage.local.set({ notes: updatedNotes }, () => {
         loadNotes();
       });
     });
