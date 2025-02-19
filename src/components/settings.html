@@ -6,80 +6,67 @@
     <title>Hawk - Settings</title>
 </head>
 <body class="settings-body hidden">
-    <button id="goBackBtn" class="btn btn-secondary" style="position: absolute;">Go Back</button>
+    <button id="goBackBtn" class="btn btn-secondary">Go Back</button>
     <div class="container d-flex settings-container flex-nowrap">
-        <div class="settings-title">Settings</div>
-        <div class="col-4 me-5 settings-sidebar" id="settings-sidebar">
-            <div class="settings-entry selected" id="indexing" data-tooltip="Indexing settings" data-target="indexing-pane">
+        <div class="col-4 me-5 settings-sidebar" style="background-color: white;" id="settings-sidebar">
+            <div class="settings-title">Settings</div>
+            <div class="settings-entry selected" id="appearance" data-tooltip="Appearance settings" data-target="appearance-pane">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-display-fill settings-icon" viewBox="0 0 16 16">
+                    <path d="M5 3.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-7z"/>
+                    <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2z"/>
+                </svg>
+                Appearance
+            </div>
+            <div class="settings-entry" id="indexing" data-tooltip="Indexing settings" data-target="indexing-pane">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-clipboard-check settings-icon" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
                     <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h-1z"/>
                     <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/>
                 </svg>
-                <span class="settings-icon-text">Indexing</span>
+                Indexing
             </div>
             <div class="settings-entry" id="backup" data-tooltip="Backup and restore" data-target="backup-pane">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-device-ssd settings-icon" viewBox="0 0 16 16">
                     <path d="M4.75 4a.75.75 0 0 0-.75.75v3.5c0 .414.336.75.75.75h6.5a.75.75 0 0 0 .75-.75v-3.5a.75.75 0 0 0-.75-.75zM5 8V5h6v3zm0-5.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0m7 0a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0M4.5 11a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1m7 0a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1"/>
                     <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm11 12V2a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1v-2a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2a1 1 0 0 0 1-1m-7.25 1v-2H5v2zm1.75 0v-2h-.75v2zm1.75 0v-2H8.5v2zM11 13h-.75v2H11z"/>
                 </svg>
-                <span class="settings-icon-text">Backup</span>
-            </div>
-            <div class="settings-entry" id="appearance" data-tooltip="Appearance settings" data-target="appearance-pane">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-palette settings-icon" viewBox="0 0 16 16">
-                    <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3"/>
-                    <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8m-8 7c.611 0 .654-.171.655-.176.078-.146.124-.464.07-1.119-.014-.168-.037-.37-.061-.591-.052-.464-.112-1.005-.118-1.462-.01-.707.083-1.61.704-2.314.369-.417.845-.578 1.272-.618.404-.038.812.026 1.16.104.343.077.702.186 1.025.284l.028.008c.346.105.658.199.953.266.653.148.904.083.991.024C14.717 9.38 15 9.161 15 8a7 7 0 1 0-7 7"/>
-                </svg>
-                <span class="settings-icon-text">Appearance</span>
+                Backup and Restore
             </div>
             <div class="settings-entry" id="about" data-tooltip="About Hawk" data-target="about-pane">
                 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-info-circle settings-icon" viewBox="0 0 16 16">
                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
                     <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
                 </svg>
-                <span class="settings-icon-text">About</span>
+                About
             </div>
-            <div class="settings-indicator"></div>
         </div>
-        <div class="col-8" style="padding-left: 0px; padding-right: 0px;">
-            <div class="settings-pane active" id="indexing-pane">
-                <div class="section-heading index-heading">Allowed sites</div>
-                <div class="row flex settings-section align-contents-center">
-                    <div class="col-auto zero-margin zero-padding index-info dynamic-title">Indexing will occur whenever these host names are visited. Enter rules starting "www".</div>
-                    <ul class="nav nav-tabs mt-2" id="indexerTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="sites-tab" data-bs-toggle="tab" href="#sites" role="tab">Sites</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="string-matches-tab" data-bs-toggle="tab" href="#string-matches" role="tab">String matches</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
-                        </li>
-                        <div class="col d-flex align-items-center">
-                            <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
+        <div class="col-8">
+            <div class="settings-pane" id="appearance-pane">
+                <div class="section-heading">Wallpaper</div>
+                <div class="row flex settings-section align-contents-center mb-4">
+                    <div class="col-auto zero-margin zero-padding dynamic-title">Change background on To-Do List and Notebook pages</div>
+                    <div class="col-auto d-flex zero-margin zero-padding w-100 mt-2 settings-wallpaper-preview">
+                        <img class="settings-wallpaper-preview-img">
+                    </div>
+                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
+                        <button class="btn btn-secondary background-reset-btn">Restore to default</button>
+                        <label for="backgroundInput" class="btn btn-secondary browse-background-btn">Browse for background</label>
+                        <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
+                    </div>
+                </div>
+                <div class="section-heading">UI theming</div>
+                <div class="row flex settings-section align-contents-center mb-2">
+                    <div class="col-auto zero-margin zero-padding dynamic-title my-auto">Dark mode</div>
+                    <div class="col d-flex zero-margin zero-padding align-contents-end w-25 justify-content-end">
+                        <div class="form-check form-switch form-switch-lg">
+                            <input class="form-check-input form-switch-lg dark-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
                         </div>
-                        <div class="col d-flex justify-content-xxl-end zero-margin">
-                            <button class="btn btn-secondary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
-                            
-                        </div>
-                        <button type="button" id="addCurrentSite" class="btn btn-secondary add-rule-btn tab-section-btn">Add current URL</button>
-                    </ul>
-                    <div class="tab-content mt-2">
-                        <div class="tab-pane fade show active" id="sites" role="tabpanel">
-                            <ul class="index-list" id="sites-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="urls" role="tabpanel">
-                            <ul class="index-list" id="urls-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="string-matches" role="tabpanel">
-                            <ul class="index-list" id="string-matches-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="regex" role="tabpanel">
-                            <ul class="index-list" id="regex-list"></ul>
+                    </div>
+                    <div class="row w-100 mt-2"></div>
+                    <div class="col-auto zero-margin zero-padding dynamic-title my-auto">Use system setting to determine theme</div>
+                    <div class="col d-flex zero-margin zero-padding align-contents-end w-25 justify-content-end">
+                        <div class="form-check form-switch form-switch-lg">
+                            <input class="form-check-input form-switch-lg sys-dark-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
                         </div>
                     </div>
                 </div>
@@ -87,11 +74,15 @@
             <div class="settings-pane d-none" id="backup-pane">
                 <div class="section-heading">Restore data</div>
                 <div class="row flex settings-section align-contents-center mb-4">
-                    <label for="jsonAllInput" class="btn btn-secondary restore-all-btn">Restore all from JSON file</label>
-                    <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
+                    <div class="button-container" data-tooltip="Either restore all data from a JSON file, or import it and select elements for restore from below">
+                        <label for="jsonAllInput" class="btn btn-secondary restore-all-btn">Restore all from JSON file</label>
+                        <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
+                    </div>
                     
-                    <label for="jsonSelectiveInput" class="btn btn-secondary import-selection-btn">Import data for selection</label>
-                    <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
+                    <div class="button-container" data-tooltip="Upload a JSON file to import settings">
+                        <label for="jsonSelectiveInput" class="btn btn-secondary import-selection-btn">Import data for selection</label>
+                        <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
+                    </div>
                 </div>
                 <div class="col zero-margin zero-padding mt-3 d-none" id="backup-select-col">
                     <ul class="nav nav-tabs" id="backupTabs" role="tablist">
@@ -142,32 +133,44 @@
                     </div>
                 </div>
             </div>
-            <div class="settings-pane d-none" id="appearance-pane">
-                <div class="section-heading">Wallpaper</div>
-                <div class="row flex settings-section align-contents-center mb-4">
-                    <div class="col-auto zero-margin zero-padding dynamic-title">Change background on To-Do List and Notebook pages</div>
-                    <div class="col-auto d-flex zero-margin zero-padding w-100 mt-2 settings-wallpaper-preview">
-                        <img class="settings-wallpaper-preview-img">
-                    </div>
-                    <div class="col-auto zero-margin zero-padding w-100 mt-2">
-                        <button class="btn btn-secondary background-reset-btn">Restore to default</button>
-                        <label for="backgroundInput" class="btn btn-secondary browse-background-btn">Browse for background</label>
-                        <input type="file" id="backgroundInput" name="jsonBackgroundInput" accept="image/*" style="display: none;" />
-                    </div>
-                </div>
-                <div class="section-heading">UI theming</div>
-                <div class="row flex settings-section align-contents-center mb-2">
-                    <div class="col-auto zero-margin zero-padding dynamic-title my-auto">Dark mode</div>
-                    <div class="col d-flex zero-margin zero-padding align-contents-end w-25 justify-content-end">
-                        <div class="form-check form-switch form-switch-lg">
-                            <input class="form-check-input form-switch-lg dark-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            <div class="settings-pane d-none" id="indexing-pane">
+                <div class="section-heading index-heading">Allowed sites</div>
+                <div class="row flex settings-section align-contents-center">
+                    <div class="col-auto zero-margin zero-padding index-info dynamic-title">Indexing will occur whenever these host names are visited. Enter rules starting "www".</div>
+                    <ul class="nav nav-tabs mt-2" id="indexerTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active" id="sites-tab" data-bs-toggle="tab" href="#sites" role="tab">Sites</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="string-matches-tab" data-bs-toggle="tab" href="#string-matches" role="tab">String matches</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
+                        </li>
+                        <div class="col d-flex align-items-center">
+                            <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
                         </div>
-                    </div>
-                    <div class="row w-100 mt-2"></div>
-                    <div class="col-auto zero-margin zero-padding dynamic-title my-auto">Use system setting to determine theme</div>
-                    <div class="col d-flex zero-margin zero-padding align-contents-end w-25 justify-content-end">
-                        <div class="form-check form-switch form-switch-lg">
-                            <input class="form-check-input form-switch-lg sys-dark-toggle" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                        <div class="col d-flex justify-content-xxl-end zero-margin">
+                            <button class="btn btn-secondary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
+                            
+                        </div>
+                        <button type="button" id="addCurrentSite" class="btn btn-secondary add-rule-btn tab-section-btn">Add current URL</button>
+                    </ul>
+                    <div class="tab-content mt-2">
+                        <div class="tab-pane fade show active" id="sites" role="tabpanel">
+                            <ul class="index-list" id="sites-list"></ul>
+                        </div>
+                        <div class="tab-pane fade" id="urls" role="tabpanel">
+                            <ul class="index-list" id="urls-list"></ul>
+                        </div>
+                        <div class="tab-pane fade" id="string-matches" role="tabpanel">
+                            <ul class="index-list" id="string-matches-list"></ul>
+                        </div>
+                        <div class="tab-pane fade" id="regex" role="tabpanel">
+                            <ul class="index-list" id="regex-list"></ul>
                         </div>
                     </div>
                 </div>

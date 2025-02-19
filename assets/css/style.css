@@ -12,105 +12,68 @@
 	font-style: normal;
 }
 
-/* Modern Color Scheme */
+
 :root {
-  --ui-pane-color: rgba(230, 126, 34, 0.1);
+  --ui-pane-color: #dddddda3;
   --pane-text-color: #212529;
-  --primary-color: #e67e22;
-  --primary-hover: #d35400;
-  --accent-color: #e67e22;
-  --panel-bg: rgba(255, 255, 255, 0.95);
-  --search-bar-color: rgba(230, 126, 34, 0.08);
-  --settings-section-color: rgba(230, 126, 34, 0.1);
-  --settings-section-outline: solid 1px rgba(230, 126, 34, 0.2);
-  --panel-box-shadow: 0px 4px 15px rgba(230, 126, 34, 0.15);
   --placeholder-text-color: #757575;
   --search-svg-color: black;
   --filter-active-color: white;
   --filter-color: black;
+  --search-bar-color: #ffffff69;
   --dynamic-svg-color: black;
   --selected-color: white;
-  --modal-form-section-color: rgba(230, 126, 34, 0.2);
+  --settings-section-color: #6969691f;
+  --modal-form-section-color: #DDDDDD;
+  --settings-section-outline: solid 1px #bbbbbb;
   --warn-color: #2c2f32;
   --del-progress-color: #ff000036;
-  --cont-color: rgba(230, 126, 34, 0.15);
-  --circle-ind-color: #e67e22;
+  --cont-color: #dddddd;
+  --circle-ind-color: #6c757d;
   --settings-bg: url('../images/comic_cogs_bg.png');
   --wallpaper-preview: ../images/comic_bg.png;
   --comic-bg: url('../images/comic_bg.png');
+  --panel-box-shadow: 0px 0px 24px #0000008a;
   --note-item-hover-color: #e9ecef;
-  --background-dark: #1a1a1a;
-  --background-light: #ffffff;
-  --text-dark: #2c3e50;
-  --text-light: #ecf0f1;
-  --panel-bg-dark: rgba(28, 28, 30, 0.95);
-  --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  --border-radius: 12px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  /* Darker greys to complement orange */
-  --background-dark: #1a1a1a;
-  --panel-bg: rgba(38, 38, 38, 0.95);
-  --ui-pane-color: rgba(45, 45, 45, 0.95);
-  --search-bar-color: rgba(50, 50, 50, 0.9);
-  --settings-section-color: rgba(40, 40, 40, 0.95);
-  --modal-form-section-color: rgba(35, 35, 35, 0.95);
-  --warn-color: #e6e6e6;
-  --text-dark: #d4d4d4;
-  --pane-text-color: #e6e6e6;
-  --placeholder-text-color: #999999;
-  
-  /* Keep orange accents */
-  --primary-color: #e67e22;
-  --primary-hover: #d35400;
-  --accent-color: #e67e22;
-  --panel-box-shadow: 0px 4px 15px rgba(230, 126, 34, 0.2);
-}
+}   
 
-/* Dark mode variables */
 html.dark {
-  --ui-pane-color: rgba(230, 126, 34, 0.2);
+  --ui-pane-color: #2c2c2ca3;
   --pane-text-color: white;
-  --panel-bg: var(--panel-bg-dark);
-  --search-bar-color: rgba(230, 126, 34, 0.15);
-  --settings-section-color: rgba(230, 126, 34, 0.15);
-  --settings-section-outline: none;
   --placeholder-text-color: #c2c2c2;
   --search-svg-color: white;
   --filter-active-color: white;
   --filter-color: white;
+  --search-bar-color: #00000069;
   --dynamic-svg-color: white;
   --selected-color: white;
-  --modal-form-section-color: rgba(230, 126, 34, 0.3);
+  --settings-section-color: #4a4a4a;
+  --modal-form-section-color: #4a4a4a;
+  --settings-section-outline: none;
   --warn-color: white;
   --del-progress-color: #321717c9;
-  --cont-color: rgba(230, 126, 34, 0.25);
+  --cont-color: #dddddd26;
   --circle-ind-color: #3d4144;
   --wallpaper-preview: ../images/comic_bg_dark.png;
   --settings-bg: url('../images/comic_cogs_bg_dark.png');
   --comic-bg: url('../images/comic_bg_dark.png');
-  --panel-box-shadow: 0px 4px 20px rgba(230, 126, 34, 0.2);
+  --panel-box-shadow: 0px 0px 24px #0000008a;
   --note-item-hover-color: #1e1e1f;
-  --text-color: var(--text-light);
-  background-color: var(--background-dark);
-  --panel-bg: rgba(28, 28, 30, 0.95);
-  --ui-pane-color: rgba(35, 35, 35, 0.95);
-  --search-bar-color: rgba(40, 40, 40, 0.95);
-  --settings-section-color: rgba(45, 45, 45, 0.95);
 }
 
-/* Base Styles */
+body.hidden {
+  display: none;
+}
+
 body, html {
-	font-family: 'Roboto', sans-serif !important;
-	background-color: rgba(230, 126, 34, 0.05);
+	font-family: Roboto, Arial, sans-serif !important;
+	background-color: white;
 	margin: 0;
 	max-width: 100%;
 	height: 100%;
 	padding: 0!important;
 	overflow-x: hidden;
-  background-color: #262626;
-  line-height: 1.6;
-  color: var(--text-dark);
-  transition: var(--transition);
+  background-color: #dddddda3;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -151,7 +114,6 @@ ul {
 	border-radius: 18px;
 	position: relative;
 }
-
 .button-div, #add-todo-btn, .primary-outline-btn, #add-note-button, .add-task, .add-task-modal, .selective-checkbox, #appearance,
 #notebook, #indexing,#backup,#about, #manage-settings, #todo-list-button, .note-item {
 	cursor: pointer;
@@ -159,7 +121,7 @@ ul {
 
 .button-div, #add-todo-btn, .primary-outline-btn {
 	margin-top: 0.8em !important;
-	background-color: rgba(230, 126, 34, 0.1);
+	background-color: #DDDDDD;
 	border: 2px solid #C45500;
 	position: absolute;
 	top: 50%; 
@@ -202,6 +164,7 @@ ul {
   font-size: 1.35rem;
   display: flex;
   align-items: center;
+	
 }
 
 .popup-control-group {
@@ -211,26 +174,21 @@ ul {
   justify-content: space-between;
 	user-select: none;
 }
-
 .popup-control-group , .card-title-lg , .card-title-md , .search-bar , .search-bar-sm, .list-group-item {
 	padding-left: 0.6em
 }
-
 .card-title-lg, .card-title-md, .popup-control-group {
 	padding-right: 0.6em
 }
-
 .popup-control-group, .card-title-lg, .card-title-md, .panel-lg,.search-bar, .search-bar-sm, .list-group-item {
 	padding-top: 0.4em
 }
-
 .popup-control {
-  width: 45%;
+width: 45%;
   align-items: center;
   display: flex;
   justify-content: center;
 }
-
 .popup-control-group, .card-title-lg, .card-title-md, .panel-lg, .search-bar , .search-bar-sm , .list-group-item {
 	padding-bottom: 0.4em
 }
@@ -242,7 +200,6 @@ ul {
 .cosmetic-offset-1 {
   margin-left: 1.25rem;
 }
-
 .card-title-lg, .card-title-md {
 	font-family: Roboto Medium, Arial, sans-serif;
 	background-color: var(--ui-pane-color);
@@ -250,7 +207,7 @@ ul {
 	box-shadow: var(--panel-box-shadow);
 	border-radius: 12px;
 	display: flex;
-  align-items: center;
+  	align-items: center;
 	user-select: none;
 }
 
@@ -258,7 +215,7 @@ ul {
   font-size: 1.25rem;
 }
 
-.card-title-lg , .task-title, .warn-text, .warn-text-3, .warn-text-4 {
+.card-title-lg , .task-title, .warn-text, .warn-text-3, .warn-text-4{
   font-size: 2rem;
 }
 
@@ -268,6 +225,7 @@ ul {
 	box-shadow: var(--panel-box-shadow);
 	border-radius: 12px;
 }
+
 
 .controls {
   margin-left: 0.075rem;
@@ -285,7 +243,7 @@ ul {
 }
 
 .filter-btn:hover {
-	background-color: rgba(230, 126, 34, 0.2);
+	background-color: #6c757d2e;
 }
 
 .filter-btn:active svg {
@@ -299,8 +257,6 @@ ul {
   transition: background 0.5s ease-out;
   font-size: 0.85rem;
   padding: 0.4rem 0.6rem;
-  background-color: var(--search-bar-color);
-  color: var(--text-dark);
 }
 
 .search-bar-sm:focus {
@@ -323,16 +279,15 @@ ul {
   width: 96%;
   margin-top: 1.2em;
 }
-
 .search-bar, .search-bar-sm {
 	font-family: Roboto, Arial, sans-serif;
 	background-color: var(--search-bar-color);
 	backdrop-filter: blur(8px);
 	border: none;
 	font-size: 1rem;
-  border-radius: 0.375rem;
-  display: flex;
-  align-items: start;
+  	border-radius: 0.375rem;
+  	display: flex;
+  	align-items: start;
 }
 
 .search-bar:focus {
@@ -357,17 +312,17 @@ input::placeholder {
 .col-auto {
 	display: flex; /* Ensure the child columns align correctly */
 	align-items: center; /* Vertical alignment */
-}
+  }
 
 .search-bar-lg:focus {
 	outline: none;
 }
-
 #add-todo-btn, .primary-outline-btn {
 	margin-left: 10px;
 	font-weight: bold;
 	color: #C45500;
 	border-radius: 1.5vw;
+
 }
 
 #add-todo-btn {
@@ -376,6 +331,7 @@ input::placeholder {
 	height: 3vw;
 	font-size: 2.5vw;
 	line-height: 3vw;
+	 
 }
 
 .form-control:focus {
@@ -388,12 +344,13 @@ input::placeholder {
   border-radius: 4rem
 }
 
-.primary-outline-btn {
+.primary-outline-btn{
 	width: 6vw;
 	height: 6vw;
 	font-size: 3vw;
 	padding-left: 1.8vw;
 	line-height: 0;
+	
 }
 
 .btn-circle {
@@ -499,19 +456,12 @@ input::placeholder {
   margin-top: 0.2em;
 }
 
-.note-container, .form-check-2 {
-	background-color: var(--panel-bg);
+.note-container, .form-check-2{
+	background-color: var(--ui-pane-color);
 	backdrop-filter: blur(8px);
-	box-shadow: 0 4px 15px rgba(230, 126, 34, 0.15);
+	box-shadow: var(--panel-box-shadow);
 	padding: 1.5em;
 	border-radius: 12px;
-  transition: var(--transition);
-}
-
-.note-container:hover,
-.form-check-2:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(230, 126, 34, 0.25);
 }
 
 .changing {
@@ -531,7 +481,8 @@ input::placeholder {
 .section-heading,
 .card-title-clear,
 .search-bar,
-.search-bar-lg {
+.search-bar-lg
+ {
   color: var(--pane-text-color);
 }
 
@@ -551,8 +502,11 @@ input::placeholder {
 .form-check-2 {
 	display: block;
 	margin-top: 1.5em;
-  transition: background 0.5s ease-out;
-  border: 1px solid rgba(230, 126, 34, 0.2);
+  	transition: background 0.5s ease-out;
+}
+
+.form-check-2 .form-check-input {
+	float: left;
 }
 
 .task-desc {
@@ -577,7 +531,7 @@ input::placeholder {
 }
 
 .todo-container {
-	background-color: rgba(230, 126, 34, 0.08);
+	background-color: #DDDDDD;
 	border: None;
 }
 
@@ -613,7 +567,7 @@ input::placeholder {
 }
 
 .task-form {
-	background-color: rgba(230, 126, 34, 0.1);
+	background-color: #DDDDDD;
 	border-radius: 5px;
 	padding: 15px;
 	margin-bottom: 20px;
@@ -649,7 +603,7 @@ input::placeholder {
 }
 
 .task-form-modal {
-	background-color: rgba(230, 126, 34, 0.1);
+	background-color: #DDDDDD;
 	border-radius: 5px;
 	padding: 15px;
 }
@@ -678,6 +632,7 @@ input::placeholder {
   background: none;
 	border-radius: 0.375rem;
 	padding-bottom: 2rem;
+  
 }
 
 .task-list,
@@ -730,7 +685,7 @@ label {
 
 .btn.btn-primary.index-restore-btn,
 .btn.btn-primary.tasks-restore-btn,
-.btn.btn-primary.note-restore-btn {
+.btn.btn-primary.note-restore-btn{
 	margin-left: 0;
 }
 
@@ -746,6 +701,7 @@ label {
 	padding-bottom: 2rem;
 }
 
+
 .task-row {
 	margin-top: 2rem;
 }
@@ -754,6 +710,7 @@ label {
 	display: block;
 	clear: both;
   vertical-align: middle;
+  
 }
 
 input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
@@ -761,6 +718,8 @@ input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
 	border: 2px solid #C45500;
 	color: #fff;
 }
+
+
 
 .form-check .form-check-input:not([role="switch"]):checked + .container .row .form-check-label , 
 .form-check-2 .form-check-input:not:checked + .container .row .form-check-label {
@@ -862,6 +821,7 @@ input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
 	background-color: transparent;
 	border: 2px solid black;
 	border-radius: 10px;
+	
 }
 
 #title {
@@ -895,13 +855,12 @@ input[type="checkbox"]:not(.selective-checkbox):not([role="switch"]):checked {
 	font-size: 2.5rem;
 }
 
-.bold-text {
+.bold-text{
 	font-weight: bold;
 	border-bottom: 2px solid #0000003d;
 	padding-bottom: 0.5em;
 }
-
-.no-padding {
+.no-padding{
 	padding:0;
 }
 
@@ -950,44 +909,19 @@ svg {
   margin: 0.3rem 0;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease; /* Keep only background transition */
+  transition: all 0.2s ease;
+  color: var(--text-color);
+  text-decoration: none;
+  position: relative;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
-.settings-entry:hover {
-  background-color: rgba(230, 126, 34, 0.15);
-  /* Remove transform effect */
+.settings-entry span {
+  display: none;
 }
-
-/* Remove icon scale effect on hover */
-.settings-entry:hover .settings-icon {
-    transform: none; /* Remove scale effect */
-}
-
-/* Remove tooltip hover effect */
-.settings-entry[data-tooltip]:before {
-    display: none; /* Remove tooltip completely */
-}
-
-.settings-entry[data-tooltip]:hover:before {
-    display: none; /* Ensure tooltip stays hidden on hover */
-}
-
-/* Keep selected state styling */
-.settings-entry.selected {
-    background: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
-}
-
-/* Icon base styling */
-.settings-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    /* Remove transition effects */
-}
-
-
 
 .settings-entry::after {
     content: attr(data-tooltip);
@@ -1054,15 +988,16 @@ svg {
 
 .settings-icon {
 	margin-left: 0.75rem;
-	margin-right: 0.75rem;
+	margin-right: 0.5rem;
   width: 24px;
   height: 24px;
 }
 
 .section-heading {
 	font-size: 1.5rem;
-	font-weight: bold;  
+	font-weight: bold;
 	margin-bottom: 0.5rem;
+  
 }
 
 .settings-section {
@@ -1071,16 +1006,7 @@ svg {
 	padding: 0.5rem;
 	background-color: var(--settings-section-color);
 	width: 96%;
-  transition: var(--transition);
-  background: var(--settings-section-color);
-  border: 1px solid rgba(230, 126, 34, 0.15);
 }
-
-.settings-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
 .warn, .warn-2 , .warn-3 {
 	fill: var(--warn-color);
 }
@@ -1091,6 +1017,7 @@ svg {
 	opacity: 0.08;
 	position: absolute;
 	padding-bottom: 1.5rem;
+  
 }
 
 .warn-2 {
@@ -1098,6 +1025,7 @@ svg {
 	width: 12rem;
 	height: 12rem;
 	opacity: 0.75;
+  
 }
 
 .warn-3 {
@@ -1105,12 +1033,10 @@ svg {
 	height: 10rem;
 	opacity: 0.75;
 }
-
 .warn-text, .warn-text-2, .warn-text-3, .warn-text-4 {
 	font-weight: bold;
 	color: var(--warn-color);
 }
-
 .warn-text {
 	padding-top: 3.6rem;
 }
@@ -1237,6 +1163,7 @@ svg {
 	border-radius: 12px;
 	width: 100%;
 	height: 100%;
+  
 }
 
 @keyframes due-shake {
@@ -1353,6 +1280,7 @@ svg {
 .settings-entry .settings-icon {
     width: 24px;
     height: 24px;
+    margin-right: 0;
 }
 
 /* Hide the text next to icons */
@@ -1535,62 +1463,13 @@ svg {
     transition: all 0.4s ease;
     padding: 1.5rem;
     border-radius: 12px;
-    background: var(--bs-body-bg);
+    background: white;
     box-shadow: var(--panel-box-shadow);
 }
 
 .settings-pane.active {
     opacity: 1;
     transform: translateX(0);
-}
-
-/* Button Styling */
-.btn {
-  border-radius: 8px;
-  padding: 0.8rem 1.5rem;
-  font-weight: 500;
-  transition: var(--transition);
-  border: none;
-  background: var(--primary-color);
-  color: white;
-}
-
-.btn:hover {
-  background: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
-}
-
-/* Search Bar Enhancement */
-.search-bar {
-  background: var(--panel-bg);
-  border: 1px solid rgba(230, 126, 34, 0.2);
-  border-radius: 8px;
-  padding: 0.8rem 1rem;
-  transition: var(--transition);
-}
-
-.search-bar:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
-}
-
-/* Animation Keyframes */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.settings-pane,
-.note-container,
-.form-check-2 {
-  animation: fadeIn 0.3s ease-out;
 }
 
 /* Button Styling */
@@ -1770,9 +1649,6 @@ svg {
 .form-control {
     font-size: 0.85rem;
     padding: 0.4rem 0.6rem;
-    background-color: var(--search-bar-color);
-    color: var(--text-dark);
-    border: 1px solid rgba(230, 126, 34, 0.2);
 }
 
 /* Tooltip Enhancement */
@@ -1830,7 +1706,7 @@ svg {
 }
 
 [data-tooltip]:before {
-    content: none; /* Remove the tooltip content */
+    content: attr(data-tooltip);
     position: absolute;
     bottom: 100%;
     left: 50%;
@@ -1849,15 +1725,22 @@ svg {
 }
 
 [data-tooltip]:hover:before {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 1;
+    visibility: visible;
+    bottom: calc(100% + 5px);
 }
-/* Add styles for the text under icons */
-.settings-icon-text {
-  text-align: center;
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--pane-text-color); /* Ensure the text color is visible */
+
+/* Button Tooltips */
+.btn[data-tooltip] {
+    overflow: visible;
+}
+
+/* Search Bar Tooltips */
+.search-bar-sm[data-tooltip]:before {
+    font-size: 0.75rem;
+    white-space: normal;
+    max-width: 200px;
+    text-align: center;
 }
 
 /* Responsive Adjustments */
@@ -2089,7 +1972,7 @@ svg {
 #settings-sidebar {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
     width: 100%;
     min-height: 70px;
@@ -2124,7 +2007,8 @@ svg {
 
 /* Settings Title */
 .settings-title {
-    font-size: 22px;
+    margin-right: 2rem;
+    font-size: 1.2rem;
 }
 
 /* Responsive Design */
@@ -2140,6 +2024,10 @@ svg {
         padding: 0.4rem;
     }
 
+    .settings-title {
+        margin-right: 1.5rem;
+        font-size: 1.1rem;
+    }
 
     .settings-entry[data-tooltip]:before {
         font-size: 0.75rem;
@@ -2325,189 +2213,7 @@ svg {
     }
 }
 
-/* Settings Entry Enhancement */
-.settings-entry {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: 12px;
-    transition: background-color 0.3s ease; /* Keep only background transition */
-}
-
-.settings-entry:hover {
-    background: var(--settings-section-color);
-    /* Remove transform effect */
-}
-
-/* Remove icon scale effect on hover */
-.settings-entry:hover .settings-icon {
-    transform: none; /* Remove scale effect */
-}
-
-/* Remove tooltip hover effect */
-.settings-entry[data-tooltip]:before {
-    display: none; /* Remove tooltip completely */
-}
-
-.settings-entry[data-tooltip]:hover:before {
-    display: none; /* Ensure tooltip stays hidden on hover */
-}
-
-/* Keep selected state styling */
-.settings-entry.selected {
-    background: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
-}
-
-/* Icon base styling */
-.settings-icon {
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
-    /* Remove transition effects */
-}
-
-/* Button styling */
-.btn-secondary {
-    background-color: var(--primary-color);
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2);
-}
-
-/* Settings sections */
-.settings-section {
-    background: var(--settings-section-color);
-    border-radius: 12px;
-    padding: 1.2rem;
-    margin-bottom: 1rem;
-    border: var(--settings-section-outline);
-    transition: all 0.3s ease;
-}
-
-.settings-section:hover {
-    box-shadow: 0 6px 15px rgba(230, 126, 34, 0.1);
-}
-
-/* Form controls */
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--panel-bg);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
-}
-
-/* Settings icon text */
-.settings-icon-text {
-    font-size: 12px;
-    margin-top: 4px;
-    color: var(--pane-text-color);
-    text-align: center;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.settings-entry.selected .settings-icon-text {
-    color: white;
-}
-
-/* Sliding indicator for selected tab */
-.settings-sidebar {
-    position: relative;
-    padding-bottom: 3px; /* Space for the indicator */
-}
-
-.settings-indicator {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 3px;
-    width: 60px; /* Width of each tab */
-    background-color: var(--primary-color);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-radius: 3px;
-}
-
-/* Update settings entry for horizontal layout */
-.settings-entry {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 8px;
-    cursor: pointer;
-    min-width: 60px; /* Match indicator width */
-}
-
-/* Sliding indicator for selected tab */
-.settings-sidebar {
-    position: relative;
-}
-
-.settings-indicator {
-    position: absolute;
-    bottom: -2px;
-    height: 3px;
-    background-color: var(--primary-color);
-    transition: transform 0.3s ease;
-    border-radius: 3px;
-    width: 60px; /* Match the width of your icons */
-}
-
-.settings-entry {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-/* Remove existing selected state background */
-.settings-entry.selected {
-    background: transparent;
-    color: var(--primary-color);
-}
-
-.settings-entry.selected .settings-icon {
-    color: var(--primary-color);
-    fill: var(--primary-color);
-}
-
-.settings-entry.selected .settings-icon-text {
-    color: var(--primary-color);
-}
-
-/* Modal backgrounds */
-.modal-content {
-  background-color: var(--panel-bg);
-  border: 1px solid rgba(230, 126, 34, 0.2);
+#group-by-dropdown {
+  border-left: 1px solid white;
+  border-radius: 0 10px 0 0;
 }
