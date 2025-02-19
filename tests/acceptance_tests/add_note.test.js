@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 
 const extensionPath = path.resolve(__dirname, '../../'); // Adjust if needed
-const extensionId = 'nfeeaifmnnlphlhlpifkfonoddpfegag'; // Use your extension ID
+let extensionId = 'nfeeaifmnnlphlhlpifkfonoddpfegag'; // Use your extension ID
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -22,8 +22,19 @@ describe('Chrome Extension: Add Note Test', () => {
     });
 
     console.log('✅ Extension Loaded. Opening New Tab...');
+    
     page = await browser.newPage();
-    await page.goto('about:blank');
+    await page.goto('chrome://extensions');
+
+    extensionId = await page.evaluate(() => {
+      const extensionsItemElement = document.querySelector('body > extensions-manager')
+        ?.shadowRoot.querySelector('#items-list')
+        ?.shadowRoot.querySelector('extensions-item');
+  
+      return extensionsItemElement ? extensionsItemElement.getAttribute('id') : null;
+    });
+
+    console.log('Extension ID:', extensionId);
 
     console.log('🔄 Opening Extension Popup...');
     const popupUrl = `chrome-extension://${extensionId}/src/components/hello.html`;
