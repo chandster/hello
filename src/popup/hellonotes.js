@@ -1,5 +1,3 @@
-
-
 $(document).ready(() => {
   let currentNote = null;
   const categoryDropdownMenu = $('#categoryDropdownMenu');
@@ -26,8 +24,8 @@ $(document).ready(() => {
   }
 
   function getSelectedCheckboxes() {
-    const dropdownMenuNote = document.getElementById('categoryDropdownMenu');
-    const selectedCheckboxes = dropdownMenuNote.querySelectorAll('.form-check-input:checked');
+    const dropdownMenu = document.getElementById('categoryDropdownMenu');
+    const selectedCheckboxes = dropdownMenu.querySelectorAll('.form-check-input:checked');
     const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
       const tagId = checkbox.getAttribute('data-category-id');
       const tagName = checkbox.value;
@@ -130,11 +128,8 @@ $(document).ready(() => {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const { notes } = data;
       const tableBody = $('#tasks-display');
-      const noTasks = $('#tasks-display-noNotes');
-      const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
-      var activeDisplayNote = 0;
       notes.forEach((note, index) => {
         if (note.recentlyDeleted) {
           return;
@@ -144,7 +139,7 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-        activeDisplayNote = activeDisplayNote + 1;
+
         const row = $(`
                     <tr>
                         <td style="justify-content: center; align-items: center;">
@@ -160,14 +155,6 @@ $(document).ready(() => {
 
         tableBody.append(row);
       });
-      if (activeDisplayNote > 0) {
-        noTasks.hide();
-        tasks.show();
-        
-    } else {
-      tasks.hide();
-      noTasks.show();
-    }
     });
     setDueDate(7);
   }
@@ -409,13 +396,6 @@ $(document).ready(() => {
     setNoteDeleted();
     resetAddNoteForm();
   });
-
-  chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === "local" && changes.notes) {
-        loadNotes();
-    }
-});
-  
 
   // Load the notes when the document is ready
   loadNotes();

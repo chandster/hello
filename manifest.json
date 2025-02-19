@@ -11,15 +11,13 @@
 
   "permissions": [
     "activeTab",
-    "contextMenus",
     "tabs",
     "storage",
     "unlimitedStorage",
 		"notifications",
 		"alarms",
-    "sidePanel",
-    "contextMenus",
-    "commands"
+    "tabs",
+    "sidePanel"
   ],
 
   "side_panel": {
@@ -49,8 +47,7 @@
       "matches": ["<all_urls>"],
       "js": [
         "assets/js/jquery-3.7.1.min.js",
-        "src/content/send_content.js",
-        "src/popup/hellonotes.js"
+        "src/content/send_content.js"
       ]
     }
   ],
