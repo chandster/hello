@@ -5,7 +5,9 @@ const path = require('path');
 const extensionPath = path.resolve(__dirname, '../../');
 let extensionId;
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
 describe('Chrome Extension: Delete Note Test', () => {
   let browser;

@@ -5,7 +5,9 @@ const path = require('path');
 const extensionPath = path.resolve(__dirname, '../../'); // Adjust if needed
 let extensionId = 'nfeeaifmnnlphlhlpifkfonoddpfegag'; // Use your extension ID dynamically
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => {
+  setTimeout(resolve, ms);
+});
 
 describe('Chrome Extension: Note Management Tests', () => {
   let browser;
