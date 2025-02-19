@@ -67,7 +67,9 @@ describe('Chrome Extension: Edit Note Test', () => {
       console.log('📝 Original Note:', originalText);
 
       console.log('⌨ Editing the note...');
-      await popupPage.evaluate(() => document.querySelector('#noteinput').value = '');
+      await popupPage.evaluate(() => {
+        document.querySelector('#noteinput').value = '';
+      });
       await popupPage.type('#noteinput', 'Updated Note');
 
       console.log('🖱 Clicking the save button...');
