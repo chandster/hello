@@ -1,8 +1,6 @@
 import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
 import MiniSearch from '../../assets/js/minisearch.min.js';
 
-const { Mutex } = require('async-mutex');
-
 let engine;
 const winkNLP = require('wink-nlp');
 const model = require('wink-eng-lite-web-model');
@@ -63,17 +61,6 @@ async function setupBM25F() {
 
 setupBM25F();
 
-async function getLocalStorage(key) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get([key], (result) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        resolve(result);
-      }
-    });
-  });
-}
 
 // update the documents used by miniSearch
 function updateIndex(miniSearch, result) {
@@ -199,28 +186,6 @@ function deleteTask(allTasks, taskIdToRemove) {
     allTasks = updatedTasks;
   }
   chrome.storage.local.set({ tasks: allTasks }, () => {});
-}
-
-async function waitForTitleUpdate(title, lastTitles) {
-  for (let i = 0; i < MAX_TAB_REFRESH_ATTEMPTS; i += 1) {
-    await new Promise((resolve) => {
-      setTimeout(resolve, TAB_REFRESH_DELAY_MS);
-    });
-
-    const tabs = await new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
-        resolve(allTabs);
-      });
-    });
-    if (!(tabs && tabs.length)) return '';
-
-    title = tabs[0].title;
-    if (!lastTitles.has(title)) break;
-
-    if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return '';
-  }
-
-  return title;
 }
 
 // Listen for when the tab's url changes and send a message to popup.js
