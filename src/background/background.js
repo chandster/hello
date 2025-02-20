@@ -1,11 +1,7 @@
 import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
 import MiniSearch from '../../assets/js/minisearch.min.js';
-import * as PrepDocument from './prep-document.js';
 
-const xmlEscape = require('xml-escape');
 const { Mutex } = require('async-mutex');
-
-const indexMutex = new Mutex();
 
 let engine;
 const winkNLP = require('wink-nlp');
@@ -101,17 +97,6 @@ chrome.storage.local.get(['indexed']).then((result) => {
 const MAX_TAB_REFRESH_ATTEMPTS = 20;
 const TAB_REFRESH_DELAY_MS = 50;
 
-async function getIndexed() {
-  const indexedResult = await getLocalStorage('indexed');
-  const indexed = indexedResult.indexed || {};
-  if (Object.keys(indexed).length === 0) {
-    indexed.corpus = [];
-    indexed.links = new Set();
-  }
-  // chrome storage serialising and deserialising loses set type
-  indexed.links = new Set(indexed.links);
-  return indexed;
-}
 
 // gets the logical combinator (if present) to be passed into the MiniSearch search
 function getLogicalCombinator(searchTerms) {
@@ -236,18 +221,6 @@ async function waitForTitleUpdate(title, lastTitles) {
   }
 
   return title;
-}
-
-async function updateAllLastTitles(request, title, allLastTitles, tabId, lastTitles) {
-  if (lastTitles.has(title) || request.clicked) {
-    lastTitles.add(title);
-    title = await waitForTitleUpdate(title, lastTitles);
-    if (title === '') return;
-  }
-  lastTitles.add(title);
-  lastTitles = Array.from(lastTitles);
-  allLastTitles[tabId] = lastTitles;
-  await chrome.storage.local.set({ allLastTitles });
 }
 
 // Listen for when the tab's url changes and send a message to popup.js
