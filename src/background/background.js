@@ -81,8 +81,6 @@ chrome.storage.local.get(['indexed']).then((result) => {
   updateIndex(miniSearch, result);
 });
 
-const MAX_TAB_REFRESH_ATTEMPTS = 20;
-const TAB_REFRESH_DELAY_MS = 50;
 
 
 // gets the logical combinator (if present) to be passed into the MiniSearch search
