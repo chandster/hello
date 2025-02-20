@@ -96,8 +96,8 @@ $(document).ready(() => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
     if (today) {
-      //dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
-      dueDate.setHours(dueDate.getHours() + 3); 
+      dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      //dueDate.setHours(dueDate.getHours() + 3); 
     } else {
       dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
     }
@@ -144,7 +144,7 @@ $(document).ready(() => {
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
       var activeDisplayNote = 0;
-      notes.forEach((note, index) => {
+      notes.forEach((note) => {
         if (note.recentlyDeleted) {
           return;
         }
@@ -244,7 +244,7 @@ $(document).ready(() => {
           if (!selectedDueDate) {
             selectedDueDate = targetNote.due;
           } 
-          if (targetNote.due != selectedDueDate) {
+          if (targetNote.due !== selectedDueDate) {
             targetNote.overdue = false;
             const alarmName = `${currentNote}_task_due_alarm`;
             chrome.alarms.create(alarmName, {
