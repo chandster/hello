@@ -2226,14 +2226,6 @@ svg {
     cursor: pointer;
 }
 
-.radio-circle {
-  width: 3px;
-  height: 3px;
-  border: 1px solid blue;
-  border-radius: 50%;
-  display: inline-block;
-} 
-
 .task-overdue {
   background-color:#FA5F55!important;
 }

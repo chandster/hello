@@ -162,7 +162,7 @@ $(document).ready(() => {
                 `);
                 if (note.overdue) {
                   row.find('td').addClass('task-overdue');
-                  row.find('.note-date').text("OVERDUE");
+                  row.find('.note-date').html("<strong>OVERDUE</strong>");
               }
 
         tableBody.append(row);
@@ -243,6 +243,13 @@ $(document).ready(() => {
           targetNote.content = content;
           if (!selectedDueDate) {
             selectedDueDate = targetNote.due;
+          } 
+          if (targetNote.due != selectedDueDate) {
+            targetNote.overdue = false;
+            const alarmName = `${currentNote}_task_due_alarm`;
+            chrome.alarms.create(alarmName, {
+              when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
+          });
           }
           targetNote.due = selectedDueDate;
           chrome.storage.local.set({ notes: existingNotes }, () => {
@@ -401,6 +408,7 @@ $(document).ready(() => {
       const alarmName = currentNote + "_task_due_alarm";
       chrome.alarms.clear(alarmName);
   }
+
 
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
