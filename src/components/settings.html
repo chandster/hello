@@ -73,13 +73,11 @@
             </div>
             <div class="settings-pane d-none" id="backup-pane">
                 <div class="section-heading">Restore data</div>
-                <div class="row flex settings-section align-contents-center mb-4">
-                    <div class="button-container" data-tooltip="Either restore all data from a JSON file, or import it and select elements for restore from below">
+                <div class="row flex settings-section align-contents-center">
+                    <div class="">
                         <label for="jsonAllInput" class="btn btn-secondary restore-all-btn">Restore all from JSON file</label>
                         <input type="file" id="jsonAllInput" name="jsonAllInput" accept=".json" style="display: none;" />
-                    </div>
-                    
-                    <div class="button-container" data-tooltip="Upload a JSON file to import settings">
+                        
                         <label for="jsonSelectiveInput" class="btn btn-secondary import-selection-btn">Import data for selection</label>
                         <input type="file" id="jsonSelectiveInput" name="jsonSelectiveInput" accept=".json" style="display: none;" />
                     </div>
@@ -109,7 +107,7 @@
                 <div class="section-heading mt-4">Restore all data by category</div>
                 <div class="row flex settings-section align-contents-center">
                     <div class="col-auto zero-margin zero-padding dynamic-title">Restore only the data from a given data category from the provided JSON backup</div>
-                    <div class="col-auto zero-margin zero-padding mt-2 w-100">
+                    <div>
                         <label for="jsonIndexInput" class="btn btn-secondary index-restore-btn">Upload data to restore search index</label>
                         <input type="file" id="jsonIndexInput" name="jsonIndexInput" accept=".json" style="display: none;" />
                         <label for="jsonInput" class="btn btn-secondary tasks-restore-btn">Upload data to restore tasks</label>
