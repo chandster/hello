@@ -2205,7 +2205,189 @@ svg {
     }
 }
 
-#group-by-dropdown {
-  border-left: 1px solid white;
-  border-radius: 0 10px 0 0;
+/* Settings Entry Enhancement */
+.settings-entry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background-color 0.3s ease; /* Keep only background transition */
+}
+
+.settings-entry:hover {
+    background: var(--settings-section-color);
+    /* Remove transform effect */
+}
+
+/* Remove icon scale effect on hover */
+.settings-entry:hover .settings-icon {
+    transform: none; /* Remove scale effect */
+}
+
+/* Remove tooltip hover effect */
+.settings-entry[data-tooltip]:before {
+    display: none; /* Remove tooltip completely */
+}
+
+.settings-entry[data-tooltip]:hover:before {
+    display: none; /* Ensure tooltip stays hidden on hover */
+}
+
+/* Keep selected state styling */
+.settings-entry.selected {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+}
+
+/* Icon base styling */
+.settings-icon {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+    /* Remove transition effects */
+}
+
+/* Button styling */
+.btn-secondary {
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.2);
+}
+
+/* Settings sections */
+.settings-section {
+    background: var(--settings-section-color);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    border: var(--settings-section-outline);
+    transition: all 0.3s ease;
+}
+
+.settings-section:hover {
+    box-shadow: 0 6px 15px rgba(230, 126, 34, 0.1);
+}
+
+/* Form controls */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.2);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--panel-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
+}
+
+/* Settings icon text */
+.settings-icon-text {
+    font-size: 12px;
+    margin-top: 4px;
+    color: var(--pane-text-color);
+    text-align: center;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.settings-entry.selected .settings-icon-text {
+    color: white;
+}
+
+/* Sliding indicator for selected tab */
+.settings-sidebar {
+    position: relative;
+    padding-bottom: 3px; /* Space for the indicator */
+}
+
+.settings-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 60px; /* Width of each tab */
+    background-color: var(--primary-color);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px;
+}
+
+/* Update settings entry for horizontal layout */
+.settings-entry {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    cursor: pointer;
+    min-width: 60px; /* Match indicator width */
+}
+
+/* Sliding indicator for selected tab */
+.settings-sidebar {
+    position: relative;
+}
+
+.settings-indicator {
+    position: absolute;
+    bottom: -2px;
+    height: 3px;
+    background-color: var(--primary-color);
+    transition: transform 0.3s ease;
+    border-radius: 3px;
+    width: 60px; /* Match the width of your icons */
+}
+
+.settings-entry {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Remove existing selected state background */
+.settings-entry.selected {
+    background: transparent;
+    color: var(--primary-color);
+}
+
+.settings-entry.selected .settings-icon {
+    color: var(--primary-color);
+    fill: var(--primary-color);
+}
+
+.settings-entry.selected .settings-icon-text {
+    color: var(--primary-color);
+}
+
+/* Modal backgrounds */
+.modal-content {
+  background-color: var(--panel-bg);
+  border: 1px solid rgba(230, 126, 34, 0.2);
 }
