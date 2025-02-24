@@ -1,24 +1,24 @@
 function updateIndicatorPosition(entry) {
-    const indicator = document.querySelector('.settings-indicator');
-    if (!indicator) return;
-    
-    const entryRect = entry.getBoundingClientRect();
-    const sidebarRect = entry.parentElement.getBoundingClientRect();
-    
-    // Calculate horizontal position
-    const left = entryRect.left - sidebarRect.left;
-    const width = entryRect.width;
-    
-    // Update indicator position and width
-    indicator.style.transform = `translateX(${left}px)`;
-    indicator.style.width = `${width}px`;
+  const indicator = document.querySelector('.settings-indicator');
+  if (!indicator) return;
+
+  const entryRect = entry.getBoundingClientRect();
+  const sidebarRect = entry.parentElement.getBoundingClientRect();
+
+  // Calculate horizontal position
+  const left = entryRect.left - sidebarRect.left;
+  const { width } = entryRect;
+
+  // Update indicator position and width
+  indicator.style.transform = `translateX(${left}px)`;
+  indicator.style.width = `${width}px`;
 }
 
 function handleResize() {
-    const selectedEntry = document.querySelector('.settings-entry.selected');
-    if (selectedEntry) {
-        updateIndicatorPosition(selectedEntry);
-    }
+  const selectedEntry = document.querySelector('.settings-entry.selected');
+  if (selectedEntry) {
+    updateIndicatorPosition(selectedEntry);
+  }
 }
 
 function main() {

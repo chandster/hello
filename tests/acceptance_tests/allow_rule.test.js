@@ -5,10 +5,6 @@ const path = require('path');
 const extensionPath = path.resolve(__dirname, '../../');
 let extensionId;
 
-const delay = (ms) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
-
 describe('Chrome Extension: Allow Rule Test', () => {
   let browser;
   let page;
@@ -62,7 +58,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
     console.log('🔍 Checking for indexing button...');
     await popupPage.waitForSelector('#indexing', { timeout: 10000 });
 
-    console.log("🖱 Clicking indexing div...");
+    console.log('🖱 Clicking indexing div...');
     await popupPage.click('#indexing');
 
     console.log('🔍 Checking for indexing pane...');
@@ -80,9 +76,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
     console.log('🖱 Clicking button to add a new Site rule...');
     await popupPage.click('#allow-rule-btn');
 
-    console.log('Typing Site rule...')
+    console.log('Typing Site rule...');
     await popupPage.type('#addRuleInput', 'www.gla.ac.uk');
-
   });
-
 });
