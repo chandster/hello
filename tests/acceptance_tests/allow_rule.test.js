@@ -14,7 +14,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
   let page;
   let popupPage;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     browser = await puppeteer.launch({
       headless: false,
       args: [
@@ -41,7 +41,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
     console.log('✅ Extension Popup Opened Successfully!');
   }, 60000);
 
-  afterAll(async () => {
+  afterEach(async () => {
     if (browser) {
       await browser.close();
     }
@@ -58,11 +58,15 @@ describe('Chrome Extension: Allow Rule Test', () => {
     await popupPage.waitForSelector('.settings-container', { timeout: 10000 });
   });
 
-  test('User can navigate to indexing part of settings page', async () => {console.log('🔍 Checking for indexing button...');
+  test('User can navigate to indexing part of settings page', async () => {
+    console.log('🖱 Clicking settings button...');
+    await popupPage.click('#manage-settings');
+
+    console.log('🔍 Checking for indexing button...');
     await popupPage.waitForSelector('#indexing', { timeout: 10000 });
 
     console.log("🖱 Clicking indexing div...");
-    await popupPage.click('#indexing.settings-entry');
+    await popupPage.click('#indexing');
 
     console.log('🔍 Checking for indexing pane...');
     await popupPage.waitForSelector('#indexing-pane', { timeout: 10000 }).then(() => {
@@ -73,14 +77,22 @@ describe('Chrome Extension: Allow Rule Test', () => {
   });
 
   test('User can add a new Site rule', async () => {
+    console.log('🖱 Clicking settings button...');
+    await popupPage.click('#manage-settings');
 
-    console.log('🖱 Clicking Sites tab...');
-    await popupPage.click('#sites-tab');
+    console.log('Clicked settings button!');
+
+    console.log('🔍 Checking for add Site rule button...');
+    await popupPage.waitForSelector('#allow-rule-btn', { timeout: 10000 });
+
+    console.log('🖱 Clicking button to add a new Site rule...');
     await popupPage.click('#allow-rule-btn');
 
     console.log('Typing Site rule...')
     await popupPage.type('#addRuleInput', 'www.gla.ac.uk');
     await popupPage.click('#addRule');
+
+    await delay(1000);
 
     console.log('Site rule added!');
 
