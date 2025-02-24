@@ -2317,6 +2317,17 @@ svg {
     }
 }
 
+#group-by-dropdown {
+  border-left: 1px solid white;
+  border-radius: 0 10px 0 0;
+}
+
+.view-note:hover {
+    cursor: pointer;
+}
+
+.task-overdue {
+  background-color:#FA5F55!important;
 /* Settings Entry Enhancement */
 .settings-entry {
     display: flex;

@@ -1,11 +1,5 @@
 import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
 import MiniSearch from '../../assets/js/minisearch.min.js';
-import * as PrepDocument from './prep-document.js';
-
-const xmlEscape = require('xml-escape');
-const { Mutex } = require('async-mutex');
-
-const indexMutex = new Mutex();
 
 let engine;
 const winkNLP = require('wink-nlp');
@@ -67,17 +61,6 @@ async function setupBM25F() {
 
 setupBM25F();
 
-async function getLocalStorage(key) {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get([key], (result) => {
-      if (chrome.runtime.lastError) {
-        reject(chrome.runtime.lastError);
-      } else {
-        resolve(result);
-      }
-    });
-  });
-}
 
 // update the documents used by miniSearch
 function updateIndex(miniSearch, result) {
@@ -98,20 +81,7 @@ chrome.storage.local.get(['indexed']).then((result) => {
   updateIndex(miniSearch, result);
 });
 
-const MAX_TAB_REFRESH_ATTEMPTS = 20;
-const TAB_REFRESH_DELAY_MS = 50;
 
-async function getIndexed() {
-  const indexedResult = await getLocalStorage('indexed');
-  const indexed = indexedResult.indexed || {};
-  if (Object.keys(indexed).length === 0) {
-    indexed.corpus = [];
-    indexed.links = new Set();
-  }
-  // chrome storage serialising and deserialising loses set type
-  indexed.links = new Set(indexed.links);
-  return indexed;
-}
 
 // gets the logical combinator (if present) to be passed into the MiniSearch search
 function getLogicalCombinator(searchTerms) {
@@ -216,40 +186,6 @@ function deleteTask(allTasks, taskIdToRemove) {
   chrome.storage.local.set({ tasks: allTasks }, () => {});
 }
 
-async function waitForTitleUpdate(title, lastTitles) {
-  for (let i = 0; i < MAX_TAB_REFRESH_ATTEMPTS; i += 1) {
-    await new Promise((resolve) => {
-      setTimeout(resolve, TAB_REFRESH_DELAY_MS);
-    });
-
-    const tabs = await new Promise((resolve) => {
-      chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
-        resolve(allTabs);
-      });
-    });
-    if (!(tabs && tabs.length)) return '';
-
-    title = tabs[0].title;
-    if (!lastTitles.has(title)) break;
-
-    if (i === MAX_TAB_REFRESH_ATTEMPTS - 1) return '';
-  }
-
-  return title;
-}
-
-async function updateAllLastTitles(request, title, allLastTitles, tabId, lastTitles) {
-  if (lastTitles.has(title) || request.clicked) {
-    lastTitles.add(title);
-    title = await waitForTitleUpdate(title, lastTitles);
-    if (title === '') return;
-  }
-  lastTitles.add(title);
-  lastTitles = Array.from(lastTitles);
-  allLastTitles[tabId] = lastTitles;
-  await chrome.storage.local.set({ allLastTitles });
-}
-
 // Listen for when the tab's url changes and send a message to popup.js
 /* eslint-disable no-unused-vars */
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -324,85 +260,7 @@ chrome.contextMenus.onClicked.addListener((info) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(async (request) => {
-  if (
-    request.action === 'sendVisibleTextContent'
-    || request.action === 'pageNavigated'
-  ) {
-    const releaseIndexing = await indexMutex.acquire();
-    try {
-      const url = PrepDocument.stripUrl(request.url);
 
-      const tabs = await new Promise((resolve) => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (allTabs) => {
-          resolve(allTabs);
-        });
-      });
-      if (!(tabs && tabs.length)) return;
-
-      const tabId = tabs[0].id;
-
-      let title;
-      if (request.clicked) {
-        title = tabs[0].title;
-      } else {
-        title = request.title;
-      }
-      if (!title) return;
-
-      const allLastTitles = await new Promise((resolve) => {
-        chrome.storage.local.get(['allLastTitles'], (result) => {
-          resolve(result.allLastTitles);
-        });
-      });
-      let lastTitles = allLastTitles[tabId];
-      lastTitles = new Set(lastTitles);
-
-      let indexed = await getIndexed();
-
-      if (indexed.links.has(url)) return;
-
-      await updateAllLastTitles(request, title, allLastTitles, tabId, lastTitles);
-
-      const page = {
-        id: indexed.corpus.length + 1,
-        url,
-        title: xmlEscape(title),
-        body: request.visibleTextContent,
-        frequentWords: [],
-      };
-
-      const decodedURL = decodeURIComponent(page.url);
-      if (`https://www.${page.title}` === decodedURL) {
-        return;
-      }
-      if (`https://${page.title}` === decodedURL) {
-        return;
-      }
-      indexed = PrepDocument.addPageToIndex(page, indexed, miniSearch);
-      indexed = PrepDocument.addUrlToIndex(url, indexed);
-
-      engine.addDoc(page, String(page.id));
-      runningEngine = _.cloneDeep(engine);
-      if (Object.keys(runningEngine.getDocs()).length >= BM25F_MIN_DOCS) {
-        runningEngine.consolidate();
-      }
-
-      // must convert to an array to avoid values being lost when
-      // the set is converted to an Object during serialisation
-      indexed.links = Array.from(indexed.links);
-      await chrome.storage.local.set({ indexed });
-    } finally {
-      releaseIndexing();
-    }
-  } else if (request.action === 'updateIndexing') {
-    miniSearch.removeAll();
-    chrome.storage.local.get(['indexed']).then((result) => {
-      updateIndex(miniSearch, result);
-    });
-    setupBM25F();
-  }
-});
 
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
