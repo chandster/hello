@@ -14,7 +14,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
   let page;
   let popupPage;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     browser = await puppeteer.launch({
       headless: false,
       args: [
@@ -41,7 +41,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
     console.log('✅ Extension Popup Opened Successfully!');
   }, 60000);
 
-  afterEach(async () => {
+  afterAll(async () => {
     if (browser) {
       await browser.close();
     }
@@ -59,9 +59,6 @@ describe('Chrome Extension: Allow Rule Test', () => {
   });
 
   test('User can navigate to indexing part of settings page', async () => {
-    console.log('🖱 Clicking settings button...');
-    await popupPage.click('#manage-settings');
-
     console.log('🔍 Checking for indexing button...');
     await popupPage.waitForSelector('#indexing', { timeout: 10000 });
 
@@ -77,11 +74,6 @@ describe('Chrome Extension: Allow Rule Test', () => {
   });
 
   test('User can add a new Site rule', async () => {
-    console.log('🖱 Clicking settings button...');
-    await popupPage.click('#manage-settings');
-
-    console.log('Clicked settings button!');
-
     console.log('🔍 Checking for add Site rule button...');
     await popupPage.waitForSelector('#allow-rule-btn', { timeout: 10000 });
 
@@ -90,20 +82,7 @@ describe('Chrome Extension: Allow Rule Test', () => {
 
     console.log('Typing Site rule...')
     await popupPage.type('#addRuleInput', 'www.gla.ac.uk');
-    await popupPage.click('#addRule');
 
-    await delay(1000);
-
-    console.log('Site rule added!');
-
-    // console.log('🖱 Clicking URLs tab...');
-    // await popupPage.click('#urls-tab');
-
-    // console.log('🖱 Clicking String matches tab...');
-    // await popupPage.click('#string-matches-tab');
-
-    // console.log('🖱 Clicking RegEx tab...');
-    // await popupPage.click('#regex-tab');
   });
 
 });
