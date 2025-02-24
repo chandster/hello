@@ -1,5 +1,3 @@
-
-
 $(document).ready(() => {
   let currentNote = null;
   const categoryDropdownMenu = $('#categoryDropdownMenu');
@@ -153,7 +151,7 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-        activeDisplayNote = activeDisplayNote + 1;
+        activeDisplayNote += 1;
         const row = $(`
                     <tr>
                         <td class="view-note" data-index="${note.id}">${note.title}</td>
@@ -170,11 +168,10 @@ $(document).ready(() => {
       if (activeDisplayNote > 0) {
         noTasks.hide();
         tasks.show();
-        
-    } else {
-      tasks.hide();
-      noTasks.show();
-    }
+      } else {
+        tasks.hide();
+        noTasks.show();
+      }
     });
     setDueDate(7);
   }
@@ -427,11 +424,10 @@ $(document).ready(() => {
   });
 
   chrome.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === "local" && changes.notes) {
-        loadNotes();
+    if (areaName === 'local' && changes.notes) {
+      loadNotes();
     }
-});
-  
+  });
 
   // Load the notes when the document is ready
   loadNotes();
