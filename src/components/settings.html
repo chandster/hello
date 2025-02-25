@@ -44,43 +44,49 @@
         <div class="col-8" style="padding-left: 0px; padding-right: 0px;">
             <div class="settings-pane active" id="indexing-pane">
                 <div class="section-heading index-heading">Allowed sites</div>
-                <div class="row flex settings-section align-contents-center">
-                    <div class="col-auto zero-margin zero-padding index-info dynamic-title">Indexing will occur whenever these host names are visited. Enter rules starting "www".</div>
-                    <ul class="nav nav-tabs mt-2" id="indexerTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="sites-tab" data-bs-toggle="tab" href="#sites" role="tab">Sites</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="string-matches-tab" data-bs-toggle="tab" href="#string-matches" role="tab">String matches</a>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
-                        </li>
-                        <div class="col d-flex align-items-center">
-                            <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
+                
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs" id="indexerTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="sites-tab" data-bs-toggle="tab" href="#sites" role="tab">Sites</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="urls-tab" data-bs-toggle="tab" href="#urls" role="tab">URLs</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="string-matches-tab" data-bs-toggle="tab" href="#string-matches" role="tab">String matches</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="regex-tab" data-bs-toggle="tab" href="#regex" role="tab">RegEx</a>
+                    </li>
+                </ul>
+              
+                <!-- Search and Actions Row -->
+                <div class="indexer-controls">
+                    <div class="search-action-row">
+                        <input type="text" class="search-bar-sm" id="rule-search" placeholder="Type to search allow list">
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary add-rule-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">
+                                Add allow rule
+                            </button>
+                            <button type="button" id="addCurrentSite" class="btn btn-secondary add-rule-btn">
+                                Add URL
+                            </button>
                         </div>
-                        <div class="col d-flex justify-content-xxl-end zero-margin">
-                            <button class="btn btn-secondary add-rule-btn tab-section-btn" data-bs-toggle="modal" data-bs-target="#addRuleModal">Add allow rule</button>
-                            
-                        </div>
-                        <button type="button" id="addCurrentSite" class="btn btn-secondary add-rule-btn tab-section-btn">Add current URL</button>
-                    </ul>
-                    <div class="tab-content mt-2">
-                        <div class="tab-pane fade show active" id="sites" role="tabpanel">
-                            <ul class="index-list" id="sites-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="urls" role="tabpanel">
-                            <ul class="index-list" id="urls-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="string-matches" role="tabpanel">
-                            <ul class="index-list" id="string-matches-list"></ul>
-                        </div>
-                        <div class="tab-pane fade" id="regex" role="tabpanel">
-                            <ul class="index-list" id="regex-list"></ul>
-                        </div>
+                    </div>
+                </div>
+                <div class="tab-content mt-2">
+                    <div class="tab-pane fade show active" id="sites" role="tabpanel">
+                        <ul class="index-list" id="sites-list"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="urls" role="tabpanel">
+                        <ul class="index-list" id="urls-list"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="string-matches" role="tabpanel">
+                        <ul class="index-list" id="string-matches-list"></ul>
+                    </div>
+                    <div class="tab-pane fade" id="regex" role="tabpanel">
+                        <ul class="index-list" id="regex-list"></ul>
                     </div>
                 </div>
             </div>
