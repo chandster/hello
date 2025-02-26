@@ -191,7 +191,6 @@ async function getCurrentTab() {
   currentURL = tab.url;
 }
 
-
 function getTabAndUpdateIndicator() {
   getCurrentTab().then(() => {
     updateIndicator();
@@ -260,16 +259,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     chrome.storage.local.get({ tasks: {} }, (result) => {
       const existingTasks = sortTasks(result.tasks) || {};
       updateChecklist(existingTasks);
-    });
-
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      chrome.storage.local.get('tasks').then((result) => {
-        const existingTasks = result || {};
-        const foundTask = existingTasks.tasks[alarm.name];
-        if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
-          $(`label[associatedTask=${foundTask.id}]`).addClass('text-danger');
-        }
-      });
     });
   });
 }
