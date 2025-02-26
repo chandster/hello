@@ -175,7 +175,25 @@ $(document).ready(() => {
     });
     setDueDate(7);
   }
+  function loadCats() {
+    chrome.storage.local.get({ tags: {} }, (data) => {
+      const { tags } = data;
 
+      // Add each tag to the dropdown menu
+      Object.entries(tags).forEach(([tagId, tagData]) => {
+        const { tagName, tagColour } = tagData;
+        const tagItem = `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+            <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+              ${tagName}
+            </label>
+          </div>`;
+        categoryDropdownMenu.prepend(tagItem);
+      });
+    });
+    attachCheckboxListeners();
+  }
   function markSelectedCheckboxes(tags) {
     const selectedTags = tags;
 
@@ -201,26 +219,51 @@ $(document).ready(() => {
     autoResizeTextareas();
     markSelectedCheckboxes(note.tags);
   }
+  // two of the same function not sure what one is to be used
+  // function loadTagsToDropdown() {
+  //   chrome.storage.local.get({ tags: {} }, (data) => {
+  //     const tags = data.tags || {};
+  //     const tagsMenu = $('#tagsDropdownMenu');
+  //     tagsMenu.empty();
+  //     const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
+  //     tagsMenu.append(headerItem);
+  //     Object.entries(tags).forEach(([tagId, tagData]) => {
+  //       const { tagName, tagColour } = tagData;
+  //       const categoryItem = `
+  //   <div class="form-check">
+  //     <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+  //     <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+  //       ${tagName}
+  //     </label>
+  //   </div>`;
 
+  //       // Append the new category to the dropdown menu
+  //       tagsMenu.append(categoryItem);
+  //     });
+  //   });
+  // }
+  // Make sure loadTagsToDropdown is defined
   function loadTagsToDropdown() {
     chrome.storage.local.get({ tags: {} }, (data) => {
       const tags = data.tags || {};
       const tagsMenu = $('#tagsDropdownMenu');
       tagsMenu.empty();
+
+      // Add header
       const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
       tagsMenu.append(headerItem);
+
+      // Add tags
       Object.entries(tags).forEach(([tagId, tagData]) => {
         const { tagName, tagColour } = tagData;
-        const categoryItem = `
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
-      <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
-        ${tagName}
-      </label>
-    </div>`;
-
-        // Append the new category to the dropdown menu
-        tagsMenu.append(categoryItem);
+        const tagItem = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+                    <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+                        ${tagName}
+                    </label>
+                </div>`;
+        tagsMenu.append(tagItem);
       });
     });
   }
@@ -322,6 +365,66 @@ $(document).ready(() => {
     }
   });
 
+  // Add this helper function to update tags display
+  function updateTagsDisplay() {
+  // Clear existing tags
+    $('#noteTags').text('Tags: ');
+
+    // Refresh any tag-related UI elements
+    if (currentNote && currentNote.tags) {
+      const formattedTags = formatTagsForDisplay(currentNote.tags);
+      $('#noteTags').text(`Tags: ${formattedTags}`);
+    }
+  }
+
+  // Modify the delete button click handler
+  $('#deleteCategoryButton').on('click', () => {
+    // Get all checked categories
+    const selectedCategories = [];
+    $('#categoryDropdownMenu .form-check-input:checked').each(function () {
+      selectedCategories.push($(this).data('category-id'));
+    });
+
+    // Validate if any categories are selected
+    if (selectedCategories.length === 0) {
+      alert('Please select categories to delete');
+      return;
+    }
+
+    // Confirm deletion
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Are you sure you want to delete the selected categories? This cannot be undone.')) {
+      chrome.storage.local.get({ tags: {} }, (data) => {
+        const existingTags = data.tags;
+        let hasChanges = false;
+
+        // Delete each selected category
+        selectedCategories.forEach((categoryId) => {
+          if (existingTags[categoryId]) {
+            delete existingTags[categoryId];
+            hasChanges = true;
+          }
+        });
+
+        if (hasChanges) {
+          // Save updated tags
+          chrome.storage.local.set({ tags: existingTags }, () => {
+            // Clear checkboxes
+            $('#categoryDropdownMenu .form-check-input:checked').prop('checked', false);
+
+            // Refresh the dropdowns
+            loadTagsToDropdown();
+            categoryDropdownMenu.empty();
+            loadCats();
+
+            // Update any related UI elements
+            updateTagsDisplay();
+          });
+        }
+      });
+    }
+  });
+
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
 
@@ -343,26 +446,6 @@ $(document).ready(() => {
       });
     }
   });
-
-  function loadCats() {
-    chrome.storage.local.get({ tags: {} }, (data) => {
-      const { tags } = data;
-
-      // Add each tag to the dropdown menu
-      Object.entries(tags).forEach(([tagId, tagData]) => {
-        const { tagName, tagColour } = tagData;
-        const tagItem = `
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
-            <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
-              ${tagName}
-            </label>
-          </div>`;
-        categoryDropdownMenu.prepend(tagItem);
-      });
-    });
-    attachCheckboxListeners();
-  }
 
   $('#due-today').on('click', () => {
     setDueDate(0, true);
