@@ -930,19 +930,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#editTaskModal').modal('hide');
   });
 
-  chrome.alarms.onAlarm.addListener((alarm) => {
-    chrome.storage.local.get('tasks').then((result) => {
-      const existingTasks = result || {};
-      const foundTask = existingTasks.tasks[alarm.name];
-      if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
-        $(`.checklist-item[associatedTask=${foundTask.id}]`).find('.form-check-label').addClass('text-danger');
-        $(`.checklist-item[associatedTask=${foundTask.id}]`).addClass('shaking');
-        setTimeout(() => {
-          $(`.checklist-item[associatedTask=${foundTask.id}]`).removeClass('shaking');
-        }, 500);
-      }
-    });
-  });
 
   $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
     let startDate = $('#startDate').val();

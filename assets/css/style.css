@@ -2914,3 +2914,11 @@ html.dark .settings-icon-text {
         padding: 0.4rem 0.6rem;
     }
 }
+
+.view-note:hover {
+  cursor: pointer;
+}
+
+.task-overdue {
+background-color:#FA5F55!important;
+}
