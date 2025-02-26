@@ -21,7 +21,7 @@ class CrawledDocument {
 class QuipCrawler {
     
      getApplicableDomains() {
-        return ["quip-amazon"];    
+        return ["quip-amazon","bbc"];    
     }
 
      process(url, document) {

@@ -4,7 +4,7 @@ export class GenericCrawler {
     
     // Returns a list of domains this crawler is applicable to
     getApplicableDomains() {
-        return ["amazon", "a2z"];
+        return ["amazon", "a2z","bbc"];
     }
 
     // Processes a webpage by extracting its text and normalizing it
