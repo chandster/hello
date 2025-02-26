@@ -1,28 +1,32 @@
 import { CrawledDocument } from "./CrawledDocument";
 
 export class GenericCrawler {
-
-
-     getApplicableDomains() {
-        return ["amazon","a2z"];
-    }
-     process(url, document) {
-        const allWords = document.body.innerText;
-        const normalizedWords = allWords.replace("\n"," ");
-        return new CrawledDocument(url, normalizedWords, document.title);
+    
+    // Returns a list of domains this crawler is applicable to
+    getApplicableDomains() {
+        return ["amazon", "a2z"];
     }
 
-     isCompatible(url){
-        let domainURL = (new URL(url));
-        let domain = domainURL.hostname.toLocaleLowerCase();
+    // Processes a webpage by extracting its text and normalizing it
+    process(url, document) {
+        const allWords = document.body.innerText; // Extracts all visible text from the page
+        const normalizedWords = allWords.replace("\n", " "); // Replaces newlines with spaces for consistency
+        return new CrawledDocument(url, normalizedWords, document.title); // Creates a CrawledDocument instance
+    }
+
+    // Checks if a given URL belongs to one of the applicable domains
+    isCompatible(url) {
+        let domainURL = new URL(url); // Parses the URL
+        let domain = domainURL.hostname.toLocaleLowerCase(); // Converts hostname to lowercase for comparison
         let isMatch = false;
-        let compatibleDomains = this.getApplicableDomains();
-        for(let i = 0; i < compatibleDomains.length; i++){
-            if(domain.indexOf(compatibleDomains[i]) !== -1){
+        let compatibleDomains = this.getApplicableDomains(); // Retrieves the list of compatible domains
+
+        // Loops through the list of compatible domains and checks if the URL contains any of them
+        for (let i = 0; i < compatibleDomains.length; i++) {
+            if (domain.indexOf(compatibleDomains[i]) !== -1) {
                 isMatch = true;
             }
         }
         return isMatch;
-    } 
+    }
 }
-

@@ -1,102 +1,28 @@
-import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
-import MiniSearch from '../../assets/js/minisearch.min.js';
+/* eslint-disable */
+import MiniSearch from "minisearch";
+ 
+export const LOCAL_INDEX_ID = "localSearchIndex";
+ 
 
-let engine;
-const winkNLP = require('wink-nlp');
-const model = require('wink-eng-lite-web-model');
-
-const nlp = winkNLP(model);
-const { its } = nlp;
-const _ = require('lodash');
-
-const defaultRegexList = [
-  '^https://[^/]+.amazon.com/.*$',
-  '^https://atoz.amazon.work/.*$',
-  '^https://quip-amazon.com/.*$',
-  '^https://quip.com/.*$',
-];
-
-const TITLE_BOOST = 3;
-const FREQUENT_WORD_BOOST = 2;
-const MIN_SEARCH_TERM_LENGTH = 3;
-const DEFAULT_WEIGHT = 0.2;
-const BM25F_MIN_DOCS = 3;
-
-let docs;
-let runningEngine;
-
-const prepTask = function prepTask(text) {
-  const tokens = [];
-  nlp
-    .readDoc(text)
-    .tokens()
-    .filter((t) => t.out(its.type) === 'word' && !t.out(its.stopWordFlag))
-    .each((t) => tokens.push(
-      t.out(its.negationFlag) ? `!${t.out(its.stem)}` : t.out(its.stem),
-    ));
-  return tokens;
-};
-
-async function setupBM25F() {
-  engine = new BM25F();
-
-  await chrome.storage.local.get(['indexed']).then((result) => {
-    if (result && result.indexed) {
-      docs = result.indexed.corpus;
+ 
+const createIndex = (existingIndex)=> {
+  let stopWords = ['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
+ 
+  const indexDescriptor = {
+    fields: ['title', 'allText'],
+    storeFields: ['title'],
+    idField: 'id',
+    processTerm: (term, _fieldName) =>
+      stopWords.includes(term) ? null : term.toLowerCase(),
+    searchOptions: {
+      processTerm: (term) => term.toLowerCase()
     }
-  });
-
-  engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
-  engine.definePrepTasks([prepTask]);
-  if (docs && docs.length) {
-    docs.forEach((doc, i) => {
-      engine.addDoc(doc, i + 1);
-    });
-    if (docs.length >= BM25F_MIN_DOCS) {
-      runningEngine = _.cloneDeep(engine);
-      runningEngine.consolidate();
-    }
-  }
-}
-
-setupBM25F();
-
-
-// update the documents used by miniSearch
-function updateIndex(miniSearch, result) {
-  miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
-}
-
-function initialiseMiniSearch() {
-  const miniSearch = new MiniSearch({
-    fields: ['title', 'body', 'frequentWords'],
-    storeFields: ['url'],
-  });
-  return miniSearch;
-}
-
-const miniSearch = initialiseMiniSearch();
-
-chrome.storage.local.get(['indexed']).then((result) => {
-  updateIndex(miniSearch, result);
-});
-
-
-
-// gets the logical combinator (if present) to be passed into the MiniSearch search
-function getLogicalCombinator(searchTerms) {
-  const lastTerm = searchTerms[searchTerms.length - 1];
-  let combinator;
-  switch (lastTerm) {
-    case '&':
-      combinator = 'AND';
-      break;
-    case '~':
-      combinator = 'AND_NOT';
-      break;
-    default:
-      combinator = null;
-      break;
+  };
+  let indexer = undefined;
+  if(existingIndex === undefined){
+    indexer = new MiniSearch(indexDescriptor);
+  }else{
+    indexer = MiniSearch.loadJSON(existingIndex,indexDescriptor);
   }
   return indexer;
 }
@@ -146,144 +72,57 @@ const search = (document, options) => {
   let idx = getIndex();
   return idx.search(document);
 }
-
-// Listen for when the tab's url changes and send a message to popup.js
-/* eslint-disable no-unused-vars */
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url) {
-    chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
+const sendResults = (searchQuery, sendResponse)=>{
+  let searchResults =  search(searchQuery, null);
+  let suggestions = [];
+  for(let i=0;i<searchResults.length && i<5;i++){
+    suggestions.push({content:searchResults[i].id,description:removeSpecialCharacters(searchResults[i].title)});
+    console.log({content:searchResults[i].id,description:searchResults[i].title});
   }
-});
-/* eslint-enable no-unused-vars */
-
-// Listen for when the user changes tabs and send a message to popup.js
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (tab && tab.url) {
-      chrome.runtime.sendMessage({ type: 'TAB_CHANGED', url: tab.url });
-    }
-  });
-});
-
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-  chrome.storage.local.get(['indexed']).then((result) => {
-    if (Object.keys(result).length > 0) {
-      const { corpus } = result.indexed;
-      if (corpus.length) {
-        const suggestions = suggestFromIndex(text, corpus);
-        suggest(suggestions);
-      }
-    }
-  });
-});
-
-chrome.omnibox.onInputEntered.addListener((text) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs && tabs[0]) {
-      const tabId = tabs[0].id;
-      chrome.tabs.update(tabId, { url: text });
-    } else {
-      chrome.tabs.create({ url: text });
-    }
-  });
-});
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  const alarmName = alarm.name;
-  if (alarmName.endsWith('_deletion_alarm')) {
-    const taskId = alarmName.split('_')[0];
-    chrome.storage.local.get({ tasks: {} }, (result) => {
-      const existingTasks = result.tasks || {};
-      deleteTask(existingTasks, taskId);
-    });
-  }
-});
-
-chrome.alarms.onAlarm.addListener((alarm) => {
-  chrome.storage.local.get('tasks').then((result) => {
-    const existingTasks = result || {};
-    const foundTask = existingTasks.tasks[alarm.name];
-    if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
-      const notification = {
-        type: 'basic',
-        iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
-        title: `Your task ${foundTask.title} is due`,
-        message: foundTask.description,
-      };
-      chrome.notifications.create(alarm.name, notification);
-    }
-  });
-});
-
-chrome.contextMenus.onClicked.addListener((info) => {
-  if (info.menuItemId === 'add-note') {
-    alert('You clicked the custom menu item!');
-  }
-});
-
-
-
-chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    chrome.storage.local.set({ allowedSites: [] }, () => {
-    });
-
-    chrome.storage.local.set({ allowedURLs: [] }, () => {});
-
-    chrome.storage.local.set({ allowedStringMatches: [] }, () => {});
-
-    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {});
-
-    chrome.storage.local.set({ allLastTitles: {} }, () => {});
-  }
-});
-
-function createContextMenu() {
-  chrome.contextMenus.create({
-    id: 'addNote',
-    title: 'Hawk - Add text to Notes',
-    contexts: ['selection'],
-  });
+  console.log("numbers of suggestions:" + suggestions.length);
+  sendResponse(suggestions);
 }
-
-function setDueDate(daysToAdd) {
-  const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
-  return dueDate.toISOString();
+ 
+const indexingListener = (request, sender, sendResponse) => {
+    // First, validate the message's structure.
+ 
+    if ((request.from === 'popup') && (request.subject === 'indexerData')) {
+      // Enable the page-action for the requesting tab.
+      sendResponse(chrome.storedIndex);
+    }else if ((request.from === 'popup') && (request.subject === 'setIndexerData')){
+      let isSuccessful = replaceIndexerData(request.content);
+    }else{
+      addToIndex(request.document);
+      sendResponse("OK:Indexed");
+    }
+   
 }
-
-function addNewNote(title, content, tags) {
-  const noteId = Date.now().toString();
-  const note = {
-    id: noteId,
-    title,
-    content,
-    due: setDueDate(7),
-    scheduledDeletion: '',
-    recentlyDeleted: false,
-    tags,
-  };
-  chrome.storage.local.get({ notes: [] }, (data) => {
-    const existingNotes = data.notes;
-
-    existingNotes.push(note);
-
-    chrome.storage.local.set({ notes: existingNotes }, () => {
-    });
-  });
-}
-
-chrome.contextMenus.onClicked.addListener((info) => {
-  if (info.menuItemId === 'addNote') {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const currentTitle = tabs[0].title;
-      const selectedText = `${currentTitle} ${info.selectionText}`;
-      const title = selectedText.length > 10 ? `${selectedText.substring(0, 15)}...` : selectedText;
-      addNewNote(title, selectedText, {});
-    });
+ 
+const initialiseIndexer = ()=> {
+  const initialiseIndexerAsync =(indexerData) => {
+    if(indexerData && indexerData.length > 0){
+      chrome.storedIndex = indexerData;
+    }
+    chrome.indexer  = createIndex(chrome.storedIndex);
   }
+  getStoredIndex(initialiseIndexerAsync);
+}
+ 
+initialiseIndexer();
+chrome.runtime.onMessage.addListener(indexingListener);
+ 
+chrome.omnibox.onInputChanged.addListener((text,suggest) => {
+  sendResults(text,suggest);
 });
-
-chrome.runtime.onInstalled.addListener(() => {
-  createContextMenu();
+ 
+chrome.omnibox.onInputEntered.addListener((text, OnInputEnteredDisposition) => {
+  chrome.tabs.update({url:text});
 });
+ 
+const removeSpecialCharacters = (stringToBeSanitized)=>{
+  let specialChars = "!@#$^&%*+=[]\/{}|:<>?,.";
+  for (let i = 0; i < specialChars.length; i++) {
+    stringToBeSanitized = stringToBeSanitized.replace(new RegExp("\\" + specialChars[i], "gi"), "");
+  }
+  return stringToBeSanitized;
+}
