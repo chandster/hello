@@ -94,7 +94,7 @@ $(document).ready(() => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
     if (today) {
-      //dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      //dueDate.setSeconds(dueDate.getSeconds() + 6); // enable this to test today and have the alarm go off in 15 seconds for testing
       dueDate.setHours(dueDate.getHours() + 3); 
     } else {
       dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
