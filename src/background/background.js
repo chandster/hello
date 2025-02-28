@@ -280,7 +280,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 function createContextMenu() {
   chrome.contextMenus.create({
     id: 'addNote',
-    title: 'Hawk - Add text to Notes',
+    title: 'Hawk 2 - Add text to Notes',
     contexts: ['selection'],
   });
 }
