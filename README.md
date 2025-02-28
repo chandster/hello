@@ -64,10 +64,6 @@ By default when searching, all terms will be used to calculate the score each do
 - '&': shows documents that contain all of the terms in either their titles or contents
 - '~': shows documents that contain the first term but none of the later terms
 
-|                   No filtering                    |                           AND filtering                           |                             AND-NOT filtering                              |
-| :-----------------------------------------------: | :---------------------------------------------------------------: | :------------------------------------------------------------------------: |
-| ![search_plain](uploads/indexer/search_plain.png) | ![search_and_filtering](uploads/indexer/search_and_filtering.png) | ![search_and_not__filtering](uploads/indexer/search_and_not_filtering.png) |
-
 ## Developer credits
 - Kalila Chand  
 - Jaden Green  
