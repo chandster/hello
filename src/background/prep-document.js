@@ -1,4 +1,4 @@
-// This file handles the pre-processing and addition of web documents to the Hawk index.
+// This file handles the pre-processing and addition of web documents to the Hawk 2 index.
 
 const { removeStopwords } = require('stopword');
 
