@@ -24,8 +24,8 @@ $(document).ready(() => {
   }
 
   function getSelectedCheckboxes() {
-    const dropdownMenu = document.getElementById('categoryDropdownMenu');
-    const selectedCheckboxes = dropdownMenu.querySelectorAll('.form-check-input:checked');
+    const dropdownMenuNote = document.getElementById('categoryDropdownMenu');
+    const selectedCheckboxes = dropdownMenuNote.querySelectorAll('.form-check-input:checked');
     const tags = Array.from(selectedCheckboxes).reduce((acc, checkbox) => {
       const tagId = checkbox.getAttribute('data-category-id');
       const tagName = checkbox.value;
@@ -64,10 +64,13 @@ $(document).ready(() => {
       title,
       content,
       due: selectedDueDate,
-      scheduledDeletion: '',
-      recentlyDeleted: false,
       tags,
+      overdue: false
     };
+    const alarmName = `${noteId}_task_due_alarm`;
+    chrome.alarms.create(alarmName, {
+      when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
+  });
     currentNote = note;
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
@@ -87,9 +90,15 @@ $(document).ready(() => {
     return `${day}/${month}/${year}`;
   }
 
-  function setDueDate(daysToAdd) {
+  function setDueDate(daysToAdd, today = false) {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+    if (today) {
+      //dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      dueDate.setHours(dueDate.getHours() + 3); 
+    } else {
+      dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
+    }
     selectedDueDate = dueDate.toISOString();
     const formattedDate = formatDateForDisplay(dueDate);
     $('#noteDate').text(`Due Date: ${formattedDate}`);
@@ -128,9 +137,12 @@ $(document).ready(() => {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const { notes } = data;
       const tableBody = $('#tasks-display');
+      const noTasks = $('#tasks-display-noNotes');
+      const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
-      notes.forEach((note, index) => {
+      var activeDisplayNote = 0;
+      notes.forEach((note) => {
         if (note.recentlyDeleted) {
           return;
         }
@@ -139,26 +151,49 @@ $(document).ready(() => {
         if (!noteHasSelectedTags) {
           return;
         }
-
+        activeDisplayNote += 1;
         const row = $(`
                     <tr>
-                        <td style="justify-content: center; align-items: center;">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="flexRadioDefault" id="radio-${index}" style="border-color: blue;">
-                                <label class="form-check-label" for="radio-${index}"></label>
-                            </div>
-                        </td>
                         <td class="view-note" data-index="${note.id}">${note.title}</td>
-                         <td>${formatDateForDisplay(note.due)}</td>
+                         <td class="note-date">${formatDateForDisplay(note.due)}</td>
                     </tr>
                 `);
+                if (note.overdue) {
+                  row.find('td').addClass('task-overdue');
+                  row.find('.note-date').html("<strong>OVERDUE</strong>");
+              }
 
         tableBody.append(row);
       });
+      if (activeDisplayNote > 0) {
+        noTasks.hide();
+        tasks.show();
+      } else {
+        tasks.hide();
+        noTasks.show();
+      }
     });
     setDueDate(7);
   }
+  function loadCats() {
+    chrome.storage.local.get({ tags: {} }, (data) => {
+      const { tags } = data;
 
+      // Add each tag to the dropdown menu
+      Object.entries(tags).forEach(([tagId, tagData]) => {
+        const { tagName, tagColour } = tagData;
+        const tagItem = `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+            <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+              ${tagName}
+            </label>
+          </div>`;
+        categoryDropdownMenu.prepend(tagItem);
+      });
+    });
+    attachCheckboxListeners();
+  }
   function markSelectedCheckboxes(tags) {
     const selectedTags = tags;
 
@@ -184,26 +219,51 @@ $(document).ready(() => {
     autoResizeTextareas();
     markSelectedCheckboxes(note.tags);
   }
+  // two of the same function not sure what one is to be used
+  // function loadTagsToDropdown() {
+  //   chrome.storage.local.get({ tags: {} }, (data) => {
+  //     const tags = data.tags || {};
+  //     const tagsMenu = $('#tagsDropdownMenu');
+  //     tagsMenu.empty();
+  //     const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
+  //     tagsMenu.append(headerItem);
+  //     Object.entries(tags).forEach(([tagId, tagData]) => {
+  //       const { tagName, tagColour } = tagData;
+  //       const categoryItem = `
+  //   <div class="form-check">
+  //     <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+  //     <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+  //       ${tagName}
+  //     </label>
+  //   </div>`;
 
+  //       // Append the new category to the dropdown menu
+  //       tagsMenu.append(categoryItem);
+  //     });
+  //   });
+  // }
+  // Make sure loadTagsToDropdown is defined
   function loadTagsToDropdown() {
     chrome.storage.local.get({ tags: {} }, (data) => {
       const tags = data.tags || {};
       const tagsMenu = $('#tagsDropdownMenu');
       tagsMenu.empty();
+
+      // Add header
       const headerItem = '<h6 class="dropdown-header">Select Tags</h6>';
       tagsMenu.append(headerItem);
+
+      // Add tags
       Object.entries(tags).forEach(([tagId, tagData]) => {
         const { tagName, tagColour } = tagData;
-        const categoryItem = `
-    <div class="form-check">
-      <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
-      <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
-        ${tagName}
-      </label>
-    </div>`;
-
-        // Append the new category to the dropdown menu
-        tagsMenu.append(categoryItem);
+        const tagItem = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
+                    <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
+                        ${tagName}
+                    </label>
+                </div>`;
+        tagsMenu.append(tagItem);
       });
     });
   }
@@ -223,6 +283,13 @@ $(document).ready(() => {
           targetNote.content = content;
           if (!selectedDueDate) {
             selectedDueDate = targetNote.due;
+          } 
+          if (targetNote.due !== selectedDueDate) {
+            targetNote.overdue = false;
+            const alarmName = `${currentNote}_task_due_alarm`;
+            chrome.alarms.create(alarmName, {
+              when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
+          });
           }
           targetNote.due = selectedDueDate;
           chrome.storage.local.set({ notes: existingNotes }, () => {
@@ -298,6 +365,66 @@ $(document).ready(() => {
     }
   });
 
+  // Add this helper function to update tags display
+  function updateTagsDisplay() {
+  // Clear existing tags
+    $('#noteTags').text('Tags: ');
+
+    // Refresh any tag-related UI elements
+    if (currentNote && currentNote.tags) {
+      const formattedTags = formatTagsForDisplay(currentNote.tags);
+      $('#noteTags').text(`Tags: ${formattedTags}`);
+    }
+  }
+
+  // Modify the delete button click handler
+  $('#deleteCategoryButton').on('click', () => {
+    // Get all checked categories
+    const selectedCategories = [];
+    $('#categoryDropdownMenu .form-check-input:checked').each(function () {
+      selectedCategories.push($(this).data('category-id'));
+    });
+
+    // Validate if any categories are selected
+    if (selectedCategories.length === 0) {
+      alert('Please select categories to delete');
+      return;
+    }
+
+    // Confirm deletion
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm('Are you sure you want to delete the selected categories? This cannot be undone.')) {
+      chrome.storage.local.get({ tags: {} }, (data) => {
+        const existingTags = data.tags;
+        let hasChanges = false;
+
+        // Delete each selected category
+        selectedCategories.forEach((categoryId) => {
+          if (existingTags[categoryId]) {
+            delete existingTags[categoryId];
+            hasChanges = true;
+          }
+        });
+
+        if (hasChanges) {
+          // Save updated tags
+          chrome.storage.local.set({ tags: existingTags }, () => {
+            // Clear checkboxes
+            $('#categoryDropdownMenu .form-check-input:checked').prop('checked', false);
+
+            // Refresh the dropdowns
+            loadTagsToDropdown();
+            categoryDropdownMenu.empty();
+            loadCats();
+
+            // Update any related UI elements
+            updateTagsDisplay();
+          });
+        }
+      });
+    }
+  });
+
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
 
@@ -320,28 +447,8 @@ $(document).ready(() => {
     }
   });
 
-  function loadCats() {
-    chrome.storage.local.get({ tags: {} }, (data) => {
-      const { tags } = data;
-
-      // Add each tag to the dropdown menu
-      Object.entries(tags).forEach(([tagId, tagData]) => {
-        const { tagName, tagColour } = tagData;
-        const tagItem = `
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" data-category-id="${tagId}" value="${tagName}">
-            <label style="color: ${tagColour};" class="form-check-label" for="category-${tagId}">
-              ${tagName}
-            </label>
-          </div>`;
-        categoryDropdownMenu.prepend(tagItem);
-      });
-    });
-    attachCheckboxListeners();
-  }
-
   $('#due-today').on('click', () => {
-    setDueDate(0);
+    setDueDate(0, true);
   });
 
   $('#tagsDropdownMenu').on('change', '.form-check-input', () => {
@@ -377,16 +484,18 @@ $(document).ready(() => {
     });
   });
 
+  function deleteAlarm() {
+      const alarmName = currentNote + "_task_due_alarm";
+      chrome.alarms.clear(alarmName);
+  }
+
+
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
-      const note = existingNotes.find((n) => Number(n.id) === currentNote);
-      const now = new Date();
-      const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-      // const alarmName = `${note.id}_deletion_alarm`;
-      note.recentlyDeleted = true;
-      note.scheduledDeletion = deletionDate.toISOString();
-      chrome.storage.local.set({ notes: existingNotes }, () => {
+      const updatedNotes = existingNotes.filter((note) => Number(note.id) !== currentNote);
+      deleteAlarm(currentNote);
+      chrome.storage.local.set({ notes: updatedNotes }, () => {
         loadNotes();
       });
     });
@@ -395,6 +504,12 @@ $(document).ready(() => {
   deleteNoteButton.on('click', () => {
     setNoteDeleted();
     resetAddNoteForm();
+  });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes.notes) {
+      loadNotes();
+    }
   });
 
   // Load the notes when the document is ready
