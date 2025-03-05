@@ -27,7 +27,6 @@
   },
   
   "action": {
-    "default_popup": "src/components/hello.html",
     "default_icon": "assets/images/logo128x128.png"
   },
   "background": {
