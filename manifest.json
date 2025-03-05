@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Hawk - Page Indexer 2",
+  "name": "Hawk - Page Indexer 2 Test works",
   "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
-  "version": "1.0.1",
+  "version": "3.0.1",
   "omnibox": { "keyword": "@i\t" },
   
   "content_security_policy": {
@@ -19,7 +19,8 @@
 		"alarms",
     "sidePanel",
     "contextMenus",
-    "commands"
+    "commands",
+    "downloads"
   ],
 
   "side_panel": {
