@@ -3,7 +3,7 @@
   "name": "Hawk - Page Indexer 2 Test works",
   "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
   "version": "3.0.1",
-  "omnibox": { "keyword": "@i\t" },
+  "omnibox": { "keyword": "i" },
   
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
