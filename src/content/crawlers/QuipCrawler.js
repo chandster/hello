@@ -5,7 +5,7 @@ export class QuipCrawler {
     
      getApplicableDomains() {
         // Return an array of domain names that this crawler should process
-        return ["quip-amazon","bbc"];    
+        return ["quip-amazon"];    
     }
 
      process(url, document) {

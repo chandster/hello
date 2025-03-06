@@ -21,7 +21,7 @@ class CrawledDocument {
 class QuipCrawler {
     
      getApplicableDomains() {
-        return ["quip-amazon","bbc"];    
+        return ["quip-amazon"];    
     }
 
      process(url, document) {
@@ -158,10 +158,17 @@ class RuleChecker {
 
 const crawlers =[new QuipCrawler(), new GenericCrawler()];
 
-const indexDocument = (doc )=>{
-    console.log("sending.....");
-    chrome.runtime.sendMessage({document: doc }, function(response) {
+const indexDocument = (doc) => {
+    console.log("Starting document indexing...");
+    // Update UI to show indexing is active
+    chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
+    
+    chrome.runtime.sendMessage({document: doc}, function(response) {
         console.log("Document processing response:", response);
+        // Only disable the indicator if we're not about to start another indexing cycle
+        setTimeout(() => {
+            chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
+        }, 14900); // Set slightly before the next indexing cycle
     });
 }
 
@@ -181,12 +188,15 @@ const scrapePage = () => {
         // Check if any crawler is compatible with this URL
         for (const crawler of crawlers) {
             if (crawler.isCompatible(url)) {
+                chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
                 let crawledDocument = crawler.process(url, document);
                 indexDocument(crawledDocument);
                 console.log("Document Crawled (crawler compatibility):", crawledDocument.getId());
                 return;
             }
         }
+        // Update UI to show not indexing
+        chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
         console.log("Page not indexed: doesn't match any rules or crawler domains");
         return;
     }
@@ -194,12 +204,15 @@ const scrapePage = () => {
     // If URL matches rules or rules aren't loaded yet, try to index with any compatible crawler
     for (const crawler of crawlers) {
         if (shouldIndex === true || crawler.isCompatible(url)) {
+            chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
             let crawledDocument = crawler.process(url, document);
             indexDocument(crawledDocument);
             console.log("Document Crawled:", crawledDocument.getId());
             return;
         }
     }
+    // If we get here, no crawler was compatible
+    chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
 }
 
 setInterval(scrapePage,15000);
