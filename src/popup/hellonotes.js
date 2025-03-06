@@ -65,12 +65,12 @@ $(document).ready(() => {
       content,
       due: selectedDueDate,
       tags,
-      overdue: false
+      overdue: false,
     };
     const alarmName = `${noteId}_task_due_alarm`;
     chrome.alarms.create(alarmName, {
-      when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
-  });
+      when: new Date(selectedDueDate).getTime(), // Convert back to milliseconds
+    });
     currentNote = note;
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
@@ -94,10 +94,10 @@ $(document).ready(() => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
     if (today) {
-      //dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
-      dueDate.setHours(dueDate.getHours() + 3); 
+      // dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      dueDate.setHours(dueDate.getHours() + 3);
     } else {
-      dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
+      dueDate.setHours(9, 0, 0, 0); // default is 9am of selected date
     }
     selectedDueDate = dueDate.toISOString();
     const formattedDate = formatDateForDisplay(dueDate);
@@ -141,7 +141,7 @@ $(document).ready(() => {
       const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
-      var activeDisplayNote = 0;
+      let activeDisplayNote = 0;
       notes.forEach((note) => {
         if (note.recentlyDeleted) {
           return;
@@ -158,10 +158,10 @@ $(document).ready(() => {
                          <td class="note-date">${formatDateForDisplay(note.due)}</td>
                     </tr>
                 `);
-                if (note.overdue) {
-                  row.find('td').addClass('task-overdue');
-                  row.find('.note-date').html("<strong>OVERDUE</strong>");
-              }
+        if (note.overdue) {
+          row.find('td').addClass('task-overdue');
+          row.find('.note-date').html('<strong>OVERDUE</strong>');
+        }
 
         tableBody.append(row);
       });
@@ -283,13 +283,13 @@ $(document).ready(() => {
           targetNote.content = content;
           if (!selectedDueDate) {
             selectedDueDate = targetNote.due;
-          } 
+          }
           if (targetNote.due !== selectedDueDate) {
             targetNote.overdue = false;
             const alarmName = `${currentNote}_task_due_alarm`;
             chrome.alarms.create(alarmName, {
-              when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
-          });
+              when: new Date(selectedDueDate).getTime(), // Convert back to milliseconds
+            });
           }
           targetNote.due = selectedDueDate;
           chrome.storage.local.set({ notes: existingNotes }, () => {
@@ -485,10 +485,9 @@ $(document).ready(() => {
   });
 
   function deleteAlarm() {
-      const alarmName = currentNote + "_task_due_alarm";
-      chrome.alarms.clear(alarmName);
+    const alarmName = `${currentNote}_task_due_alarm`;
+    chrome.alarms.clear(alarmName);
   }
-
 
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
