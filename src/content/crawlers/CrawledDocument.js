@@ -1,19 +1,30 @@
+// Document class for storing crawled webpage data
 export class CrawledDocument {
-    constructor(id, allText, title) {
-        this.id = id;
-        this.allText = allText;
-        this.title = title;
-    }
+  // Constructor method that initializes a new instance of CrawledDocument
+  // Takes three parameters: id, allText, and title
+  constructor(id, allText, title) {
+    // URL or unique identifier
+    this.id = id;
 
-    getId() {
-        return this.id;
-    }
-    
-    getAllText() {
-        return this.allText;
-    }
+    // Main content text
+    this.allText = allText;
 
-    getTitle() {
-        return this.title;
-    }
+    // Page title
+    this.title = title;
+  }
+
+  // Get document URL
+  getId() {
+    return this.id;
+  }
+
+  // Get document content
+  getAllText() {
+    return this.allText;
+  }
+
+  // Get page title
+  getTitle() {
+    return this.title;
+  }
 }

@@ -585,7 +585,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
       restoreSelectedNotes();
       restoreSelectedTasks();
-      restoreSelectedIndexEntries();
+      restoreSelectedIndexEntries(); `
       $restoreBtn.text('Restored selected data!');
       setTimeout(() => {
         $restoreBtn.text('Perform overwriting restore of selected data');
@@ -596,7 +596,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.storage.local.set({ bg: '' }, () => {
         updateWallpaperPreview();
         chrome.runtime.sendMessage(null, 'wallpaper');
-      });
+      });`;
     });
 
     chrome.storage.local.get('theme', (result) => {

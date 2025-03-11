@@ -285,3 +285,16 @@ $(document).ready(() => {
     $('#date-picker-wrapper').hide();
   });
 });
+
+// Listen for indexing status messages
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === 'indexing_status') {
+    const indicator = document.getElementById('indexing-indicator');
+    if (indicator) {
+      // Remove both classes first
+      indicator.classList.remove('enabled', 'disabled');
+      // Add the appropriate class
+      indicator.classList.add(message.status);
+    }
+  }
+});

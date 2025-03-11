@@ -54,7 +54,7 @@ The amazon-quip.com site is also indexed by default, but there is a 10 second de
 
 #### Searching Indexed Documents
 
-To begin searching for indexed pages, type "@i" in the omnibar and then hit Tab. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query. Searching uses a [BM25F](https://github.com/winkjs/wink-bm25-text-search) implementation by default, using a popular implementation of BM25 called [MiniSearch](https://github.com/lucaong/minisearch/blob/master/DESIGN_DOCUMENT.md) if BM25F provides no results or if search filtering is applied.
+To begin searching for indexed pages, type "i" in the omnibar and then hit Tab. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query. Searching uses a [BM25F](https://github.com/winkjs/wink-bm25-text-search) implementation by default, using a popular implementation of BM25 called [MiniSearch](https://github.com/lucaong/minisearch/blob/master/DESIGN_DOCUMENT.md) if BM25F provides no results or if search filtering is applied.
 
 Both algorithms improve on TF-IDF and work on basic principles for scoring documents:
 
@@ -86,7 +86,7 @@ All data relating to indexing can be imported and exported:
 
 You can access your notebook and to-do list through the extension icon in the taskbar.
 
-You will need to start the indexer every time you open a new browser tab. You can do this by typing "@i" in the omnibar.
+You will need to start the indexer every time you open a new browser tab. You can do this by typing "i" in the omnibar.
 
 To back up your indexed data, click the extension icon, click Settings, and click Export indexed data to backup (JSON).
 
