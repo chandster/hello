@@ -694,14 +694,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
-        data.tags[newTag] = {
-          tagColour,
-          tagName,
-        };
+        // ✅ Instead of modifying `data.tags`, create a new object
+        const updatedTags = { ...data.tags, [newTag]: { tagColour, tagName } };
 
-        chrome.storage.local.set({ tags: data.tags }, () => {
-          addTag(newTag, data.tags[newTag]);
-          tagsObj = data;
+        // ✅ Store the new object in Chrome Storage
+        chrome.storage.local.set({ tags: updatedTags }, () => {
+          addTag(newTag, updatedTags[newTag]);
+          tagsObj = { ...tagsObj, tags: updatedTags }; // Update global tags object
         });
       });
     }
