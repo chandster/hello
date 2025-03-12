@@ -150,15 +150,23 @@ function sortTasks(tasks) {
   return sortedTasks.map((task) => task.id);
 }
 
-function setTaskDeleted(allTasks, task) {
+function setTaskDeleted(allTasks, taskId) {
   const now = new Date();
-  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-  const alarmName = `${task.id}_deletion_alarm`;
-  task.recentlyDeleted = true;
-  task.scheduledDeletion = deletionDate.toISOString();
-  chrome.storage.local.set({ tasks: allTasks }, () => {
+  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const alarmName = `${taskId}_deletion_alarm`;
+
+  const updatedTasks = {
+    ...allTasks,
+    [taskId]: {
+      ...allTasks[taskId],
+      recentlyDeleted: true,
+      scheduledDeletion: deletionDate.toISOString(),
+    },
+  };
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
     chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-    tasksObj = allTasks;
+    tasksObj = updatedTasks;
   });
 }
 
@@ -387,28 +395,28 @@ function getTasks() {
 }
 
 function deleteTask(allTasks, taskIdToRemove) {
-  const task = allTasks[taskIdToRemove];
-  chrome.alarms.clear(`${task.id}_deletion_alarm`);
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
+    updateChecklist(updatedTasks);
   });
 }
 
 function restoreTask(allTasks, taskIdToRestore) {
-  const task = allTasks[taskIdToRestore];
-  task.recentlyDeleted = false;
-  task.scheduledDeletion = '';
-  chrome.alarms.clear(`${task.id}_deletion_alarm`);
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
+  const updatedTasks = {
+    ...allTasks,
+    [taskIdToRestore]: {
+      ...allTasks[taskIdToRestore],
+      recentlyDeleted: false,
+      scheduledDeletion: '',
+    },
+  };
+
+  chrome.alarms.clear(`${taskIdToRestore}_deletion_alarm`);
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
+    updateChecklist(updatedTasks);
   });
 }
 
@@ -601,14 +609,10 @@ function deleteTag(allTags, tagIdToRemove) {
   const updatedTags = Object.fromEntries(
     Object.entries(allTags).filter(([tagId]) => tagId !== tagIdToRemove),
   );
-  if (Object.keys(updatedTags).length === 0) {
-    allTags = {};
-  } else {
-    allTags = updatedTags;
-  }
-  chrome.storage.local.set({ tags: allTags }, () => {
+
+  chrome.storage.local.set({ tags: updatedTags }, () => {
     removeTag(tagIdToRemove);
-    tagsObj.tags = allTags;
+    tagsObj.tags = updatedTags; // ✅ Now using the updated version instead of modifying parameter
   });
 }
 
@@ -690,14 +694,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
-        data.tags[newTag] = {
-          tagColour,
-          tagName,
-        };
+        // ✅ Instead of modifying `data.tags`, create a new object
+        const updatedTags = { ...data.tags, [newTag]: { tagColour, tagName } };
 
-        chrome.storage.local.set({ tags: data.tags }, () => {
-          addTag(newTag, data.tags[newTag]);
-          tagsObj = data;
+        // ✅ Store the new object in Chrome Storage
+        chrome.storage.local.set({ tags: updatedTags }, () => {
+          addTag(newTag, updatedTags[newTag]);
+          tagsObj = { ...tagsObj, tags: updatedTags }; // Update global tags object
         });
       });
     }

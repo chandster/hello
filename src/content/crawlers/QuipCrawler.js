@@ -25,7 +25,7 @@ export class QuipCrawler {
   // Checks if this crawler should handle a given URL
   isCompatible(url) {
     const domainURL = (new URL(url)); // Get the domain of the URL
-    const domain = domainURL.hostname.toLocaleLowerCase(); b;
+    const domain = domainURL.hostname.toLocaleLowerCase();
     let isMatch = false;
     const compatibleDomains = this.getApplicableDomains();
 

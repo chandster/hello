@@ -246,21 +246,6 @@ chrome.contextMenus.onClicked.addListener((info) => {
   }
 });
 
-chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    chrome.storage.local.set({ allowedSites: [] }, () => {
-    });
-
-    chrome.storage.local.set({ allowedURLs: [] }, () => {});
-
-    chrome.storage.local.set({ allowedStringMatches: [] }, () => {});
-
-    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {});
-
-    chrome.storage.local.set({ allLastTitles: {} }, () => {});
-  }
-});
-
 function createContextMenu() {
   chrome.contextMenus.create({
     id: 'addNote',
