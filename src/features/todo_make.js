@@ -930,7 +930,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#editTaskModal').modal('hide');
   });
 
-
   $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
     let startDate = $('#startDate').val();
     let endDate = $('#endDate').val();
