@@ -47,7 +47,7 @@ function areAllTagsFalse() {
   return Object.keys(tagFilter).every((key) => tagFilter[key] === false);
 }
 
-function generateRandomId() {
+export function generateRandomId() {
   return Math.floor(Math.random() * 1000);
 }
 
@@ -487,7 +487,7 @@ function getSelectedTags(selector) {
   return selected;
 }
 
-function addTag(tagID, tagObject) {
+export function addTag(tagID, tagObject) {
   const tagRow = $('.tag-row');
   tagFilter[tagID] = false;
   const colourToUse = getCorrectTextColour(tagObject.tagColour);
@@ -838,7 +838,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const months = parseInt(monthsStr, 10);
     const days = parseInt(daysStr, 10);
 
-    // months start from 0
+    // months start from
     const dueDate = new Date(years, months - 1, days, hours, minutes, 0);
     if (dueDate.toString() === 'Invalid Date') return;
 
@@ -984,3 +984,4 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     clearTagFilter();
   });
 }
+// module.exports = { addTag, generateRandomId };

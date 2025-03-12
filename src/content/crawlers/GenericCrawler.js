@@ -1,4 +1,4 @@
-import { CrawledDocument } from './CrawledDocument';
+import { CrawledDocument } from './CrawledDocument.js';
 
 export class GenericCrawler {
   // Returns a list of domains this crawler is applicable to
