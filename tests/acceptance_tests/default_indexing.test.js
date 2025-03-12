@@ -5,100 +5,95 @@ const path = require('path');
 const extensionPath = path.resolve(__dirname, '../../');
 let extensionId;
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
 describe('Chrome Extension: Indexing Storage Test', () => {
-    let browser;
-    let page;
-    let popupPage;
+  let browser;
+  let page;
+  let popupPage;
 
-    beforeAll(async () => {
-        browser = await puppeteer.launch({
-            headless: 'new',  // Ensure using 'new' headless mode for compatibility
-            args: [
-                `--disable-extensions-except=${extensionPath}`,
-                `--load-extension=${extensionPath}`,
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-            ],
-        });
-
-        const [firstPage] = await browser.pages();
-        page = firstPage;
-
-        await page.goto('chrome://extensions');
-
-        extensionId = await page.evaluate(() => {
-            const extItem = document.querySelector('body > extensions-manager')
-                ?.shadowRoot.querySelector('#items-list')
-                ?.shadowRoot.querySelector('extensions-item');
-
-            return extItem ? extItem.getAttribute('id') : null;
-        });
-
-        if (!extensionId) {
-            throw new Error('❌ Failed to get extension ID');
-        }
-
-        const popupUrl = `chrome-extension://${extensionId}/src/components/hello.html`;
-        popupPage = await browser.newPage();
-        await popupPage.goto(popupUrl, { waitUntil: 'networkidle2', timeout: 60000 });
-
-        console.log('✅ Extension Loaded and Popup Opened.');
-    }, 60000);
-
-    afterAll(async () => {
-        if (browser) {
-            await browser.close();
-        }
+  beforeAll(async () => {
+    browser = await puppeteer.launch({
+      headless: 'new', // Ensure using 'new' headless mode for compatibility
+      args: [
+        `--disable-extensions-except=${extensionPath}`,
+        `--load-extension=${extensionPath}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+      ],
     });
 
-    test('Pages are correctly indexed and stored', async () => {
-        const bbcPage = await browser.newPage();
-        console.log('🌐 Visiting BBC page to trigger indexing...');
-        await bbcPage.goto('https://www.bbc.co.uk/news', { waitUntil: 'domcontentloaded' });
+    const [firstPage] = await browser.pages();
+    page = firstPage;
 
-        const amazonPage = await browser.newPage();
-        console.log('🌐 Visiting Amazon page to trigger indexing...');
-        await amazonPage.goto('https://www.amazon.co.uk', { waitUntil: 'domcontentloaded' });
+    await page.goto('chrome://extensions');
 
-        console.log('⏳ Waiting for both pages to be indexed...');
-        await delay(20000);  // Allow indexing to occur (matches your extension's timing)
+    extensionId = await page.evaluate(() => {
+      const extItem = document.querySelector('body > extensions-manager')
+        ?.shadowRoot.querySelector('#items-list')
+        ?.shadowRoot.querySelector('extensions-item');
 
-        console.log('🔍 Checking indexed data in storage...');
+      return extItem ? extItem.getAttribute('id') : null;
+    });
 
-        const storageData = await popupPage.evaluate(async () => {
-            return new Promise((resolve) => {
-                chrome.storage.local.get('localSearchIndex', (result) => {
-                    resolve(result.localSearchIndex ? JSON.parse(result.localSearchIndex) : {});
-                });
-            });
-        });
+    if (!extensionId) {
+      throw new Error('❌ Failed to get extension ID');
+    }
 
-        console.log('📝 Parsed localSearchIndex:', storageData);
+    const popupUrl = `chrome-extension://${extensionId}/src/components/hello.html`;
+    popupPage = await browser.newPage();
+    await popupPage.goto(popupUrl, { waitUntil: 'networkidle2', timeout: 60000 });
 
-        const fullStorage = await popupPage.evaluate(() => {
-            return new Promise((resolve) => {
-                chrome.storage.local.get(null, (result) => {
-                    resolve(result);
-                });
-            });
-        });
-        
-        console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
-        
+    console.log('✅ Extension Loaded and Popup Opened.');
+  }, 60000);
 
-        const documentIds = storageData.documentIds || {};
-        const allUrls = Object.values(documentIds);
+  afterAll(async () => {
+    if (browser) {
+      await browser.close();
+    }
+  });
 
-        console.log('🌐 Indexed URLs:', allUrls);
+  test('Pages are correctly indexed and stored', async () => {
+    const bbcPage = await browser.newPage();
+    console.log('🌐 Visiting BBC page to trigger indexing...');
+    await bbcPage.goto('https://www.bbc.co.uk/news', { waitUntil: 'domcontentloaded' });
 
-        //const bbcIndexed = allUrls.some(url => url.includes('bbc.co.uk'));
-        const amazonIndexed = allUrls.some(url => url.includes('amazon.co.uk'));
+    const amazonPage = await browser.newPage();
+    console.log('🌐 Visiting Amazon page to trigger indexing...');
+    await amazonPage.goto('https://www.amazon.co.uk', { waitUntil: 'domcontentloaded' });
 
-       // expect(bbcIndexed).toBe(true);
-        expect(amazonIndexed).toBe(true);
+    console.log('⏳ Waiting for both pages to be indexed...');
+    await delay(20000); // Allow indexing to occur (matches your extension's timing)
 
-        console.log('✅ Test Passed! BBC and Amazon pages were successfully indexed.');
-    }, 60000);
+    console.log('🔍 Checking indexed data in storage...');
+
+    const storageData = await popupPage.evaluate(async () => new Promise((resolve) => {
+      chrome.storage.local.get('localSearchIndex', (result) => {
+        resolve(result.localSearchIndex ? JSON.parse(result.localSearchIndex) : {});
+      });
+    }));
+
+    console.log('📝 Parsed localSearchIndex:', storageData);
+
+    const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
+      chrome.storage.local.get(null, (result) => {
+        resolve(result);
+      });
+    }));
+
+    console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
+
+    const documentIds = storageData.documentIds || {};
+    const allUrls = Object.values(documentIds);
+
+    console.log('🌐 Indexed URLs:', allUrls);
+
+    // const bbcIndexed = allUrls.some(url => url.includes('bbc.co.uk'));
+    const amazonIndexed = allUrls.some((url) => url.includes('amazon.co.uk'));
+
+    // expect(bbcIndexed).toBe(true);
+    expect(amazonIndexed).toBe(true);
+
+    console.log('✅ Test Passed! BBC and Amazon pages were successfully indexed.');
+  }, 60000);
 });

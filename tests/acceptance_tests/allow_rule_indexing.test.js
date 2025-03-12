@@ -70,77 +70,68 @@ describe('Chrome Extension: Allow Rule Test', () => {
   });
 
   test('User can add a new Site rule', async () => {
-  console.log('🔍 Navigating to Indexing Settings...');
-  await popupPage.waitForSelector('#urls-tab', { timeout: 10000 });
+    console.log('🔍 Navigating to Indexing Settings...');
+    await popupPage.waitForSelector('#urls-tab', { timeout: 10000 });
 
-  console.log('🖱 Clicking URLs tab...');
-  await popupPage.click('#urls-tab');
+    console.log('🖱 Clicking URLs tab...');
+    await popupPage.click('#urls-tab');
 
-  console.log('🔍 Checking for Add Allow Rule button...');
-  await popupPage.waitForSelector('.add-rule-btn', { timeout: 10000 });
+    console.log('🔍 Checking for Add Allow Rule button...');
+    await popupPage.waitForSelector('.add-rule-btn', { timeout: 10000 });
 
-  console.log('🖱 Clicking Add Allow Rule button...');
-  await popupPage.click('.add-rule-btn');
+    console.log('🖱 Clicking Add Allow Rule button...');
+    await popupPage.click('.add-rule-btn');
 
-  console.log('⌨ Ensuring input field is ready...');
-  await popupPage.waitForSelector('#addRuleInput', { timeout: 10000 });
-  
-  console.log('⌨ Typing "https://www.gla.ac.uk/" into input field...');
-  await popupPage.type('#addRuleInput', 'https://www.gla.ac.uk/', { delay: 100 });
+    console.log('⌨ Ensuring input field is ready...');
+    await popupPage.waitForSelector('#addRuleInput', { timeout: 10000 });
 
-  // Alternative approach: Directly set value if typing still fails
-  await popupPage.evaluate(() => {
+    console.log('⌨ Typing "https://www.gla.ac.uk/" into input field...');
+    await popupPage.type('#addRuleInput', 'https://www.gla.ac.uk/', { delay: 100 });
+
+    // Alternative approach: Directly set value if typing still fails
+    await popupPage.evaluate(() => {
       const input = document.querySelector('#addRuleInput');
       if (input) input.value = 'https://www.gla.ac.uk/';
-  });
+    });
 
-  console.log('🖱 Clicking Add Rule button...');
-  await popupPage.waitForSelector('#addRule', { timeout: 10000 });
-  await popupPage.click('#addRule');
+    console.log('🖱 Clicking Add Rule button...');
+    await popupPage.waitForSelector('#addRule', { timeout: 10000 });
+    await popupPage.click('#addRule');
 
-  console.log('⏳ Waiting briefly before visiting the site...');
- }, 20000);  
+    console.log('⏳ Waiting briefly before visiting the site...');
+  }, 20000);
 
-test('Website www.gla.ac.uk is correctly indexed after visiting the page', async () => {
+  test('Website www.gla.ac.uk is correctly indexed after visiting the page', async () => {
+    const delay = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
-  await new Promise(resolve => setTimeout(resolve, 5000));
+    await delay(5000);
 
-  console.log('🌐 Visiting www.gla.ac.uk...');
-  const glaPage = await browser.newPage();
-  await glaPage.goto('https://www.gla.ac.uk', { waitUntil: 'domcontentloaded' });
+    console.log('🌐 Visiting www.gla.ac.uk...');
+    const glaPage = await browser.newPage();
+    await glaPage.goto('https://www.gla.ac.uk', { waitUntil: 'domcontentloaded' });
 
-  console.log('⏳ Waiting for indexing to complete...');
-  await new Promise(resolve => setTimeout(resolve, 20000));
+    console.log('⏳ Waiting for indexing to complete...');
+    await delay(20000);
 
-  console.log('🔍 Checking indexed data in storage...');
+    console.log('🔍 Checking indexed data in storage...');
 
-  const storageData = await popupPage.evaluate(() => {
-      return new Promise((resolve) => {
-          chrome.storage.local.get('localSearchIndex', (result) => {
-              resolve(result.localSearchIndex ? JSON.parse(result.localSearchIndex) : {});
-          });
+    const storageData = await popupPage.evaluate(() => new Promise((resolve) => {
+      chrome.storage.local.get('localSearchIndex', (result) => {
+        resolve(result.localSearchIndex ? JSON.parse(result.localSearchIndex) : {});
       });
-  });
+    }));
 
-  console.log('📝 Parsed localSearchIndex:', storageData);
+    console.log('📝 Parsed localSearchIndex:', storageData);
 
-  const documentIds = storageData.documentIds || {};
-  const allUrls = Object.values(documentIds);
+    const documentIds = storageData.documentIds || {};
+    const allUrls = Object.values(documentIds);
 
-  console.log('🌐 Indexed URLs:', allUrls);
+    console.log('🌐 Indexed URLs:', allUrls);
 
-  const glaIndexed = allUrls.some(url => url.includes('gla.ac.uk'));
-  
-  expect(glaIndexed).toBe(true);
+    const glaIndexed = allUrls.some((url) => url.includes('gla.ac.uk'));
 
-  console.log('✅ Test Passed! www.gla.ac.uk was successfully indexed.');
-}, 60000);
+    expect(glaIndexed).toBe(true);
 
-
-
-
-
-
-
-
+    console.log('✅ Test Passed! www.gla.ac.uk was successfully indexed.');
+  }, 60000);
 });
