@@ -201,12 +201,10 @@ function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {});
+
+  const finalTasks = Object.keys(updatedTasks).length === 0 ? {} : updatedTasks; // ✅ Create new variable
+
+  chrome.storage.local.set({ tasks: finalTasks }, () => {});
 }
 
 chrome.alarms.onAlarm.addListener((alarm) => {
