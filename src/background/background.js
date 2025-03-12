@@ -1,33 +1,32 @@
-/* eslint-disable */
-import MiniSearch from "minisearch";
- 
+import MiniSearch from 'minisearch';
+
 /**
  * Constants
  * --------------------------
  * LOCAL_INDEX_ID: Key for storing the search index in Chrome's local storage
  */
-export const LOCAL_INDEX_ID = "localSearchIndex";
- 
+export const LOCAL_INDEX_ID = 'localSearchIndex';
+
 /**
  * Debug Utilities
  * --------------
  * Functions for debugging and development.
  */
 function exportStorageToFile() {
-    console.log("Starting export...");
-    chrome.storage.local.get(LOCAL_INDEX_ID, function(data) {
-        console.log("Retrieved data:", data);
-        const jsonString = JSON.stringify(data, null, 2);
-        const dataUrl = 'data:application/json;base64,' + btoa(unescape(encodeURIComponent(jsonString)));
-        
-        chrome.downloads.download({
-            url: dataUrl,
-            filename: 'hawk_index_backup.json',
-            saveAs: true
-        }, (downloadId) => {
-            console.log("Download started with ID:", downloadId);
-        });
+  console.log('Starting export...');
+  chrome.storage.local.get(LOCAL_INDEX_ID, (data) => {
+    console.log('Retrieved data:', data);
+    const jsonString = JSON.stringify(data, null, 2);
+    const dataUrl = `data:application/json;base64,${btoa(unescape(encodeURIComponent(jsonString)))}`;
+
+    chrome.downloads.download({
+      url: dataUrl,
+      filename: 'hawk_index_backup.json',
+      saveAs: true,
+    }, (downloadId) => {
+      console.log('Download started with ID:', downloadId);
     });
+  });
 }
 
 // Make export function available globally
@@ -41,176 +40,171 @@ chrome.exportIndex = exportStorageToFile;
  * ----------------------
  * Handles creating, loading, and maintaining the search index.
  */
-const createIndex = (existingIndex)=> {
-  let stopWords = ['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
- 
+const createIndex = (existingIndex) => {
+  const stopWords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'];
+
   const indexDescriptor = {
     fields: ['title', 'allText'],
     storeFields: ['title'],
     idField: 'id',
-    processTerm: (term, _fieldName) =>
-      stopWords.includes(term) ? null : term.toLowerCase(),
+    processTerm: (term, _fieldName) => (stopWords.includes(term) ? null : term.toLowerCase()),
     searchOptions: {
-      processTerm: (term) => term.toLowerCase()
-    }
+      processTerm: (term) => term.toLowerCase(),
+    },
   };
-  let indexer = undefined;
-  if(existingIndex === undefined){
+  let indexer;
+  if (existingIndex === undefined) {
     indexer = new MiniSearch(indexDescriptor);
-  }else{
-    indexer = MiniSearch.loadJSON(existingIndex,indexDescriptor);
+  } else {
+    indexer = MiniSearch.loadJSON(existingIndex, indexDescriptor);
   }
   return indexer;
-}
+};
 
 /**
  * Storage Interface
  * ----------------
  * Manages reading/writing the index from Chrome's local storage.
  */
-const getStoredIndex = (cb)=>{
-  chrome.storage.local.get(LOCAL_INDEX_ID, (data)=>{cb(data[LOCAL_INDEX_ID])});
-}
- 
+const getStoredIndex = (cb) => {
+  chrome.storage.local.get(LOCAL_INDEX_ID, (data) => { cb(data[LOCAL_INDEX_ID]); });
+};
+
 const storeIndex = (indexData) => {
   const data = {
-    [LOCAL_INDEX_ID]: indexData
-  }
-  chrome.storage.local.set(data, function() {
-    console.log('Index data saved['+data.length+']');
+    [LOCAL_INDEX_ID]: indexData,
+  };
+  chrome.storage.local.set(data, () => {
+    console.log(`Index data saved[${data.length}]`);
   });
-}
- 
+};
+
 /**
  * Index Access and Manipulation
  * ---------------------------
  * Functions for retrieving, adding, and updating indexed documents.
  */
-const getIndex = ()=> {
-  if(!chrome.indexer){
+const getIndex = () => {
+  if (!chrome.indexer) {
     initialiseIndexer();
   }
   return chrome.indexer;
-}
+};
 
 /**
  * TODO: Implement this function to replace the indexer data
  */
 const replaceIndexerData = () => {
- 
- 
-}
 
-const addToIndex = (document)=> {
-  let idx = getIndex();
-  if(idx){
-    console.time("Indexing Doc:" + document.id);
-    if(idx.has(document.id)){
+};
+
+const addToIndex = (document) => {
+  const idx = getIndex();
+  if (idx) {
+    console.time(`Indexing Doc:${document.id}`);
+    if (idx.has(document.id)) {
       idx.replace(document);
-      console.log("Replacing doc in the index");
-    }else{
+      console.log('Replacing doc in the index');
+    } else {
       idx.add(document);
-      console.log("Adding new doc in the index");
+      console.log('Adding new doc in the index');
     }
-    console.timeEnd("Indexing Doc:" + document.id);
-    console.time("Storing the whole Index");
-    let data = JSON.stringify(idx);
+    console.timeEnd(`Indexing Doc:${document.id}`);
+    console.time('Storing the whole Index');
+    const data = JSON.stringify(idx);
     storeIndex(data);
-    console.timeEnd("Storing the whole Index");
+    console.timeEnd('Storing the whole Index');
   }
-}
- 
+};
+
 /**
  * Search and Results Processing
  * ---------------------------
  * Handles querying the index and formatting results.
  */
 const search = (document, options) => {
-  let idx = getIndex();
+  const idx = getIndex();
   return idx.search(document);
-}
+};
 
-const sendResults = (searchQuery, sendResponse)=>{
-  let searchResults =  search(searchQuery, null);
-  let suggestions = [];
-  for(let i=0;i<searchResults.length && i<5;i++){
-    suggestions.push({content:searchResults[i].id,description:removeSpecialCharacters(searchResults[i].title)});
-    console.log({content:searchResults[i].id,description:searchResults[i].title});
+const sendResults = (searchQuery, sendResponse) => {
+  const searchResults = search(searchQuery, null);
+  const suggestions = [];
+  for (let i = 0; i < searchResults.length && i < 5; i++) {
+    suggestions.push({ content: searchResults[i].id, description: removeSpecialCharacters(searchResults[i].title) });
+    console.log({ content: searchResults[i].id, description: searchResults[i].title });
   }
-  console.log("numbers of suggestions:" + suggestions.length);
+  console.log(`numbers of suggestions:${suggestions.length}`);
   sendResponse(suggestions);
-}
- 
+};
+
 /**
  * Message Handling
  * ---------------
  * Processes messages from content scripts and the popup.
  */
 const indexingListener = (request, sender, sendResponse) => {
-    if ((request.from === 'popup') && (request.subject === 'indexerData')) {
-        sendResponse(chrome.storedIndex);
-    } else if ((request.from === 'popup') && (request.subject === 'setIndexerData')) {
-        let isSuccessful = replaceIndexerData(request.content);
-    } else if (request.action === 'exportIndex') {
-        exportStorageToFile();
-        sendResponse({status: 'exporting'});
-    } else {
-        addToIndex(request.document);
-        sendResponse("OK:Indexed");
-    }
-}
- 
+  if ((request.from === 'popup') && (request.subject === 'indexerData')) {
+    sendResponse(chrome.storedIndex);
+  } else if ((request.from === 'popup') && (request.subject === 'setIndexerData')) {
+    const isSuccessful = replaceIndexerData(request.content);
+  } else if (request.action === 'exportIndex') {
+    exportStorageToFile();
+    sendResponse({ status: 'exporting' });
+  } else {
+    addToIndex(request.document);
+    sendResponse('OK:Indexed');
+  }
+};
+
 /**
  * Initialization
  * -------------
  * Sets up the extension and search indexer.
  */
-const initialiseIndexer = ()=> {
-  const initialiseIndexerAsync =(indexerData) => {
-    if(indexerData && indexerData.length > 0){
+const initialiseIndexer = () => {
+  const initialiseIndexerAsync = (indexerData) => {
+    if (indexerData && indexerData.length > 0) {
       chrome.storedIndex = indexerData;
     }
-    chrome.indexer  = createIndex(chrome.storedIndex);
-  }
+    chrome.indexer = createIndex(chrome.storedIndex);
+  };
   getStoredIndex(initialiseIndexerAsync);
-}
- 
+};
+
 /**
  * Utility Functions
  * ----------------
  */
-const removeSpecialCharacters = (stringToBeSanitized)=>{
-  let specialChars = "!@#$^&%*+=[]\/{}|:<>?,.";
+const removeSpecialCharacters = (stringToBeSanitized) => {
+  const specialChars = '!@#$^&%*+=[]/{}|:<>?,.';
+  let sanitizedString = stringToBeSanitized; // ✅ Create a new variable
   for (let i = 0; i < specialChars.length; i++) {
-    stringToBeSanitized = stringToBeSanitized.replace(new RegExp("\\" + specialChars[i], "gi"), "");
+    sanitizedString = sanitizedString.replace(new RegExp(`\\${specialChars[i]}`, 'gi'), '');
   }
-  return stringToBeSanitized;
-}
+  return sanitizedString;
+};
 
 // Initialize extension and set up listeners
 initialiseIndexer();
 chrome.runtime.onMessage.addListener(indexingListener);
- 
-chrome.omnibox.onInputChanged.addListener((text,suggest) => {
-  sendResults(text,suggest);
+
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+  sendResults(text, suggest);
 });
- 
+
 chrome.omnibox.onInputEntered.addListener((text, OnInputEnteredDisposition) => {
-  chrome.tabs.update({url:text});
+  chrome.tabs.update({ url: text });
 });
-
-
 
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {});
+
+  const finalTasks = Object.keys(updatedTasks).length === 0 ? {} : updatedTasks; // ✅ Create new variable
+
+  chrome.storage.local.set({ tasks: finalTasks }, () => {});
 }
 
 chrome.alarms.onAlarm.addListener((alarm) => {
