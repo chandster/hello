@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Hawk - Page Indexer 2 Test works",
-  "description": "Extension combining to-do list, markdown notebook, and indexer into one.",
-  "version": "3.0.1",
-  "omnibox": { "keyword": "i" },
+  "name": "Hawk 2 - Page Indexer",
+  "description": "Extension combining to-do list and page indexer into one.",
+  "version": "1.0.0",
+  "omnibox": { "keyword": "@i\t" },
   
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
@@ -28,7 +28,6 @@
   },
   
   "action": {
-    "default_popup": "src/components/hello.html",
     "default_icon": "assets/images/logo128x128.png"
   },
   "background": {
@@ -42,7 +41,7 @@
         "default": "Ctrl+Shift+H",
         "mac": "Command+Shift+H"
       },
-      "description": "Hawk - Add text to notes"
+      "description": "Hawk 2 - Add text to notes"
     }
   },
   "content_scripts": [

@@ -155,6 +155,73 @@ const indexingListener = (request, sender, sendResponse) => {
         exportStorageToFile();
         sendResponse({status: 'exporting'});
     } else {
+      chrome.tabs.create({ url: text });
+    }
+  });
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  const alarmName = alarm.name;
+  if (alarmName.endsWith('_deletion_alarm')) {
+    const taskId = alarmName.split('_')[0];
+    chrome.storage.local.get({ tasks: {} }, (result) => {
+      const existingTasks = result.tasks || {};
+      deleteTask(existingTasks, taskId);
+    });
+  }
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  chrome.storage.local.get('tasks').then((result) => {
+    const existingTasks = result || {};
+    const foundTask = existingTasks.tasks[alarm.name];
+    if (Object.keys(existingTasks).length !== 0 && foundTask && !foundTask.recentlyDeleted) {
+      const notification = {
+        type: 'basic',
+        iconUrl: chrome.runtime.getURL('../images/logo128x128.png'),
+        title: `Your task ${foundTask.title} is due`,
+        message: foundTask.description,
+      };
+      chrome.notifications.create(alarm.name, notification);
+    }
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  if (info.menuItemId === 'add-note') {
+    alert('You clicked the custom menu item!');
+  }
+});
+
+
+
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.storage.local.set({ allowedSites: [] }, () => {
+    });
+
+    chrome.storage.local.set({ allowedURLs: [] }, () => {});
+
+    chrome.storage.local.set({ allowedStringMatches: [] }, () => {});
+
+    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {});
+
+    chrome.storage.local.set({ allLastTitles: {} }, () => {});
+  }
+});
+
+function createContextMenu() {
+  chrome.contextMenus.create({
+    id: 'addNote',
+    title: 'Hawk 2 - Add text to Notes',
+    contexts: ['selection'],
+  });
+}
+
+function setDueDate(daysToAdd) {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
+  return dueDate.toISOString();
         addToIndex(request.document);
         sendResponse("OK:Indexed");
     }
