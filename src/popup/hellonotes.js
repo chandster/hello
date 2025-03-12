@@ -1,3 +1,5 @@
+import { generateRandomId, addTag } from '../features/todo_make';
+
 $(document).ready(() => {
   let currentNote = null;
   const categoryDropdownMenu = $('#categoryDropdownMenu');
@@ -434,6 +436,7 @@ $(document).ready(() => {
 
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
+    const tagColour = $('#tagColour').val().trim();
 
     if (tagName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
@@ -441,14 +444,12 @@ $(document).ready(() => {
         const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
-        data.tags[newTag] = {
-          tagColour,
-          tagName,
-        };
+        // ✅ Fix: Create a new object instead of modifying `data`
+        const updatedTags = { ...data.tags, [newTag]: { tagColour, tagName } };
 
-        chrome.storage.local.set({ tags: data.tags }, () => {
-          addTag(newTag, data.tags[newTag]);
-          tagsObj = data;
+        chrome.storage.local.set({ tags: updatedTags }, () => {
+          addTag(newTag, updatedTags[newTag]);
+          tagsObj = { ...tagsObj, tags: updatedTags }; // Update global tags object
         });
       });
     }
