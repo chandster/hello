@@ -14,7 +14,7 @@ describe('Chrome Extension: Indexing Storage Test', () => {
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
-      headless: 'new', // Ensure using 'new' headless mode for compatibility
+      headless: true, // Ensure using 'new' headless mode for compatibility
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,

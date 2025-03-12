@@ -1,11 +1,29 @@
-image: node:alpine
+image: node:18
 
 stages:
   - lint
   - test
+
+variables:
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+  CHROME_BIN: "/usr/bin/google-chrome-stable"
+
+before_script:
+  - apk add --no-cache chromium
+  - npm install
+
 
 eslint:
   stage: lint
   script:
     - npm install
     - npx eslint --fix .
+
+puppeteer-tests:
+  stage: test
+  script:
+    - npm test
+  artifacts:
+    paths:
+      - test-results/
+    allow_failure: false

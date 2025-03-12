@@ -16,7 +16,7 @@ describe('Chrome Extension: Edit Note Test', () => {
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
-      headless: false,
+      headless: true,
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
