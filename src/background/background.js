@@ -246,8 +246,6 @@ chrome.contextMenus.onClicked.addListener((info) => {
   }
 });
 
-
-
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.storage.local.set({ allowedSites: [] }, () => {
@@ -311,4 +309,8 @@ chrome.contextMenus.onClicked.addListener((info) => {
 
 chrome.runtime.onInstalled.addListener(() => {
   createContextMenu();
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 });
