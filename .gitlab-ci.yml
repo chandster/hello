@@ -2,11 +2,13 @@ image: node:18
 
 variables:
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
-  CHROME_BIN: "/usr/bin/google-chrome-stable"
+  CHROME_BIN: "/usr/bin/google-chrome-stable" 
+
 
 stages:
   - lint
   - test
+  - package
 
 before_script:
   - apk add --no-cache chromium
@@ -25,3 +27,16 @@ puppeteer-tests:
     paths:
       - test-results/
   allow_failure: false
+
+package-extension:
+  stage: package
+  before_script:
+    - apk add --no-cache --update zip
+  script:
+    - zip -r sh27-main
+  artifacts:
+    paths:
+      - sh27-main.zip
+    expire_in: 1 week
+    when: on_success
+
