@@ -405,12 +405,18 @@ function deleteTask(allTasks, taskIdToRemove) {
 }
 
 function restoreTask(allTasks, taskIdToRestore) {
-  const task = allTasks[taskIdToRestore];
-  task.recentlyDeleted = false;
-  task.scheduledDeletion = '';
-  chrome.alarms.clear(`${task.id}_deletion_alarm`);
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
+  const updatedTasks = {
+    ...allTasks,
+    [taskIdToRestore]: {
+      ...allTasks[taskIdToRestore],
+      recentlyDeleted: false,
+      scheduledDeletion: '',
+    },
+  };
+
+  chrome.alarms.clear(`${taskIdToRestore}_deletion_alarm`);
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
+    updateChecklist(updatedTasks);
   });
 }
 
@@ -603,14 +609,10 @@ function deleteTag(allTags, tagIdToRemove) {
   const updatedTags = Object.fromEntries(
     Object.entries(allTags).filter(([tagId]) => tagId !== tagIdToRemove),
   );
-  if (Object.keys(updatedTags).length === 0) {
-    allTags = {};
-  } else {
-    allTags = updatedTags;
-  }
-  chrome.storage.local.set({ tags: allTags }, () => {
+
+  chrome.storage.local.set({ tags: updatedTags }, () => {
     removeTag(tagIdToRemove);
-    tagsObj.tags = allTags;
+    tagsObj.tags = updatedTags; // ✅ Now using the updated version instead of modifying parameter
   });
 }
 
