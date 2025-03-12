@@ -8,4 +8,4 @@ eslint:
   stage: lint
   script:
     - npm install
-
+    - npx eslint --fix .
