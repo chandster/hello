@@ -1,4 +1,4 @@
-first = true;
+let first = true;
 
 function loadCustomBackground() {
   chrome.storage.local.get('bg', (result) => {

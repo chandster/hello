@@ -47,7 +47,7 @@ function areAllTagsFalse() {
   return Object.keys(tagFilter).every((key) => tagFilter[key] === false);
 }
 
-function generateRandomId() {
+export function generateRandomId() {
   return Math.floor(Math.random() * 1000);
 }
 
@@ -150,15 +150,23 @@ function sortTasks(tasks) {
   return sortedTasks.map((task) => task.id);
 }
 
-function setTaskDeleted(allTasks, task) {
+function setTaskDeleted(allTasks, taskId) {
   const now = new Date();
-  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-  const alarmName = `${task.id}_deletion_alarm`;
-  task.recentlyDeleted = true;
-  task.scheduledDeletion = deletionDate.toISOString();
-  chrome.storage.local.set({ tasks: allTasks }, () => {
+  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const alarmName = `${taskId}_deletion_alarm`;
+
+  const updatedTasks = {
+    ...allTasks,
+    [taskId]: {
+      ...allTasks[taskId],
+      recentlyDeleted: true,
+      scheduledDeletion: deletionDate.toISOString(),
+    },
+  };
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
     chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-    tasksObj = allTasks;
+    tasksObj = updatedTasks;
   });
 }
 
@@ -387,28 +395,28 @@ function getTasks() {
 }
 
 function deleteTask(allTasks, taskIdToRemove) {
-  const task = allTasks[taskIdToRemove];
-  chrome.alarms.clear(`${task.id}_deletion_alarm`);
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
+    updateChecklist(updatedTasks);
   });
 }
 
 function restoreTask(allTasks, taskIdToRestore) {
-  const task = allTasks[taskIdToRestore];
-  task.recentlyDeleted = false;
-  task.scheduledDeletion = '';
-  chrome.alarms.clear(`${task.id}_deletion_alarm`);
-  chrome.storage.local.set({ tasks: allTasks }, () => {
-    updateChecklist(allTasks);
+  const updatedTasks = {
+    ...allTasks,
+    [taskIdToRestore]: {
+      ...allTasks[taskIdToRestore],
+      recentlyDeleted: false,
+      scheduledDeletion: '',
+    },
+  };
+
+  chrome.alarms.clear(`${taskIdToRestore}_deletion_alarm`);
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
+    updateChecklist(updatedTasks);
   });
 }
 
@@ -479,7 +487,7 @@ function getSelectedTags(selector) {
   return selected;
 }
 
-function addTag(tagID, tagObject) {
+export function addTag(tagID, tagObject) {
   const tagRow = $('.tag-row');
   tagFilter[tagID] = false;
   const colourToUse = getCorrectTextColour(tagObject.tagColour);
@@ -601,14 +609,10 @@ function deleteTag(allTags, tagIdToRemove) {
   const updatedTags = Object.fromEntries(
     Object.entries(allTags).filter(([tagId]) => tagId !== tagIdToRemove),
   );
-  if (Object.keys(updatedTags).length === 0) {
-    allTags = {};
-  } else {
-    allTags = updatedTags;
-  }
-  chrome.storage.local.set({ tags: allTags }, () => {
+
+  chrome.storage.local.set({ tags: updatedTags }, () => {
     removeTag(tagIdToRemove);
-    tagsObj.tags = allTags;
+    tagsObj.tags = updatedTags; // ✅ Now using the updated version instead of modifying parameter
   });
 }
 
@@ -690,14 +694,13 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
         const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
-        data.tags[newTag] = {
-          tagColour,
-          tagName,
-        };
+        // ✅ Instead of modifying `data.tags`, create a new object
+        const updatedTags = { ...data.tags, [newTag]: { tagColour, tagName } };
 
-        chrome.storage.local.set({ tags: data.tags }, () => {
-          addTag(newTag, data.tags[newTag]);
-          tagsObj = data;
+        // ✅ Store the new object in Chrome Storage
+        chrome.storage.local.set({ tags: updatedTags }, () => {
+          addTag(newTag, updatedTags[newTag]);
+          tagsObj = { ...tagsObj, tags: updatedTags }; // Update global tags object
         });
       });
     }
@@ -835,7 +838,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     const months = parseInt(monthsStr, 10);
     const days = parseInt(daysStr, 10);
 
-    // months start from 0
+    // months start from
     const dueDate = new Date(years, months - 1, days, hours, minutes, 0);
     if (dueDate.toString() === 'Invalid Date') return;
 
@@ -930,7 +933,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     $('#editTaskModal').modal('hide');
   });
 
-
   $('#startDate, #endDate, #startTime, #endTime').on('input', () => {
     let startDate = $('#startDate').val();
     let endDate = $('#endDate').val();
@@ -982,3 +984,4 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
     clearTagFilter();
   });
 }
+// module.exports = { addTag, generateRandomId };

@@ -1,8 +1,8 @@
 const defaultRegexList = [
-  '^https://[^/]+\.amazon\.com/.*$',
-  '^https://atoz\.amazon\.work/.*$',
-  '^https://quip-amazon\.com/.*$',
-  '^https://quip\.com/.*$',
+  '^https://[^/]+\\.amazon\\.com/.*$',
+  '^https://atoz\\.amazon\\.work/.*$',
+  '^https://quip-amazon\\.com/.*$',
+  '^https://quip\\.com/.*$',
 ];
 
 let curTags = null;
@@ -111,13 +111,17 @@ function constrainStringLength(inputString, length) {
 function overwriteTasks(tasks) {
   const currentDate = new Date();
   const tasksArray = Object.values(tasks);
-  const filteredTasks = tasksArray.filter((task) => (task.recentlyDeleted === false) || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
+  const filteredTasks = tasksArray.filter((task) => !task.recentlyDeleted || (task.scheduledDeletion && new Date(task.scheduledDeletion) > currentDate));
+
   const newTasks = {};
   filteredTasks.forEach((task) => {
     newTasks[task.id] = task;
   });
-  tasks = newTasks;
-  chrome.storage.local.set({ tasks }, () => {
+
+  // Instead of reassigning `tasks`, create a new variable
+  const updatedTasks = newTasks;
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
     chrome.alarms.clearAll();
     $.each(filteredTasks, (key, task) => {
       if (task.recentlyDeleted) {
@@ -585,7 +589,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       }
       restoreSelectedNotes();
       restoreSelectedTasks();
-      restoreSelectedIndexEntries();
+      restoreSelectedIndexEntries(); `
       $restoreBtn.text('Restored selected data!');
       setTimeout(() => {
         $restoreBtn.text('Perform overwriting restore of selected data');
@@ -596,7 +600,7 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       chrome.storage.local.set({ bg: '' }, () => {
         updateWallpaperPreview();
         chrome.runtime.sendMessage(null, 'wallpaper');
-      });
+      });`;
     });
 
     chrome.storage.local.get('theme', (result) => {

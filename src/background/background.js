@@ -1,231 +1,211 @@
-import { BM25F } from '../../assets/js/wink-bm25-text-search.js';
-import MiniSearch from '../../assets/js/minisearch.min.js';
+import MiniSearch from 'minisearch';
 
-let engine;
-const winkNLP = require('wink-nlp');
-const model = require('wink-eng-lite-web-model');
+/**
+ * Constants
+ * --------------------------
+ * LOCAL_INDEX_ID: Key for storing the search index in Chrome's local storage
+ */
+export const LOCAL_INDEX_ID = 'localSearchIndex';
 
-const nlp = winkNLP(model);
-const { its } = nlp;
-const _ = require('lodash');
+/**
+ * Debug Utilities
+ * --------------
+ * Functions for debugging and development.
+ */
+function exportStorageToFile() {
+  console.log('Starting export...');
+  chrome.storage.local.get(LOCAL_INDEX_ID, (data) => {
+    console.log('Retrieved data:', data);
+    const jsonString = JSON.stringify(data, null, 2);
+    const dataUrl = `data:application/json;base64,${btoa(unescape(encodeURIComponent(jsonString)))}`;
 
-const defaultRegexList = [
-  '^https://[^/]+.amazon.com/.*$',
-  '^https://atoz.amazon.work/.*$',
-  '^https://quip-amazon.com/.*$',
-  '^https://quip.com/.*$',
-];
+    chrome.downloads.download({
+      url: dataUrl,
+      filename: 'hawk_index_backup.json',
+      saveAs: true,
+    }, (downloadId) => {
+      console.log('Download started with ID:', downloadId);
+    });
+  });
+}
 
-const TITLE_BOOST = 3;
-const FREQUENT_WORD_BOOST = 2;
-const MIN_SEARCH_TERM_LENGTH = 3;
-const DEFAULT_WEIGHT = 0.2;
-const BM25F_MIN_DOCS = 3;
+// Make export function available globally
+globalThis.exportIndex = exportStorageToFile;
 
-let docs;
-let runningEngine;
+// Also add to chrome object for service worker context
+chrome.exportIndex = exportStorageToFile;
 
-const prepTask = function prepTask(text) {
-  const tokens = [];
-  nlp
-    .readDoc(text)
-    .tokens()
-    .filter((t) => t.out(its.type) === 'word' && !t.out(its.stopWordFlag))
-    .each((t) => tokens.push(
-      t.out(its.negationFlag) ? `!${t.out(its.stem)}` : t.out(its.stem),
-    ));
-  return tokens;
+/**
+ * Search Index Management
+ * ----------------------
+ * Handles creating, loading, and maintaining the search index.
+ */
+const createIndex = (existingIndex) => {
+  const stopWords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'];
+
+  const indexDescriptor = {
+    fields: ['title', 'allText'],
+    storeFields: ['title'],
+    idField: 'id',
+    processTerm: (term, _fieldName) => (stopWords.includes(term) ? null : term.toLowerCase()),
+    searchOptions: {
+      processTerm: (term) => term.toLowerCase(),
+    },
+  };
+  let indexer;
+  if (existingIndex === undefined) {
+    indexer = new MiniSearch(indexDescriptor);
+  } else {
+    indexer = MiniSearch.loadJSON(existingIndex, indexDescriptor);
+  }
+  return indexer;
 };
 
-async function setupBM25F() {
-  engine = new BM25F();
+/**
+ * Storage Interface
+ * ----------------
+ * Manages reading/writing the index from Chrome's local storage.
+ */
+const getStoredIndex = (cb) => {
+  chrome.storage.local.get(LOCAL_INDEX_ID, (data) => { cb(data[LOCAL_INDEX_ID]); });
+};
 
-  await chrome.storage.local.get(['indexed']).then((result) => {
-    if (result && result.indexed) {
-      docs = result.indexed.corpus;
-    }
+const storeIndex = (indexData) => {
+  const data = {
+    [LOCAL_INDEX_ID]: indexData,
+  };
+  chrome.storage.local.set(data, () => {
+    console.log(`Index data saved[${data.length}]`);
   });
+};
 
-  engine.defineConfig({ fldWeights: { title: 20, body: 1 } });
-  engine.definePrepTasks([prepTask]);
-  if (docs && docs.length) {
-    docs.forEach((doc, i) => {
-      engine.addDoc(doc, i + 1);
-    });
-    if (docs.length >= BM25F_MIN_DOCS) {
-      runningEngine = _.cloneDeep(engine);
-      runningEngine.consolidate();
-    }
+/**
+ * Index Access and Manipulation
+ * ---------------------------
+ * Functions for retrieving, adding, and updating indexed documents.
+ */
+const getIndex = () => {
+  if (!chrome.indexer) {
+    initialiseIndexer();
   }
-}
+  return chrome.indexer;
+};
 
-setupBM25F();
+/**
+ * TODO: Implement this function to replace the indexer data
+ */
+const replaceIndexerData = () => {
 
+};
 
-// update the documents used by miniSearch
-function updateIndex(miniSearch, result) {
-  miniSearch.addAll((result.indexed && result.indexed.corpus) ? result.indexed.corpus : []);
-}
+const addToIndex = (document) => {
+  const idx = getIndex();
+  if (idx) {
+    console.time(`Indexing Doc:${document.id}`);
+    if (idx.has(document.id)) {
+      idx.replace(document);
+      console.log('Replacing doc in the index');
+    } else {
+      idx.add(document);
+      console.log('Adding new doc in the index');
+    }
+    console.timeEnd(`Indexing Doc:${document.id}`);
+    console.time('Storing the whole Index');
+    const data = JSON.stringify(idx);
+    storeIndex(data);
+    console.timeEnd('Storing the whole Index');
+  }
+};
 
-function initialiseMiniSearch() {
-  const miniSearch = new MiniSearch({
-    fields: ['title', 'body', 'frequentWords'],
-    storeFields: ['url'],
-  });
-  return miniSearch;
-}
+/**
+ * Search and Results Processing
+ * ---------------------------
+ * Handles querying the index and formatting results.
+ */
+const search = (document, options) => {
+  const idx = getIndex();
+  return idx.search(document);
+};
 
-const miniSearch = initialiseMiniSearch();
+const sendResults = (searchQuery, sendResponse) => {
+  const searchResults = search(searchQuery, null);
+  const suggestions = [];
+  for (let i = 0; i < searchResults.length && i < 5; i++) {
+    suggestions.push({ content: searchResults[i].id, description: removeSpecialCharacters(searchResults[i].title) });
+    console.log({ content: searchResults[i].id, description: searchResults[i].title });
+  }
+  console.log(`numbers of suggestions:${suggestions.length}`);
+  sendResponse(suggestions);
+};
 
-chrome.storage.local.get(['indexed']).then((result) => {
-  updateIndex(miniSearch, result);
+/**
+ * Message Handling
+ * ---------------
+ * Processes messages from content scripts and the popup.
+ */
+const indexingListener = (request, sender, sendResponse) => {
+  if ((request.from === 'popup') && (request.subject === 'indexerData')) {
+    sendResponse(chrome.storedIndex);
+  } else if ((request.from === 'popup') && (request.subject === 'setIndexerData')) {
+    const isSuccessful = replaceIndexerData(request.content);
+  } else if (request.action === 'exportIndex') {
+    exportStorageToFile();
+    sendResponse({ status: 'exporting' });
+  } else {
+    addToIndex(request.document);
+    sendResponse('OK:Indexed');
+  }
+};
+
+/**
+ * Initialization
+ * -------------
+ * Sets up the extension and search indexer.
+ */
+const initialiseIndexer = () => {
+  const initialiseIndexerAsync = (indexerData) => {
+    if (indexerData && indexerData.length > 0) {
+      chrome.storedIndex = indexerData;
+    }
+    chrome.indexer = createIndex(chrome.storedIndex);
+  };
+  getStoredIndex(initialiseIndexerAsync);
+};
+
+/**
+ * Utility Functions
+ * ----------------
+ */
+const removeSpecialCharacters = (stringToBeSanitized) => {
+  const specialChars = '!@#$^&%*+=[]/{}|:<>?,.';
+  let sanitizedString = stringToBeSanitized; // ✅ Create a new variable
+  for (let i = 0; i < specialChars.length; i++) {
+    sanitizedString = sanitizedString.replace(new RegExp(`\\${specialChars[i]}`, 'gi'), '');
+  }
+  return sanitizedString;
+};
+
+// Initialize extension and set up listeners
+initialiseIndexer();
+chrome.runtime.onMessage.addListener(indexingListener);
+
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+  sendResults(text, suggest);
 });
 
-
-
-// gets the logical combinator (if present) to be passed into the MiniSearch search
-function getLogicalCombinator(searchTerms) {
-  const lastTerm = searchTerms[searchTerms.length - 1];
-  let combinator;
-  switch (lastTerm) {
-    case '&':
-      combinator = 'AND';
-      break;
-    case '~':
-      combinator = 'AND_NOT';
-      break;
-    default:
-      combinator = null;
-      break;
-  }
-  return combinator;
-}
-
-// returns results from a MiniSearch search
-function search(miniSearchObj, text) {
-  return miniSearchObj.search(text, {
-    boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
-    prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-    fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
-  });
-}
-
-// returns results from a MiniSearch search with a provided logical combinator
-function searchWithCombinator(miniSearchObj, text, combinator) {
-  return miniSearchObj.search(text, {
-    boost: { title: TITLE_BOOST, frequentWords: FREQUENT_WORD_BOOST },
-    prefix: (term) => term.length > MIN_SEARCH_TERM_LENGTH,
-    fuzzy: (term) => (term.length > MIN_SEARCH_TERM_LENGTH ? DEFAULT_WEIGHT : null),
-    combineWith: combinator,
-  });
-}
-
-// gets top search suggestions as an array of dictionaries
-function getSuggestions(searchResults, numSuggestions, corpus) {
-  const suggestions = [];
-  for (let docID = 0; docID < numSuggestions; docID += 1) {
-    if (docID === searchResults.length) break;
-    const searchResult = searchResults[docID];
-    const page = corpus[searchResult.id - 1];
-    suggestions.push({
-      content: page.url,
-      description: page.title,
-      deletable: true,
-    });
-  }
-  return suggestions;
-}
-
-// search indexed pages (corpus) for text with BM25 and MiniSearch
-// hoping to remove the dependency on BM25 and use MiniSearch only
-function suggestFromIndex(text, corpus) {
-  let suggestions = [];
-  let searchResults = [];
-
-  let searchTerms = text.split(' ');
-  const combinator = getLogicalCombinator(searchTerms);
-
-  if (combinator && searchTerms.length) {
-    searchTerms = searchTerms.slice(0, searchTerms.length - 1);
-    text = searchTerms.join(' ');
-  }
-
-  if (corpus.length >= MIN_SEARCH_TERM_LENGTH && !combinator) {
-    searchResults = runningEngine.search(text);
-    for (let docID = 0; docID < 10; docID += 1) {
-      if (docID === searchResults.length) break;
-      const page = corpus[searchResults[docID][0] - 1];
-      suggestions.push({
-        content: page.url,
-        description: page.title,
-        deletable: true,
-      });
-    }
-  }
-  if (!suggestions.length) {
-    if (combinator) {
-      searchResults = searchWithCombinator(miniSearch, text, combinator);
-    } else {
-      searchResults = search(miniSearch, text);
-    }
-    const MAX_SUGGESTIONS = 10;
-    suggestions = getSuggestions(searchResults, MAX_SUGGESTIONS, corpus);
-  }
-  return suggestions;
-}
+chrome.omnibox.onInputEntered.addListener((text, OnInputEnteredDisposition) => {
+  chrome.tabs.update({ url: text });
+});
 
 function deleteTask(allTasks, taskIdToRemove) {
   const updatedTasks = Object.fromEntries(
     Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
   );
-  if (Object.keys(updatedTasks).length === 0) {
-    allTasks = {};
-  } else {
-    allTasks = updatedTasks;
-  }
-  chrome.storage.local.set({ tasks: allTasks }, () => {});
+
+  const finalTasks = Object.keys(updatedTasks).length === 0 ? {} : updatedTasks; // ✅ Create new variable
+
+  chrome.storage.local.set({ tasks: finalTasks }, () => {});
 }
-
-// Listen for when the tab's url changes and send a message to popup.js
-/* eslint-disable no-unused-vars */
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url) {
-    chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
-  }
-});
-/* eslint-enable no-unused-vars */
-
-// Listen for when the user changes tabs and send a message to popup.js
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (tab && tab.url) {
-      chrome.runtime.sendMessage({ type: 'TAB_CHANGED', url: tab.url });
-    }
-  });
-});
-
-chrome.omnibox.onInputChanged.addListener((text, suggest) => {
-  chrome.storage.local.get(['indexed']).then((result) => {
-    if (Object.keys(result).length > 0) {
-      const { corpus } = result.indexed;
-      if (corpus.length) {
-        const suggestions = suggestFromIndex(text, corpus);
-        suggest(suggestions);
-      }
-    }
-  });
-});
-
-chrome.omnibox.onInputEntered.addListener((text) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs && tabs[0]) {
-      const tabId = tabs[0].id;
-      chrome.tabs.update(tabId, { url: text });
-    } else {
-      chrome.tabs.create({ url: text });
-    }
-  });
-});
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   const alarmName = alarm.name;
@@ -257,23 +237,6 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 chrome.contextMenus.onClicked.addListener((info) => {
   if (info.menuItemId === 'add-note') {
     alert('You clicked the custom menu item!');
-  }
-});
-
-
-
-chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    chrome.storage.local.set({ allowedSites: [] }, () => {
-    });
-
-    chrome.storage.local.set({ allowedURLs: [] }, () => {});
-
-    chrome.storage.local.set({ allowedStringMatches: [] }, () => {});
-
-    chrome.storage.local.set({ allowedRegex: defaultRegexList }, () => {});
-
-    chrome.storage.local.set({ allLastTitles: {} }, () => {});
   }
 });
 
@@ -312,6 +275,24 @@ function addNewNote(title, content, tags) {
   });
 }
 
+// Listen for when the tab's url changes and send a message to popup.js
+/* eslint-disable no-unused-vars */
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) {
+    chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
+  }
+});
+/* eslint-enable no-unused-vars */
+
+// Listen for when the user changes tabs and send a message to popup.js
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab && tab.url) {
+      chrome.runtime.sendMessage({ type: 'TAB_CHANGED', url: tab.url });
+    }
+  });
+});
+
 chrome.contextMenus.onClicked.addListener((info) => {
   if (info.menuItemId === 'addNote') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -325,4 +306,8 @@ chrome.contextMenus.onClicked.addListener((info) => {
 
 chrome.runtime.onInstalled.addListener(() => {
   createContextMenu();
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(console.error);
 });

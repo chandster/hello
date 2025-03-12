@@ -1,170 +1,279 @@
-const TEN_SECONDS = 10000;
-const SIXTY_SECONDS = 60000;
+class CrawledDocument {
+  constructor(id, allText, title) {
+    this.id = id;
+    this.allText = allText;
+    this.title = title;
+  }
 
-const currentURL = window.location.href;
+  getId() {
+    return this.id;
+  }
 
-const quipRegex = /^https?:\/\/(?:www\.)?quip-amazon\.com(?:\/|$)/;
+  getAllText() {
+    return this.allText;
+  }
 
-function checkSitesList() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedSites'], (result) => {
-      const storedSiteList = result.allowedSites;
-      const sitesList = storedSiteList || [];
-      const currentHostname = window.location.hostname;
-      resolve(sitesList.includes(currentHostname));
-    });
-  });
+  getTitle() {
+    return this.title;
+  }
 }
 
-function checkUrlsList() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedURLs'], (result) => {
-      const storedUrlsList = result.allowedURLs;
-      const urlsList = storedUrlsList || [];
-      resolve(urlsList.includes(currentURL));
-    });
-  });
-}
+class QuipCrawler {
+  getApplicableDomains() {
+    return ['quip-amazon'];
+  }
 
-function checkStringMatchesList() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedStringMatches'], (result) => {
-      const storedMatchesList = result.allowedStringMatches;
-      const matchesList = storedMatchesList || [];
-      resolve(matchesList.some((match) => currentURL.indexOf(match) > -1));
-    });
-  });
-}
-
-function checkRegexList() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(['allowedRegex'], (result) => {
-      const storedRegexList = result.allowedRegex;
-      const regexList = storedRegexList || [];
-
-      const isMatch = regexList.some((regex) => new RegExp(regex).test(currentURL));
-      resolve(isMatch);
-    });
-  });
-}
-
-// sometimes params contain invalid characters like underscores
-// encode them to avoid the URL constructor throwing an error
-const parseURLWithParams = function parseURLWithParams(parts) {
-  const baseURL = parts[0];
-  const queryParams = parts[1];
-  const params = queryParams.split('&');
-  let newURL = `${baseURL}?`;
-  params.forEach((param, index) => {
-    if (index > 0) {
-      newURL += '&';
+  process(url, document) {
+    const allWords = document.body.innerText;
+    const normalizedWords = allWords.replace(/(\r\n|\n|\r)/gm, ' ');
+    const index = url.lastIndexOf('#');
+    let normalizedUrl = url;
+    if (index !== -1) {
+      normalizedUrl = url.substring(0, index);
     }
+    return new CrawledDocument(normalizedUrl, normalizedWords, document.title);
+  }
 
-    const [key, value] = param.split('=');
-    const encodedKey = encodeURIComponent(key);
-    const encodedValue = encodeURIComponent(value);
-    newURL += `${encodedKey}=${encodedValue}`;
-  });
-
-  return newURL;
-};
-
-function callIndexer(url, clicked) {
-  const visibleTextContent = document.body.innerText;
-  const { title } = document;
-  chrome.runtime.sendMessage({
-    action: 'sendVisibleTextContent',
-    visibleTextContent,
-    url,
-    title,
-    clicked,
-  });
+  isCompatible(url) {
+    const domainURL = (new URL(url));
+    const domain = domainURL.hostname.toLocaleLowerCase();
+    let isMatch = false;
+    const compatibleDomains = this.getApplicableDomains();
+    for (let i = 0; i < compatibleDomains.length; i++) {
+      if (domain.indexOf(compatibleDomains[i]) !== -1) {
+        isMatch = true;
+      }
+    }
+    return isMatch;
+  }
 }
 
-const indexQuip = function indexQuip() {
-  if (quipRegex.test(currentURL)) {
-    try {
-      chrome.storage.local.get(['indexed']).then((result) => {
-        const indexed = result.indexed || {};
-        if (Object.keys(indexed).length > 0) {
-          indexed.links = new Set(indexed.links);
-          if (indexed.links.has(currentURL)) {
-            for (let i = 0; i < indexed.corpus.length; i += 1) {
-              const page = indexed.corpus[i];
-              if (page.url === currentURL) {
-                const documentEditor = document.getElementsByClassName('document-editor');
-                if (documentEditor.length === 1) {
-                  const quipContent = documentEditor[0].innerText;
-                  if (page.body !== quipContent) {
-                    page.body = quipContent;
-                    indexed.links = Array.from(indexed.links);
-                    chrome.storage.local.set({ indexed });
-                    chrome.runtime.sendMessage({ action: 'updateIndexing' });
-                    return;
-                  }
-                }
-              }
-            }
-          }
-        }
+class GenericCrawler {
+  getApplicableDomains() {
+    return ['amazon', 'a2z'];
+  }
 
-        const documentEditor = document.getElementsByClassName('document-editor');
-        if (documentEditor.length >= 1) {
-          callIndexer(currentURL, false);
-        }
+  process(url, document) {
+    const allWords = document.body.innerText;
+    const normalizedWords = allWords.replace('\n', ' ');
+    return new CrawledDocument(url, normalizedWords, document.title);
+  }
+
+  isCompatible(url) {
+    const domainURL = (new URL(url));
+    const domain = domainURL.hostname.toLocaleLowerCase();
+    let isMatch = false;
+    const compatibleDomains = this.getApplicableDomains();
+    for (let i = 0; i < compatibleDomains.length; i++) {
+      if (domain.indexOf(compatibleDomains[i]) !== -1) {
+        isMatch = true;
+      }
+    }
+    return isMatch;
+  }
+}
+
+class RuleChecker {
+  constructor() {
+    this.sitesList = [];
+    this.urlsList = [];
+    this.matchesList = [];
+    this.regexList = [];
+    this.rulesLoaded = false;
+  }
+
+  loadRules() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedStringMatches', 'allowedRegex'], (result) => {
+        this.sitesList = result.allowedSites || [];
+        this.urlsList = result.allowedURLs || [];
+        this.matchesList = result.allowedStringMatches || [];
+        this.regexList = result.allowedRegex || [];
+        this.rulesLoaded = true;
+        console.log('Rules loaded:', {
+          sites: this.sitesList.length,
+          urls: this.urlsList.length,
+          matches: this.matchesList.length,
+          regex: this.regexList.length,
+        });
+        resolve();
       });
-    } catch (error) {
-      // extension will have been reloaded, ignore
+    });
+  }
+
+  checkSitesList(url) {
+    try {
+      const currentHostname = new URL(url).hostname.toLowerCase();
+      return this.sitesList.some((site) => currentHostname.includes(site.toLowerCase()));
+    } catch (e) {
+      console.error('Error in checkSitesList:', e);
+      return false;
     }
   }
+
+  checkUrlsList(url) {
+    return this.urlsList.includes(url);
+  }
+
+  checkStringMatchesList(url) {
+    return this.matchesList.some((match) => url.toLowerCase().includes(match.toLowerCase()));
+  }
+
+  checkRegexList(url) {
+    return this.regexList.some((regex) => {
+      try {
+        return new RegExp(regex, 'i').test(url);
+      } catch (e) {
+        console.error('Invalid regex pattern:', regex, e);
+        return false;
+      }
+    });
+  }
+
+  shouldIndex(url) {
+    if (!this.rulesLoaded) {
+      console.warn('Rules not loaded yet, using default crawler compatibility check');
+      return null;
+    }
+
+    // Check all rule types
+    const siteMatch = this.checkSitesList(url);
+    const urlMatch = this.checkUrlsList(url);
+    const stringMatch = this.checkStringMatchesList(url);
+    const regexMatch = this.checkRegexList(url);
+
+    // If any rule matches, we should index
+    const shouldIndex = siteMatch || urlMatch || stringMatch || regexMatch;
+
+    console.log(`URL '${url}' indexing decision:`, {
+      siteMatch,
+      urlMatch,
+      stringMatch,
+      regexMatch,
+      result: shouldIndex ? 'WILL INDEX' : 'WILL NOT INDEX',
+    });
+
+    return shouldIndex;
+  }
+}
+
+const crawlers = [new QuipCrawler(), new GenericCrawler()];
+
+const indexDocument = (doc) => {
+  console.log('Starting document indexing...');
+  // Update UI to show indexing is active
+  chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
+
+  chrome.runtime.sendMessage({ document: doc }, (response) => {
+    console.log('Document processing response:', response);
+    // Only disable the indicator if we're not about to start another indexing cycle
+    setTimeout(() => {
+      chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
+    }, 14900); // Set slightly before the next indexing cycle
+  });
 };
 
-$(document).ready(() => {
-  Promise.all([
-    checkSitesList(),
-    checkUrlsList(),
-    checkStringMatchesList(),
-    checkRegexList(),
-  ]).then((results) => {
-    if (results.some((result) => result)) {
-      $(document).on('click', 'a', (event) => {
-        let link = $(event.target).prop('href');
-        if (!link) return;
-        const parts = link.split('?');
-        if (parts.length > 1) {
-          link = parseURLWithParams(parts);
-        }
-        const clickedURL = new URL(link);
-        const clickedURLPath = clickedURL.pathname.replace(/\/[^\/]+$/, '');
-        const currentURLPath = new URL(currentURL).pathname.replace(
-          /\/[^\/]+$/,
-          '',
-        );
+const scrapePage = () => {
+  // Only process complete pages
+  if (document.readyState !== 'complete') {
+    return;
+  }
 
-        // Check if the clicked link is not an anchor link within the same page
-        if (
-          clickedURL.origin === new URL(currentURL).origin
-          && clickedURLPath === currentURLPath
-        ) {
-          // Send a message indicating that the page has navigated
-          try {
-            callIndexer(clickedURL, true);
-          } catch (error) {
-            // extension will have been reloaded, ignore
+  const url = window.location.href;
+
+  // Check against user-defined rules first
+  const shouldIndex = ruleChecker.shouldIndex(url);
+
+  // If rules are loaded and URL doesn't match any rules, check crawler compatibility
+  if (shouldIndex === false) {
+    // Check if any crawler is compatible with this URL
+    for (const crawler of crawlers) {
+      if (crawler.isCompatible(url)) {
+        chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
+        const crawledDocument = crawler.process(url, document);
+        indexDocument(crawledDocument);
+        console.log('Document Crawled (crawler compatibility):', crawledDocument.getId());
+        return;
+      }
+    }
+    // Update UI to show not indexing
+    chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
+    console.log("Page not indexed: doesn't match any rules or crawler domains");
+    return;
+  }
+
+  // If URL matches rules or rules aren't loaded yet, try to index with any compatible crawler
+  for (const crawler of crawlers) {
+    if (shouldIndex === true || crawler.isCompatible(url)) {
+      chrome.runtime.sendMessage({ type: 'indexing_status', status: 'enabled' });
+      const crawledDocument = crawler.process(url, document);
+      indexDocument(crawledDocument);
+      console.log('Document Crawled:', crawledDocument.getId());
+      return;
+    }
+  }
+  // If we get here, no crawler was compatible
+  chrome.runtime.sendMessage({ type: 'indexing_status', status: 'disabled' });
+};
+
+setInterval(scrapePage, 15000);
+
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local') {
+    const ruleKeys = ['allowedSites', 'allowedURLs', 'allowedStringMatches', 'allowedRegex'];
+    const shouldReload = ruleKeys.some((key) => changes[key]);
+
+    if (shouldReload) {
+      console.log('Indexing rules changed, reloading rules');
+      ruleChecker.loadRules();
+    }
+  }
+});
+
+// Initialize rule checker
+const ruleChecker = new RuleChecker();
+
+// Function to convert crawler domains to regex patterns
+function initializeDefaultRules() {
+  chrome.storage.local.get(['allowedSites', 'allowedURLs', 'allowedStringMatches', 'allowedRegex'], (result) => {
+    const hasAnyRules = (result.allowedSites && result.allowedSites.length > 0)
+                           || (result.allowedURLs && result.allowedURLs.length > 0)
+                           || (result.allowedStringMatches && result.allowedStringMatches.length > 0)
+                           || (result.allowedRegex && result.allowedRegex.length > 0);
+
+    if (!hasAnyRules) {
+      console.log('No rules found, adding default rules from crawler domains');
+
+      // Get domains from crawlers and convert to regex patterns
+      const defaultRegexPatterns = [];
+      for (const crawler of crawlers) {
+        if (crawler.getApplicableDomains) {
+          const domains = crawler.getApplicableDomains();
+          for (const domain of domains) {
+            // Create a regex that matches any URL containing the domain
+            defaultRegexPatterns.push(`.*${domain}.*`);
           }
         }
-      });
-      if (quipRegex.test(currentURL)) {
-        (async () => {
-          await new Promise((resolve) => {
-            setTimeout(resolve, TEN_SECONDS);
-          });
-          indexQuip();
-          setInterval(indexQuip, SIXTY_SECONDS);
-        })();
-      } else {
-        callIndexer(currentURL, false);
+      }
+
+      // Remove duplicates
+      const uniquePatterns = [...new Set(defaultRegexPatterns)];
+
+      // Save to storage as regex patterns
+      if (uniquePatterns.length > 0) {
+        chrome.storage.local.set({ allowedRegex: uniquePatterns }, () => {
+          console.log('Added default regex patterns:', uniquePatterns);
+          // Reload rules after adding defaults
+          ruleChecker.loadRules();
+        });
       }
     }
   });
+}
+
+// Load rules and initialize defaults
+ruleChecker.loadRules().then(() => {
+  initializeDefaultRules();
 });
+
+console.log('CONTENT SCRIPT: Hello World');

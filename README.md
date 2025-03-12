@@ -55,7 +55,7 @@ The amazon-quip.com site is also indexed by default, but there is a 10 second de
 
 ### Searching Indexed Documents
 
-To begin searching for indexed pages, type "@i" in the omnibar and then hit Tab or Space. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query.
+To begin searching for indexed pages, type "i" in the omnibar and then hit Tab or Space. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query.
 
 #### Search Filtering
 

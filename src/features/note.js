@@ -1,3 +1,5 @@
+/* global SimpleMDE, marked */
+
 // Check if the document is ready
 $(() => {
   let currentNote = null;

@@ -1,3 +1,5 @@
+import { generateRandomId, addTag } from '../features/todo_make.js';
+
 $(document).ready(() => {
   let currentNote = null;
   const categoryDropdownMenu = $('#categoryDropdownMenu');
@@ -11,6 +13,7 @@ $(document).ready(() => {
   const deleteNoteButton = $('#deleteNote');
   let isEditMode = false;
   let selectedDueDate = null;
+  let tagsObj = {};
 
   function getSelectedTagsForFiltering() {
     const selectedTags = [];
@@ -65,12 +68,12 @@ $(document).ready(() => {
       content,
       due: selectedDueDate,
       tags,
-      overdue: false
+      overdue: false,
     };
     const alarmName = `${noteId}_task_due_alarm`;
     chrome.alarms.create(alarmName, {
-      when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
-  });
+      when: new Date(selectedDueDate).getTime(), // Convert back to milliseconds
+    });
     currentNote = note;
     chrome.storage.local.get({ notes: [] }, (data) => {
       const existingNotes = data.notes;
@@ -94,10 +97,10 @@ $(document).ready(() => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
     if (today) {
-      dueDate.setSeconds(dueDate.getSeconds() + 6); // enable this to test today and have the alarm go off in 15 seconds for testing
-      //dueDate.setHours(dueDate.getHours() + 3); 
+      // dueDate.setSeconds(dueDate.getSeconds() + 15); // enable this to test today and have the alarm go off in 15 seconds for testing
+      dueDate.setHours(dueDate.getHours() + 3);
     } else {
-      dueDate.setHours(9, 0, 0, 0); //default is 9am of selected date
+      dueDate.setHours(9, 0, 0, 0); // default is 9am of selected date
     }
     selectedDueDate = dueDate.toISOString();
     const formattedDate = formatDateForDisplay(dueDate);
@@ -105,7 +108,8 @@ $(document).ready(() => {
   }
 
   function autoResizeTextareas() {
-    document.querySelectorAll('textarea').forEach((textarea) => {
+    document.querySelectorAll('textarea').forEach((textareaElement) => {
+      const textarea = textareaElement; // Create a new variable
       textarea.style.overflowY = 'hidden';
       textarea.addEventListener('input', function () {
         this.style.height = 'auto';
@@ -141,7 +145,7 @@ $(document).ready(() => {
       const tasks = $('#tasks-display-notes');
       const selectedTags = getSelectedTagsForFiltering();
       tableBody.empty();
-      var activeDisplayNote = 0;
+      let activeDisplayNote = 0;
       notes.forEach((note) => {
         if (note.recentlyDeleted) {
           return;
@@ -158,10 +162,10 @@ $(document).ready(() => {
                          <td class="note-date">${formatDateForDisplay(note.due)}</td>
                     </tr>
                 `);
-                if (note.overdue) {
-                  row.find('td').addClass('task-overdue');
-                  row.find('.note-date').html("<strong>OVERDUE</strong>");
-              }
+        if (note.overdue) {
+          row.find('td').addClass('task-overdue');
+          row.find('.note-date').html('<strong>OVERDUE</strong>');
+        }
 
         tableBody.append(row);
       });
@@ -283,13 +287,13 @@ $(document).ready(() => {
           targetNote.content = content;
           if (!selectedDueDate) {
             selectedDueDate = targetNote.due;
-          } 
+          }
           if (targetNote.due !== selectedDueDate) {
             targetNote.overdue = false;
             const alarmName = `${currentNote}_task_due_alarm`;
             chrome.alarms.create(alarmName, {
-              when: new Date(selectedDueDate).getTime() // Convert back to milliseconds
-          });
+              when: new Date(selectedDueDate).getTime(), // Convert back to milliseconds
+            });
           }
           targetNote.due = selectedDueDate;
           chrome.storage.local.set({ notes: existingNotes }, () => {
@@ -330,6 +334,11 @@ $(document).ready(() => {
     newCategoryInputContainer.show();
   });
 
+  function showAlert(message) {
+    $('#customAlertMessage').text(message);
+    $('#customAlertModal').modal('show');
+  }
+
   saveCategoryButton.on('click', () => {
     const newCategoryName = newCategoryInput.val().trim();
     const newCategoryColour = '';
@@ -361,7 +370,7 @@ $(document).ready(() => {
       });
       newCategoryInput.val('');
     } else {
-      alert('Please enter a category name.');
+      showAlert('Please enter a category name.');
     }
   });
 
@@ -387,7 +396,7 @@ $(document).ready(() => {
 
     // Validate if any categories are selected
     if (selectedCategories.length === 0) {
-      alert('Please select categories to delete');
+      showAlert('Please select categories to delete');
       return;
     }
 
@@ -427,6 +436,7 @@ $(document).ready(() => {
 
   $(document).on('click', '#createTagBtn', () => {
     const tagName = $('#tagName').val().trim();
+    const tagColour = $('#tagColour').val().trim();
 
     if (tagName) {
       chrome.storage.local.get({ tags: {} }, (data) => {
@@ -434,14 +444,12 @@ $(document).ready(() => {
         const randomId = generateRandomId();
         const newTag = `${timestamp}-${randomId}`;
 
-        data.tags[newTag] = {
-          tagColour,
-          tagName,
-        };
+        // ✅ Fix: Create a new object instead of modifying `data`
+        const updatedTags = { ...data.tags, [newTag]: { tagColour, tagName } };
 
-        chrome.storage.local.set({ tags: data.tags }, () => {
-          addTag(newTag, data.tags[newTag]);
-          tagsObj = data;
+        chrome.storage.local.set({ tags: updatedTags }, () => {
+          addTag(newTag, updatedTags[newTag]);
+          tagsObj = { ...tagsObj, tags: updatedTags }; // Update global tags object
         });
       });
     }
@@ -485,10 +493,9 @@ $(document).ready(() => {
   });
 
   function deleteAlarm() {
-      const alarmName = currentNote + "_task_due_alarm";
-      chrome.alarms.clear(alarmName);
+    const alarmName = `${currentNote}_task_due_alarm`;
+    chrome.alarms.clear(alarmName);
   }
-
 
   function setNoteDeleted() {
     chrome.storage.local.get({ notes: [] }, (data) => {
