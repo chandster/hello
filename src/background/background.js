@@ -155,10 +155,63 @@ const indexingListener = (request, sender, sendResponse) => {
         exportStorageToFile();
         sendResponse({status: 'exporting'});
     } else {
-      chrome.tabs.create({ url: text });
+        addToIndex(request.document);
+        sendResponse("OK:Indexed");
     }
-  });
+}
+ 
+/**
+ * Initialization
+ * -------------
+ * Sets up the extension and search indexer.
+ */
+const initialiseIndexer = ()=> {
+  const initialiseIndexerAsync =(indexerData) => {
+    if(indexerData && indexerData.length > 0){
+      chrome.storedIndex = indexerData;
+    }
+    chrome.indexer  = createIndex(chrome.storedIndex);
+  }
+  getStoredIndex(initialiseIndexerAsync);
+}
+ 
+/**
+ * Utility Functions
+ * ----------------
+ */
+const removeSpecialCharacters = (stringToBeSanitized)=>{
+  let specialChars = "!@#$^&%*+=[]\/{}|:<>?,.";
+  for (let i = 0; i < specialChars.length; i++) {
+    stringToBeSanitized = stringToBeSanitized.replace(new RegExp("\\" + specialChars[i], "gi"), "");
+  }
+  return stringToBeSanitized;
+}
+
+// Initialize extension and set up listeners
+initialiseIndexer();
+chrome.runtime.onMessage.addListener(indexingListener);
+ 
+chrome.omnibox.onInputChanged.addListener((text,suggest) => {
+  sendResults(text,suggest);
 });
+ 
+chrome.omnibox.onInputEntered.addListener((text, OnInputEnteredDisposition) => {
+  chrome.tabs.update({url:text});
+});
+
+
+
+function deleteTask(allTasks, taskIdToRemove) {
+  const updatedTasks = Object.fromEntries(
+    Object.entries(allTasks).filter(([taskId]) => taskId !== taskIdToRemove),
+  );
+  if (Object.keys(updatedTasks).length === 0) {
+    allTasks = {};
+  } else {
+    allTasks = updatedTasks;
+  }
+  chrome.storage.local.set({ tasks: allTasks }, () => {});
+}
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   const alarmName = alarm.name;
@@ -222,46 +275,40 @@ function setDueDate(daysToAdd) {
   const dueDate = new Date();
   dueDate.setDate(dueDate.getDate() + daysToAdd); // Add days based on the input
   return dueDate.toISOString();
-        addToIndex(request.document);
-        sendResponse("OK:Indexed");
-    }
-}
- 
-/**
- * Initialization
- * -------------
- * Sets up the extension and search indexer.
- */
-const initialiseIndexer = ()=> {
-  const initialiseIndexerAsync =(indexerData) => {
-    if(indexerData && indexerData.length > 0){
-      chrome.storedIndex = indexerData;
-    }
-    chrome.indexer  = createIndex(chrome.storedIndex);
-  }
-  getStoredIndex(initialiseIndexerAsync);
-}
- 
-/**
- * Utility Functions
- * ----------------
- */
-const removeSpecialCharacters = (stringToBeSanitized)=>{
-  let specialChars = "!@#$^&%*+=[]\/{}|:<>?,.";
-  for (let i = 0; i < specialChars.length; i++) {
-    stringToBeSanitized = stringToBeSanitized.replace(new RegExp("\\" + specialChars[i], "gi"), "");
-  }
-  return stringToBeSanitized;
 }
 
-// Initialize extension and set up listeners
-initialiseIndexer();
-chrome.runtime.onMessage.addListener(indexingListener);
- 
-chrome.omnibox.onInputChanged.addListener((text,suggest) => {
-  sendResults(text,suggest);
+function addNewNote(title, content, tags) {
+  const noteId = Date.now().toString();
+  const note = {
+    id: noteId,
+    title,
+    content,
+    due: setDueDate(7),
+    scheduledDeletion: '',
+    recentlyDeleted: false,
+    tags,
+  };
+  chrome.storage.local.get({ notes: [] }, (data) => {
+    const existingNotes = data.notes;
+
+    existingNotes.push(note);
+
+    chrome.storage.local.set({ notes: existingNotes }, () => {
+    });
+  });
+}
+
+chrome.contextMenus.onClicked.addListener((info) => {
+  if (info.menuItemId === 'addNote') {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentTitle = tabs[0].title;
+      const selectedText = `${currentTitle} ${info.selectionText}`;
+      const title = selectedText.length > 10 ? `${selectedText.substring(0, 15)}...` : selectedText;
+      addNewNote(title, selectedText, {});
+    });
+  }
 });
- 
-chrome.omnibox.onInputEntered.addListener((text, OnInputEnteredDisposition) => {
-  chrome.tabs.update({url:text});
+
+chrome.runtime.onInstalled.addListener(() => {
+  createContextMenu();
 });
