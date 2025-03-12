@@ -1,4 +1,4 @@
-import { generateRandomId, addTag } from '../features/todo_make';
+import { generateRandomId, addTag } from '../features/todo_make.js';
 
 $(document).ready(() => {
   let currentNote = null;

@@ -1,4 +1,4 @@
-import { CrawledDocument } from './CrawledDocument';
+import { CrawledDocument } from './CrawledDocument.js';
 
 // Returns the list of domains that this crawler should process
 export class QuipCrawler {

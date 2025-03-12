@@ -36,5 +36,12 @@ module.exports = {
     'no-unused-vars': 'off',
     'func-names': 'off',
     'max-len': 'off',
+    'import/extensions': [
+      'error',
+      'ignorePackages',
+      {
+        js: 'always', // ✅ Allow JS file extensions in imports
+      },
+    ],
   },
 };
