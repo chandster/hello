@@ -11,6 +11,7 @@ $(document).ready(() => {
   const deleteNoteButton = $('#deleteNote');
   let isEditMode = false;
   let selectedDueDate = null;
+  let tagsObj = {};
 
   function getSelectedTagsForFiltering() {
     const selectedTags = [];
@@ -105,7 +106,8 @@ $(document).ready(() => {
   }
 
   function autoResizeTextareas() {
-    document.querySelectorAll('textarea').forEach((textarea) => {
+    document.querySelectorAll('textarea').forEach((textareaElement) => {
+      const textarea = textareaElement; // Create a new variable
       textarea.style.overflowY = 'hidden';
       textarea.addEventListener('input', function () {
         this.style.height = 'auto';
@@ -330,6 +332,11 @@ $(document).ready(() => {
     newCategoryInputContainer.show();
   });
 
+  function showAlert(message) {
+    $('#customAlertMessage').text(message);
+    $('#customAlertModal').modal('show');
+  }
+
   saveCategoryButton.on('click', () => {
     const newCategoryName = newCategoryInput.val().trim();
     const newCategoryColour = '';
@@ -361,7 +368,7 @@ $(document).ready(() => {
       });
       newCategoryInput.val('');
     } else {
-      alert('Please enter a category name.');
+      showAlert('Please enter a category name.');
     }
   });
 
@@ -387,7 +394,7 @@ $(document).ready(() => {
 
     // Validate if any categories are selected
     if (selectedCategories.length === 0) {
-      alert('Please select categories to delete');
+      showAlert('Please select categories to delete');
       return;
     }
 
