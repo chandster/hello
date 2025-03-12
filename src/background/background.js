@@ -277,6 +277,24 @@ function addNewNote(title, content, tags) {
   });
 }
 
+// Listen for when the tab's url changes and send a message to popup.js
+/* eslint-disable no-unused-vars */
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.url) {
+    chrome.runtime.sendMessage({ type: 'URL_UPDATED', url: changeInfo.url });
+  }
+});
+/* eslint-enable no-unused-vars */
+
+// Listen for when the user changes tabs and send a message to popup.js
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (tab && tab.url) {
+      chrome.runtime.sendMessage({ type: 'TAB_CHANGED', url: tab.url });
+    }
+  });
+});
+
 chrome.contextMenus.onClicked.addListener((info) => {
   if (info.menuItemId === 'addNote') {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
