@@ -1,8 +1,8 @@
 const defaultRegexList = [
-  '^https://[^/]+\.amazon\.com/.*$',
-  '^https://atoz\.amazon\.work/.*$',
-  '^https://quip-amazon\.com/.*$',
-  '^https://quip\.com/.*$',
+  '^https://[^/]+\\.amazon\\.com/.*$',
+  '^https://atoz\\.amazon\\.work/.*$',
+  '^https://quip-amazon\\.com/.*$',
+  '^https://quip\\.com/.*$',
 ];
 
 let curTags = null;
