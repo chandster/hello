@@ -111,13 +111,17 @@ function constrainStringLength(inputString, length) {
 function overwriteTasks(tasks) {
   const currentDate = new Date();
   const tasksArray = Object.values(tasks);
-  const filteredTasks = tasksArray.filter((task) => (task.recentlyDeleted === false) || (task.scheduledDeletion !== '' && new Date(task.scheduledDeletion) > currentDate));
+  const filteredTasks = tasksArray.filter((task) => !task.recentlyDeleted || (task.scheduledDeletion && new Date(task.scheduledDeletion) > currentDate));
+
   const newTasks = {};
   filteredTasks.forEach((task) => {
     newTasks[task.id] = task;
   });
-  tasks = newTasks;
-  chrome.storage.local.set({ tasks }, () => {
+
+  // Instead of reassigning `tasks`, create a new variable
+  const updatedTasks = newTasks;
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
     chrome.alarms.clearAll();
     $.each(filteredTasks, (key, task) => {
       if (task.recentlyDeleted) {
