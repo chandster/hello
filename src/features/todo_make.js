@@ -150,15 +150,23 @@ function sortTasks(tasks) {
   return sortedTasks.map((task) => task.id);
 }
 
-function setTaskDeleted(allTasks, task) {
+function setTaskDeleted(allTasks, taskId) {
   const now = new Date();
-  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // 30 days later
-  const alarmName = `${task.id}_deletion_alarm`;
-  task.recentlyDeleted = true;
-  task.scheduledDeletion = deletionDate.toISOString();
-  chrome.storage.local.set({ tasks: allTasks }, () => {
+  const deletionDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const alarmName = `${taskId}_deletion_alarm`;
+
+  const updatedTasks = {
+    ...allTasks,
+    [taskId]: {
+      ...allTasks[taskId],
+      recentlyDeleted: true,
+      scheduledDeletion: deletionDate.toISOString(),
+    },
+  };
+
+  chrome.storage.local.set({ tasks: updatedTasks }, () => {
     chrome.alarms.create(alarmName, { when: deletionDate.getTime() });
-    tasksObj = allTasks;
+    tasksObj = updatedTasks;
   });
 }
 
