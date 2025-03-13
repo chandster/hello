@@ -20,6 +20,8 @@ describe('Chrome Extension: Edit Note Test', () => {
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
       ],
     });
 

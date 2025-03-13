@@ -19,7 +19,9 @@ describe('Chrome Extension: Delete Note Test', () => {
       headless: true,
       args: [
         `--disable-extensions-except=${extensionPath}`,
-        `--load-extension=${extensionPath}`,
+        `--load-extension=${extensionPath}`, 
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
       ],
     });
 

@@ -21,6 +21,8 @@ describe('Chrome Extension: Note Management Tests', () => {
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
       ],
     });
 
