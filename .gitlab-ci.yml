@@ -4,14 +4,16 @@ variables:
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
   CHROME_BIN: "/usr/bin/google-chrome-stable" 
 
-
 stages:
   - lint
   - test
   - package
 
 before_script:
-  - apk add --no-cache chromium
+  - apt-get update && apt-get install -y wget curl gnupg
+  - wget -qO- https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-chrome-keyring.gpg
+  - echo "deb [signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list
+  - apt-get update && apt-get install -y google-chrome-stable
   - npm install
 
 eslint:
@@ -29,14 +31,14 @@ puppeteer-tests:
   allow_failure: false
 
 package-extension:
+  image: alpine
   stage: package
   before_script:
-    - apk add --no-cache --update zip
+    - apk add --no-cache zip
   script:
-    - zip -r sh27-main
+    - zip -r sh27-main.zip ./*
   artifacts:
     paths:
       - sh27-main.zip
     expire_in: 1 week
     when: on_success
-
