@@ -16,11 +16,13 @@ describe('Chrome Extension: Note Management Tests', () => {
 
   beforeAll(async () => {
     browser = await puppeteer.launch({
-      headless: false, // Visible mode for debugging
+      headless: true, // Visible mode for debugging
       slowMo: 100, // Slow down for better debugging
       args: [
         `--disable-extensions-except=${extensionPath}`,
         `--load-extension=${extensionPath}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
       ],
     });
 
