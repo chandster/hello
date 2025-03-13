@@ -123,12 +123,12 @@ describe('Chrome Extension: Allow Rule Test', () => {
       });
     }));
 
-    console.log('📝 Parsed localSearchIndex:', storageData);
+   // console.log('📝 Parsed localSearchIndex:', storageData);
 
     const documentIds = storageData.documentIds || {};
     const allUrls = Object.values(documentIds);
 
-    console.log('🌐 Indexed URLs:', allUrls);
+   // console.log('🌐 Indexed URLs:', allUrls);
 
     const glaIndexed = allUrls.some((url) => url.includes('gla.ac.uk'));
 

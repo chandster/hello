@@ -48,10 +48,11 @@ describe('Chrome Extension: Indexing Storage Test', () => {
   }, 60000);
 
   afterAll(async () => {
+    jest.setTimeout(30000);
     if (browser) {
       await browser.close();
     }
-  });
+  },30000);
 
   test('Pages are correctly indexed and stored', async () => {
     const bbcPage = await browser.newPage();
@@ -73,7 +74,7 @@ describe('Chrome Extension: Indexing Storage Test', () => {
       });
     }));
 
-    console.log('📝 Parsed localSearchIndex:', storageData);
+   // console.log('📝 Parsed localSearchIndex:', storageData);
 
     const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
       chrome.storage.local.get(null, (result) => {
@@ -86,7 +87,7 @@ describe('Chrome Extension: Indexing Storage Test', () => {
     const documentIds = storageData.documentIds || {};
     const allUrls = Object.values(documentIds);
 
-    console.log('🌐 Indexed URLs:', allUrls);
+    //console.log('🌐 Indexed URLs:', allUrls);
 
     // const bbcIndexed = allUrls.some(url => url.includes('bbc.co.uk'));
     const amazonIndexed = allUrls.some((url) => url.includes('amazon.co.uk'));
