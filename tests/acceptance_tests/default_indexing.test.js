@@ -76,13 +76,13 @@ describe('Chrome Extension: Indexing Storage Test', () => {
 
    // console.log('📝 Parsed localSearchIndex:', storageData);
 
-    const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
-      chrome.storage.local.get(null, (result) => {
-        resolve(result);
-      });
-    }));
+    // const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
+    //   chrome.storage.local.get(null, (result) => {
+    //     resolve(result);
+    //   });
+    // }));
 
-    console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
+    // console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
 
     const documentIds = storageData.documentIds || {};
     const allUrls = Object.values(documentIds);
