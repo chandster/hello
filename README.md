@@ -27,7 +27,7 @@ To install the extension from your unzipped download:
 
 ## Features
 
-### Indexer
+### Indexing
 
 #### Indexing Rules
 
@@ -47,22 +47,17 @@ There are four types of rules that can be used to trigger indexing:
 
 All types of rules can be added and deleted. If you choose to remove all data and reset extension settings, the rules will be reset to the default four regex rules shown previously.
 
-### How Pages Are Indexed
+#### Searching Indexed Documents
 
-When a page is indexed, the title and content are stored in local Chrome storage after stopwords in the page's content are removed to reduce unnecessary storage size.
+To begin searching for indexed pages, type "i" in the omnibar and type text to search. Any text typed will be used to search through all indexed content to provide relevant results for your query.
 
-The amazon-quip.com site is also indexed by default, but there is a 10 second delay to handle redirects. Pages on amazon-quip.com are polled every minute to update the indexed contents, overwriting the old contents.
+### Tasks
 
-### Searching Indexed Documents
+From the side panel, you can type in your task. You can set a due date from the dropdown menu upon which day you will receive an alarm notification from Google Chrome at 9AM. The default due date is 7 days from the current date. You can also create and select tags for your tasks and then view select tasks using the 'Group by' button. Click on a task to edit or delete it.
 
-To begin searching for indexed pages, type "i" in the omnibar and then hit Tab or Space. Any text typed afterwards will be used to search through all indexed content to provide relevant results for your query.
+#### Add tasks from the web
 
-#### Search Filtering
-
-By default when searching, all terms will be used to calculate the score each document is given. However, there are two operators that can be used to further filter the results shown by placing at the end of the search after a space:
-
-- '&': shows documents that contain all of the terms in either their titles or contents
-- '~': shows documents that contain the first term but none of the later terms
+While browsing any web page, you can select text and right click. A context menu will appear with the option 'Hawk 2 - Add text to Notes' which if selected will make a task with the selected text. The text will appear with the title of the web page it came from as a task in your task list on Hawk 2. You can edit this task, change its due date and add tags by opening the extension.
 
 ## Developer credits
 - Kalila Chand  
