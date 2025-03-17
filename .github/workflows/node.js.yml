@@ -71,13 +71,6 @@ jobs:
       - name: Run Puppeteer Tests
         run: npm test
 
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: test-results/
-
   package:
     needs: test
     runs-on: ubuntu-latest
