@@ -37,7 +37,7 @@
             <div id="add-new-note" style="padding-bottom: 10px;">
                 <textarea class="form-control" id="noteinput" type="text" placeholder="Add a note/task"
                     style="outline: none !important; border-radius: 10px 10px 0px 0px;"></textarea>
-                    <div id="noteDetails" style="width: 100%; display: inline-block; background-color: white; padding: 10px; font-size: small; color: #4b4f53;">
+                    <div id="noteDetails" style="width: 100%; display: inline-block; background-color: rgba(79, 79, 79, 0.8); padding: 10px; font-size: small;">
                         <div id="noteDate" style="display: inline-block;">Due Date: </div>
                         <div id="noteTags" style="display: inline-block;">Tags: </div>
                       </div>
@@ -61,8 +61,7 @@
                             <a class="dropdown-item" id="due-tomorrow">Tomorrow</a>
                             <a class="dropdown-item" id="due-next-week">Next week</a>
                             <div class="dropdown-divider"></div>
-                            <label class="form-label">Pick a date</label>
-                            <input type="date" id="custom-date" name="due-date"/>
+                            <input class="dropdown-item" type="date" id="custom-date" name="due-date"/>
                           </div>
                         </div>
                       </div>

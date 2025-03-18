@@ -23,32 +23,11 @@ function loadAppearance(usepref) {
   } else {
     first = false;
   }
-  chrome.storage.local.get('theme', (result) => {
-    let decision = result.theme;
-    if (usepref === true && window.matchMedia) {
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        decision = 'dark';
-      } else {
-        decision = 'light';
-      }
-    }
-    if (decision === 'dark') {
-      $('html').addClass('dark');
-      $('html').attr('data-bs-theme', 'dark');
-    } else {
-      $('html').removeClass('dark');
-      $('html').attr('data-bs-theme', 'light');
-    }
-    loadCustomBackground();
-  });
-  setTimeout(() => {
-    $('.card-title-lg').removeClass('changing');
-    $('.card-title-md').removeClass('changing');
-    $('.note-container').removeClass('changing');
-    $('.settings-container').removeClass('changing');
-    $('.filter-btn').removeClass('changing');
-    $('.panel-lg').removeClass('changing');
-  }, 500);
+
+  // always dark mode on load
+  $('html').addClass('dark');
+  $('html').attr('data-bs-theme', 'dark');
+  loadCustomBackground();
 }
 
 if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
