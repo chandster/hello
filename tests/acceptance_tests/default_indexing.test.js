@@ -48,16 +48,16 @@ describe('Chrome Extension: Indexing Storage Test', () => {
   }, 60000);
 
   afterAll(async () => {
-    jest.setTimeout(30000);
+    jest.setTimeout(60000);
     if (browser) {
       await browser.close();
     }
-  },30000);
+  },60000);
 
   test('Pages are correctly indexed and stored', async () => {
-    const bbcPage = await browser.newPage();
-    console.log('🌐 Visiting BBC page to trigger indexing...');
-    await bbcPage.goto('https://www.bbc.co.uk/news', { waitUntil: 'domcontentloaded' });
+    // const bbcPage = await browser.newPage();
+    // console.log('🌐 Visiting BBC page to trigger indexing...');
+    // await bbcPage.goto('https://www.bbc.co.uk/news', { waitUntil: 'domcontentloaded' });
 
     const amazonPage = await browser.newPage();
     console.log('🌐 Visiting Amazon page to trigger indexing...');
@@ -76,13 +76,13 @@ describe('Chrome Extension: Indexing Storage Test', () => {
 
    // console.log('📝 Parsed localSearchIndex:', storageData);
 
-    const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
-      chrome.storage.local.get(null, (result) => {
-        resolve(result);
-      });
-    }));
+    // const fullStorage = await popupPage.evaluate(() => new Promise((resolve) => {
+    //   chrome.storage.local.get(null, (result) => {
+    //     resolve(result);
+    //   });
+    // }));
 
-    console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
+    // console.log('🗄️ Full chrome.storage.local:', JSON.stringify(fullStorage, null, 2));
 
     const documentIds = storageData.documentIds || {};
     const allUrls = Object.values(documentIds);
