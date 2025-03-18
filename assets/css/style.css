@@ -153,7 +153,7 @@ ul {
 }
 
 .button-div, #add-todo-btn, .primary-outline-btn, #add-note-button, .add-task, .add-task-modal, .selective-checkbox, #appearance,
-#notebook,#backup,#about, #manage-settings, #todo-list-button, .note-item {
+#notebook,#backup,#about, #manage-settings, #todo-list-button, .note-item, .dropdown-item {
 	cursor: pointer;
 }
 
