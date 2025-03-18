@@ -603,62 +603,6 @@ if (window.location.href.startsWith(chrome.runtime.getURL(''))) {
       });`;
     });
 
-    chrome.storage.local.get('theme', (result) => {
-      if (result.theme === 'dark') {
-        $('.dark-toggle').attr('checked', true);
-      }
-    });
-
-    chrome.storage.local.get('useprefer', (result) => {
-      if (result.useprefer === true) {
-        $('.sys-dark-toggle').attr('checked', true);
-        $('.dark-toggle').attr('disabled', true);
-      }
-    });
-
-    $('.dark-toggle').on('click', () => {
-      chrome.storage.local.get('theme', (result) => {
-        if (result.theme === 'dark') {
-          chrome.storage.local.set({ theme: 'light' }, () => {
-          });
-        } else {
-          chrome.storage.local.set({ theme: 'dark' }, () => {
-          });
-        }
-        chrome.runtime.sendMessage(null, 'wallpaper');
-        chrome.runtime.sendMessage(null, 'theme');
-        loadAppearance(false);
-        updateWallpaperPreview();
-      });
-    });
-    $('.sys-dark-toggle').on('click', () => {
-      chrome.storage.local.get('useprefer', (result) => {
-        if (result.useprefer === true) {
-          chrome.storage.local.set({ useprefer: false }, () => {
-            $('.dark-toggle').removeAttr('disabled');
-            chrome.storage.local.get('theme', (result2) => {
-              if (result2.theme === 'dark') {
-                $('.dark-toggle').attr('checked', true);
-              } else {
-                $('.dark-toggle').attr('checked', false);
-              }
-              loadAppearance(false);
-            });
-          });
-        } else {
-          chrome.storage.local.set({ useprefer: true }, () => {
-            $('.dark-toggle').attr('disabled', true);
-            loadAppearance(true);
-          });
-        }
-        chrome.runtime.sendMessage(null, 'wallpaper');
-        chrome.runtime.sendMessage(null, 'theme');
-        setTimeout(() => {
-          updateWallpaperPreview();
-        }, 500);
-      });
-    });
-
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       setTimeout(() => {
         updateWallpaperPreview();
